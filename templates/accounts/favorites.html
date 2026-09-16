@@ -1,0 +1,22 @@
+{% extends "accounts/_cabinet.html" %}
+{% load shop i18n %}
+
+{% block cabinet_title %}{% trans "Избранное" %}{% endblock %}
+
+{% block cabinet_body %}
+  {% if favorites %}
+    <div class="cabinet__subtitle">
+      {% trans "товар,товара,товаров" as product_forms %}
+      {{ favorites_count }} {{ favorites_count|plural:product_forms }}
+    </div>
+    <div class="grid grid--products">
+      {% for item in favorites %}{% include "includes/product_card.html" with product=item.product %}{% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <div class="empty__title">{% trans "Избранное пустое" %}</div>
+      <p>{% trans "Нажмите сердечко на карточке товара — он останется здесь до следующего раза." %}</p>
+      <a class="button button--ghost" href="{% url 'catalog:index' %}">{% trans "В каталог" %}</a>
+    </div>
+  {% endif %}
+{% endblock %}

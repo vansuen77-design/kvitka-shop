@@ -1,0 +1,26 @@
+# ЗАПАСНОЙ ВАРИАНТ — нужен, только если откажетесь от туннеля Cloudflare
+# и решите пускать трафик прямо на IP сервера.
+#
+# ВНИМАНИЕ. При таком раскладе проверку по IP в админке нужно переделать:
+# заголовок CF-Connecting-IP перестаёт быть надёжным, потому что сервер
+# станет доступен напрямую и заголовок сможет прислать кто угодно.
+# Тогда в core/middleware.py надо брать адрес из REMOTE_ADDR, а в
+# Caddy — передавать настоящий адрес клиента (строка X-Forwarded-For ниже).
+#
+# Копировать в /etc/caddy/Caddyfile, затем: sudo systemctl reload caddy
+# Сертификат Caddy получит сам, ничего покупать не нужно.
+
+kvitka.example, www.kvitka.example {
+	encode zstd gzip
+
+	# фотографии товаров отдаёт сам Caddy — быстрее, чем через Django
+	handle_path /media/* {
+		root * /home/kvitka/kvitka/media
+		file_server
+	}
+
+	reverse_proxy 127.0.0.1:8000 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-For {remote_host}
+	}
+}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+
+{% block styles %}<link rel="stylesheet" href="{% versioned 'css/cart.css' %}">{% endblock %}
+
+{% block content %}
+<div class="cart-page"
+     data-cart-page
+     data-update-url="{% url 'orders:api-update' %}"
+     data-remove-url="{% url 'orders:api-remove' %}"
+     data-clear-url="{% url 'orders:api-clear' %}"
+     data-courier="{{ form.delivery.value|default:'courier' }}">
+
+  <div class="cart-page__main">
+    <header class="cart-page__header">
+      <div>
+        <h1 class="cart-page__title">{% trans "Корзина" %}</h1>
+        <span class="cart-page__subtitle">
+          {% blocktrans with manager=shop.MANAGER %}Оплаты на сайте нет — укажите, куда и когда привезти, флорист {{ manager }} перезвонит и подтвердит.{% endblocktrans %}
+        </span>
+      </div>
+      <span data-cart-clear-slot>
+        {% if totals.lines %}
+          <button type="button" class="button button--ghost" data-cart-clear>{% trans "Очистить" %}</button>
+        {% endif %}
+      </span>
+    </header>
+
+    <div data-cart-table>
+      {% include "orders/_cart_lines.html" %}
+    </div>
+  </div>
+
+  <aside class="cart-page__side">
+    <form class="contact" method="post" action="{% url 'orders:cart' %}" novalidate>
+      {% csrf_token %}
+
+      <div class="totals">
+        <div class="totals__rows">
+          <div class="totals__row">
+            {% trans "позиция,позиции,позиций" as position_forms %}
+            <span data-totals-count>{% blocktrans with count=totals.positions forms=totals.positions|plural:position_forms qty=totals.quantity %}{{ count }} {{ forms }}, {{ qty }} шт{% endblocktrans %}</span>
+            <span data-totals-amount>{{ totals.amount|money }}</span>
+          </div>
+          <div class="totals__row totals__row--muted">
+            <span>{% trans "Доставка" %}</span>
+            <span data-totals-delivery
+                  data-free="{% trans "бесплатно" %}" data-pickup="{% trans "самовывоз" %}">
+              {% if totals.free_delivery_reached %}{% trans "бесплатно" %}{% else %}{{ totals.courier_cost|money }}{% endif %}
+            </span>
+          </div>
+        </div>
+        {% comment %}
+          Полоса до бесплатной доставки. Порог — из settings.SHOP,
+          считает CartTotals; здесь только показываем.
+        {% endcomment %}
+        <div class="progress" data-progress>
+          <div class="progress__bar"><span data-progress-bar style="width: {{ totals.free_delivery_progress }}%"></span></div>
+          <span class="progress__note" data-progress-note
+                data-reached="{% blocktrans with sum=shop.FREE_DELIVERY_FROM|money %}Доставка бесплатно — сумма от {{ sum }}.{% endblocktrans %}"
+                data-gap="{% trans "До бесплатной доставки не хватает" %}">
+            {% if totals.free_delivery_reached %}
+              {% blocktrans with sum=shop.FREE_DELIVERY_FROM|money %}Доставка бесплатно — сумма от {{ sum }}.{% endblocktrans %}
+            {% else %}
+              {% blocktrans with gap=totals.free_delivery_gap|money %}До бесплатной доставки не хватает {{ gap }}.{% endblocktrans %}
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="contact__card">
+        {% if form.non_field_errors %}
+          <div class="form-error">{{ form.non_field_errors|join:" " }}</div>
+        {% endif %}
+
+        <div class="contact__title">{% trans "Кто заказывает" %}</div>
+        {% for field in form %}
+          {% if field.name == "name" or field.name == "phone" or field.name == "email" %}
+            {% include "orders/_field.html" with field=field %}
+          {% endif %}
+        {% endfor %}
+
+        <div class="contact__title">{{ form.delivery.label }}</div>
+        <div class="field">
+          <div class="radios radios--column">
+            {% for radio in form.delivery %}
+              <label class="radio">{{ radio.tag }}<span>{{ radio.choice_label }}{% if radio.data.value == "courier" %} <em class="radio__note">{% blocktrans with sum=shop.DELIVERY_COST|money free=shop.FREE_DELIVERY_FROM|money %}{{ sum }}, бесплатно от {{ free }}{% endblocktrans %}</em>{% else %} <em class="radio__note">{{ shop.ADDRESS }}</em>{% endif %}</span></label>
+            {% endfor %}
+          </div>
+          {% if form.delivery.errors %}<span class="field__error">{{ form.delivery.errors|join:" " }}</span>{% endif %}
+        </div>
+
+        <div data-courier-fields>
+          {% include "orders/_field.html" with field=form.address required=True %}
+        </div>
+        <div class="field-row">
+          {% include "orders/_field.html" with field=form.delivery_date required=True %}
+          {% include "orders/_field.html" with field=form.delivery_time %}
+        </div>
+
+        <details class="contact__more" {% if form.recipient_name.value or form.recipient_phone.value or form.card_text.value %}open{% endif %}>
+          <summary class="contact__more-title">{% trans "Это подарок: получатель и открытка" %}</summary>
+          {% include "orders/_field.html" with field=form.recipient_name %}
+          {% include "orders/_field.html" with field=form.recipient_phone %}
+          {% include "orders/_field.html" with field=form.card_text %}
+        </details>
+
+        <div class="contact__title">{{ form.payment.label }}</div>
+        <div class="field">
+          <div class="radios radios--column">
+            {% for radio in form.payment %}
+              <label class="radio">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+            {% endfor %}
+          </div>
+          {% if form.payment.errors %}<span class="field__error">{{ form.payment.errors|join:" " }}</span>{% endif %}
+        </div>
+
+        {% include "orders/_field.html" with field=form.comment %}
+
+        <label class="agree">
+          {{ form.agree }}
+          <span>{{ form.agree.label }}</span>
+        </label>
+        {% if form.agree.errors %}<span class="field__error">{{ form.agree.errors|join:" " }}</span>{% endif %}
+        {% if privacy_page %}
+          {% comment %}
+            Согласие без возможности прочитать, на что соглашаешься,
+            юридически пустое — поэтому ссылка обязательна.
+          {% endcomment %}
+          <a class="agree__link" href="{{ privacy_page.get_absolute_url }}"
+             target="_blank" rel="noopener">{{ privacy_page.title }}</a>
+        {% endif %}
+
+        <button class="button button--accent button--large contact__submit" type="submit">
+          {% trans "Оформить заказ" %}
+        </button>
+        <p class="contact__note">{% trans "Ничего не списываем — оплата при получении или после подтверждения." %}</p>
+      </div>
+    </form>
+  </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{% versioned 'js/cart.js' %}"></script>{% endblock %}

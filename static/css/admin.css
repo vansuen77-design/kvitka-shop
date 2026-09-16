@@ -1,0 +1,767 @@
+/* Оформление админки КВІТКА.
+   Раскладка как в референсе: тёмный сайдбар, плитки статистики,
+   белые карточки со скруглениями. Палитра и шрифты — наши, с сайта. */
+
+:root,
+html,
+html[data-theme="auto"],
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --bg: #F2EFEB;
+  --surface: #FFFFFF;
+  --surface-muted: #FCFAF8;
+  --ink: #191512;
+  --ink-soft: #4A423C;
+  --ink-muted: #8C8079;
+  --line: #E7E1DA;
+  --line-soft: #F1ECE6;
+  --field: #D6CBC0;
+  --accent: #8A3A52;
+  --accent-dark: #6E2C41;
+  --ok: #4A6B45;
+  --warn: #A9691F;
+  --shadow: 0 4px 20px rgba(25, 21, 18, 0.06);
+
+  --font-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Instrument Serif", Georgia, serif;
+
+  /* переменные самой админки Django */
+  --primary: #8A3A52;
+  --secondary: #191512;
+  --accent-color: #8A3A52;
+  --link-fg: #8A3A52;
+  --link-hover-color: #6E2C41;
+  --body-fg: #191512;
+  --body-bg: #F2EFEB;
+  --body-quiet-color: #8C8079;
+  --body-loud-color: #191512;
+  --header-color: #FFFFFF;
+  --breadcrumbs-fg: #C9C1BA;
+  --breadcrumbs-link-fg: #FFFFFF;
+  --breadcrumbs-bg: #241E1A;
+  --button-bg: #8A3A52;
+  --button-fg: #FFFFFF;
+  --button-hover-bg: #6E2C41;
+  --default-button-bg: #8A3A52;
+  --default-button-hover-bg: #6E2C41;
+  --close-button-bg: #8C8079;
+  --close-button-hover-bg: #6B625B;
+  --delete-button-bg: #A03A3A;
+  --delete-button-hover-bg: #8A2F2F;
+  --selected-bg: #F6F1EC;
+  --selected-row: #F8F3EC;
+  --darkened-bg: #FAF7F3;
+  --border-color: #E7E1DA;
+  --hairline-color: #F1ECE6;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a:link, a:visited { color: var(--accent); }
+a:hover, a:focus { color: var(--accent-dark); }
+
+/* ---------- шапка и сайдбар ---------- */
+#header {
+  background: var(--ink);
+  color: #fff;
+  padding: 16px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 0;
+}
+#branding { display: flex; align-items: center; }
+#branding h1 { margin: 0; padding: 0; font-weight: 400; }
+#branding h1 a:link, #branding h1 a:visited { color: #fff; }
+.brand-mark { display: flex; flex-direction: column; gap: 1px; }
+.brand-mark__name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+}
+.brand-mark__sub {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #A2968C;
+}
+#user-tools {
+  font-size: 12.5px;
+  color: #A2968C;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 0;
+}
+#user-tools a, #logout-form button {
+  color: #F2E9E2;
+  border-bottom: 0;
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+#user-tools a:hover, #logout-form button:hover { color: #fff; text-decoration: underline; }
+.header-store-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #F2E9E2 !important;
+  font-size: 13px;
+}
+.header-store-link:hover { background: rgba(255, 255, 255, 0.16); }
+
+#nav-sidebar {
+  background: var(--ink);
+  padding: 18px 12px 40px;
+  width: 250px;
+  border-right: 0;
+}
+.sticky { background: var(--ink); }
+/* Боковое меню — это таблица: caption = раздел, th = модель, td = «Добавить».
+   Заглавные буквы и разрядка нужны только разделу; раньше то же правило
+   ловило и th, из-за чего названия моделей ломались посреди слова. */
+#nav-sidebar .module {
+  background: transparent; box-shadow: none; border: 0;
+  margin: 0 0 18px; padding: 0; border-radius: 0;
+}
+#nav-sidebar .module caption {
+  background: transparent;
+  color: #7E7167;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  margin-bottom: 4px;
+}
+#nav-sidebar .module caption a:link,
+#nav-sidebar .module caption a:visited {
+  color: #7E7167;
+  display: inline;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  background: none;
+}
+#nav-sidebar .module caption a:hover { color: #C9C1BA; background: none; }
+
+#nav-sidebar table { width: 100%; table-layout: auto; border-collapse: collapse; }
+#nav-sidebar table, #nav-sidebar tr, #nav-sidebar td, #nav-sidebar th {
+  border: 0; background: transparent;
+}
+#nav-sidebar th, #nav-sidebar td { padding: 0; vertical-align: middle; }
+#nav-sidebar th {
+  /* название модели: обычный регистр, без разрядки, переносим по словам */
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: left;
+  color: #C9C1BA;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+#nav-sidebar td { white-space: nowrap; }
+
+#nav-sidebar th a:link, #nav-sidebar th a:visited {
+  display: block;
+  color: #C9C1BA;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#nav-sidebar th a:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+#nav-sidebar .current-model th a:link,
+#nav-sidebar .current-model th a:visited { background: var(--accent); color: #fff; }
+
+/* «Добавить» — приписка справа, а не вторая кнопка во всю ширину */
+#nav-sidebar td a:link, #nav-sidebar td a:visited {
+  display: inline-block;
+  padding: 4px 10px;
+  margin-left: 6px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #7E7167;
+  background: none;
+  background-image: none;
+}
+#nav-sidebar td a:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+#nav-sidebar .addlink, #nav-sidebar .changelink, #nav-sidebar .viewlink {
+  background-image: none; padding-left: 10px;
+}
+
+#toggle-nav-sidebar {
+  background: var(--ink);
+  border: 0;
+  color: #7E7167;
+}
+#toggle-nav-sidebar:hover { background: #241E1A; color: #fff; }
+#nav-filter {
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+#nav-filter::placeholder { color: #7E7167; }
+#nav-filter:focus { outline: 1px solid var(--accent); }
+
+/* ---------- контент ---------- */
+#content { padding: 24px 30px 60px; }
+div.breadcrumbs {
+  background: transparent;
+  color: var(--ink-muted);
+  padding: 18px 30px 0;
+  font-size: 12.5px;
+  border: 0;
+}
+div.breadcrumbs a { color: var(--ink-muted); }
+div.breadcrumbs a:hover { color: var(--accent); }
+
+#content h1, .colM h1 {
+  font-size: 25px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--ink);
+}
+
+.module {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.module h2, .module caption, .inline-group h2 {
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.module > p, .module > .form-row:last-child { margin-bottom: 0; }
+fieldset.module { padding-bottom: 6px; }
+.aligned label { color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
+.help, .form-row p.help, div.help { color: var(--ink-muted); font-size: 12px; }
+
+/* ---------- таблицы ---------- */
+#changelist { background: transparent; }
+#changelist .results {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+#changelist table { border: 0; font-size: 13.5px; }
+#changelist table thead th {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 14px 10px;
+}
+#changelist table thead th a { color: var(--ink-muted); }
+#changelist table tbody td, #changelist table tbody th {
+  border-bottom: 1px solid var(--line-soft);
+  padding: 12px 10px;
+  vertical-align: middle;
+}
+#changelist table tbody tr:last-child td { border-bottom: 0; }
+#changelist table tbody tr:hover td { background: var(--surface-muted); }
+#changelist-form .results img { border-radius: 8px; }
+
+#changelist-search {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+#changelist-search label { display: none; }
+#searchbar {
+  border: 1px solid var(--field);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  min-width: 280px;
+  background: var(--surface-muted);
+}
+#searchbar:focus { border-color: var(--accent); background: #fff; outline: none; }
+
+#changelist-filter {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding-bottom: 10px;
+}
+#changelist-filter h2 {
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 14px 16px 10px;
+}
+#changelist-filter h3 { font-size: 12.5px; color: var(--ink-muted); font-weight: 600; padding: 0 16px; }
+#changelist-filter li { padding: 0 10px; }
+#changelist-filter a { border-radius: 8px; padding: 6px 8px; display: block; color: var(--ink-soft); }
+#changelist-filter li.selected a { background: var(--selected-bg); color: var(--accent); font-weight: 600; }
+#changelist-filter li.selected { border-left: 0; }
+
+.paginator {
+  background: transparent;
+  border: 0;
+  padding: 14px 2px;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.paginator a:link, .paginator a:visited {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 7px 11px;
+  color: var(--ink);
+}
+.paginator a:hover { border-color: var(--ink); }
+.paginator .this-page {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 9px;
+  padding: 7px 11px;
+}
+
+/* ---------- кнопки ---------- */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 11px;
+  padding: 11px 20px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.button:hover, input[type=submit]:hover, .submit-row input:hover, a.button:hover {
+  background: var(--accent-dark);
+  color: #fff;
+}
+.button.default, input[type=submit].default, .submit-row input.default { background: var(--accent); }
+.object-tools { margin-top: -34px; }
+.object-tools a:link, .object-tools a:visited {
+  background: var(--ink);
+  border-radius: 11px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #fff;
+}
+.object-tools a:hover { background: #2A231D; }
+.object-tools a.addlink { background: var(--accent); }
+.object-tools a.addlink:hover { background: var(--accent-dark); }
+
+.submit-row {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 14px 18px;
+  margin-top: 18px;
+}
+.submit-row a.deletelink {
+  background: #FBEFEF;
+  color: #A03A3A;
+  border-radius: 11px;
+  padding: 11px 18px;
+  font-weight: 600;
+  height: auto;
+  line-height: normal;
+}
+.submit-row a.deletelink:hover { background: #F6E2E2; }
+.submit-row .closelink {
+  background: var(--surface-muted);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+}
+
+/* ---------- поля ---------- */
+input[type=text], input[type=password], input[type=email], input[type=url],
+input[type=number], input[type=tel], textarea, select, .vTextField {
+  border: 1px solid var(--field);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.25;
+  background: var(--surface);
+  color: var(--ink);
+  /* Django задаёт полям height: 30px. Вместе с нашими отступами и
+     box-sizing: border-box на текст оставалось 10 пикселей — строка
+     обрезалась в полоску. Высоту считаем по содержимому. */
+  height: auto;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+select { padding-right: 30px; }
+/* числовые поля Django задаёт узкими (5em) — с нашими отступами
+   в них не помещается «1044» */
+input[type=number], .vIntegerField, .vBigIntegerField, .vSmallIntegerField {
+  width: auto; min-width: 96px;
+}
+.vDecimalField, .vFloatField { width: auto; min-width: 110px; }
+#result_list input[type=number], #result_list select { max-width: 100%; }
+
+/* в форме товара текстовые поля той же ширины, что и списки рядом */
+.aligned .form-row input[type=text], .aligned .form-row input[type=email],
+.aligned .form-row input[type=url], .aligned .form-row .vTextField,
+.aligned .form-row textarea {
+  width: 100%; max-width: 640px;
+}
+.aligned .form-row input[type=number] { max-width: 200px; }
+textarea { min-height: 90px; }
+input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; }
+.form-row { border-bottom: 1px solid var(--line-soft); padding: 14px 20px; }
+.form-row:last-child { border-bottom: 0; }
+.aligned label + p, .aligned label + div.readonly { padding-top: 8px; }
+
+/* ---------- вложенные блоки ---------- */
+.inline-group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.inline-group .tabular tr.add-row td { padding: 12px 16px; }
+.inline-related h3 {
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  padding: 10px 16px;
+}
+.inline-group table thead th {
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 10px;
+}
+.inline-group table td { border-bottom: 1px solid var(--line-soft); padding: 10px; }
+.add-row a { font-weight: 600; }
+
+/* ---------- сообщения ---------- */
+ul.messagelist { padding: 0; margin: 0 0 16px; }
+ul.messagelist li {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ok);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  padding: 13px 18px;
+  font-size: 13.5px;
+  background-image: none;
+}
+ul.messagelist li.warning { border-left-color: var(--warn); }
+ul.messagelist li.error { border-left-color: #A03A3A; }
+
+.errornote {
+  background: #FBEFEF;
+  border: 1px solid #EFD6D6;
+  border-radius: 12px;
+  color: #A03A3A;
+  padding: 12px 16px;
+  font-weight: 500;
+}
+.errorlist { color: #A03A3A; font-size: 12.5px; }
+
+/* ---------- дашборд ---------- */
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat__icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: var(--surface-muted);
+  border: 1px solid var(--line-soft);
+  display: grid; place-items: center;
+  margin-bottom: 8px;
+  color: var(--ink-soft);
+}
+.stat__value { font-family: var(--font-mono); font-size: 26px; font-weight: 600; line-height: 1.1; }
+.stat__label { font-size: 12.5px; color: var(--ink-muted); }
+.stat--accent .stat__value { color: var(--accent); }
+.stat--accent .stat__icon { background: #F6EEF1; border-color: #EBDCE1; color: var(--accent); }
+
+.dash-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; margin-bottom: 18px;
+}
+.dash-head h1 { margin: 0; }
+.dash-head__sub { font-size: 13.5px; color: var(--ink-muted); }
+.dash-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.dash-actions a {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 18px; border-radius: 11px;
+  font-size: 13.5px; font-weight: 600;
+  background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+}
+.dash-actions a:hover { border-color: var(--ink); color: var(--ink); }
+.dash-actions a.is-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.dash-actions a.is-primary:hover { background: var(--accent-dark); color: #fff; }
+
+.dash-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.dash-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.dash-card__head {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--line-soft);
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+}
+.dash-card__title { font-size: 15px; font-weight: 700; }
+.dash-card__hint { font-size: 12px; color: var(--ink-muted); }
+.dash-card__body { padding: 6px 10px 12px; }
+.dash-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 11px 10px; border-radius: 10px;
+}
+.dash-row:hover { background: var(--surface-muted); }
+.dash-row__name { font-size: 14px; font-weight: 500; color: var(--ink); }
+.dash-row__name:hover { color: var(--accent); }
+.dash-row__tools { display: flex; gap: 6px; }
+.dash-row__tools a {
+  font-size: 12px; padding: 6px 10px; border-radius: 8px;
+  background: var(--surface-muted); border: 1px solid var(--line-soft); color: var(--ink-soft);
+}
+.dash-row__tools a:hover { border-color: var(--accent); color: var(--accent); }
+
+.pill {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--surface-muted);
+  color: var(--ink-soft);
+}
+.pill--new { background: #F6EEF1; color: var(--accent); }
+.pill--work { background: #FBF0E2; color: var(--warn); }
+.pill--ok { background: #EAF2E8; color: var(--ok); }
+
+.dash-empty { padding: 26px 20px; text-align: center; color: var(--ink-muted); font-size: 13.5px; }
+
+/* последние заказы на дашборде */
+.dash-request { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 10px; border-radius: 10px; }
+.dash-request:hover { background: var(--surface-muted); }
+.dash-request__number { font-family: var(--font-mono); font-size: 13px; color: var(--ink-muted); }
+.dash-request__who { font-size: 13.5px; font-weight: 500; }
+.dash-request__meta { font-size: 12px; color: var(--ink-muted); }
+.dash-request__sum { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; text-align: right; }
+
+/* ---------- вход ---------- */
+body.login { background: var(--bg); }
+body.login #container {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  margin-top: 10vh;
+  padding-bottom: 8px;
+  max-width: 400px;
+}
+body.login #header {
+  background: transparent;
+  border-radius: 20px 20px 0 0;
+  padding: 28px 30px 6px;
+  justify-content: center;
+  text-align: center;
+}
+body.login #header .brand-mark { align-items: center; }
+body.login #header .brand-mark__name { color: var(--ink); font-size: 30px; }
+body.login #header .brand-mark__sub { color: var(--ink-muted); }
+body.login #content { padding: 8px 30px 24px; }
+body.login .form-row { border: 0; padding: 0 0 12px; }
+body.login .form-row label { display: block; margin-bottom: 6px; }
+body.login .form-row input { width: 100%; padding: 13px 14px; background: var(--surface-muted); }
+body.login .submit-row { border: 0; box-shadow: none; background: transparent; padding: 4px 0 0; margin: 0; }
+body.login .submit-row input { width: 100%; padding: 13px; font-size: 14.5px; }
+body.login .header-store-link { display: none; }
+
+/* ---------- мелочи ---------- */
+.hidden { display: none; }
+#footer { display: none; }
+.deletelink-box a { border-radius: 11px; }
+th.field-thumb img, td.field-thumb img { border-radius: 8px; }
+
+@media (max-width: 1024px) {
+  .dash-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+  #header { flex-wrap: wrap; gap: 12px; padding: 14px 16px; }
+  #content { padding: 18px 16px 40px; }
+  .dash-stats { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- предупреждение перед удалением характеристики ---------------------- */
+.kvitka-warning {
+  margin: 0 0 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--amg-accent, #8A3A52);
+  border-left-width: 4px;
+  border-radius: 6px;
+  background: #fff;
+  color: #191512;
+}
+.kvitka-warning__title { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+.kvitka-warning p { margin: 0 0 6px; font-size: 13.5px; line-height: 1.55; }
+.kvitka-warning__list { font-family: ui-monospace, monospace; font-size: 12.5px; color: #6B625B; }
+
+/* ---------- поле с выбором из справочника ------------------------------ */
+/* Рядом с полем стоят кнопки «изменить / добавить / удалить / посмотреть».
+   Без стилей Django они разлетаются: иконки во всю строку, а сам список
+   сжимается до нечитаемой ширины. */
+.related-widget-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  max-width: 640px;
+}
+.related-widget-wrapper > select,
+.related-widget-wrapper > .vForeignKeyRawIdAdminField {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.related-widget-wrapper-link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.related-widget-wrapper-link:hover { border-color: var(--field); background: var(--surface-muted); }
+.related-widget-wrapper-link img {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+
+/* select не должен схлопываться и в обычных строках формы */
+.form-row select, .aligned select { max-width: 100%; }
+select { min-width: 200px; }
+select[multiple] { min-width: 260px; }
+
+/* двухпанельный выбор характеристик (filter_horizontal) */
+.selector { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.selector .selector-available, .selector .selector-chosen { flex: 1 1 260px; min-width: 0; }
+.selector select { width: 100%; min-width: 0; height: 200px; padding: 6px; }
+.selector h2 {
+  font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-muted); margin: 0 0 6px;
+}
+.selector-chooser { flex: 0 0 auto; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.selector-chooser li { list-style: none; }
+.selector-chooser ul { padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.selector .selector-filter { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.selector .selector-filter input { flex: 1 1 auto; min-width: 0; }
+
+/* ---------- колонка «Удалить?» во вложенных блоках ---------------------- */
+/* Чтобы было видно, что фотографию можно убрать: отметить галку и сохранить. */
+.inline-group .delete, .inline-group td.delete {
+  text-align: center;
+  white-space: nowrap;
+}
+.inline-group .delete input[type=checkbox] {
+  width: 19px; height: 19px;
+  accent-color: #B3372B;
+}
+.inline-group .delete label { display: none; }
+.inline-group__hint {
+  padding: 10px 16px 14px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ---------- светлая схема и галочки ------------------------------------ */
+/* Windows в тёмной теме переключает всю админку в тёмную схему: галочки
+   рисуются чёрными на светлом фоне, и не видно, отмечено или нет —
+   поэтому кажется, что удалить фотографию нельзя. Селекторы с
+   [data-theme] нужны, чтобы перебить dark_mode.css самой Django. */
+:root, html, body,
+html[data-theme="auto"], html[data-theme="dark"], html[data-theme="light"] {
+  color-scheme: light;
+}
+
+input[type=checkbox], input[type=radio] {
+  accent-color: var(--accent);
+  width: 17px; height: 17px;
+  cursor: pointer;
+  vertical-align: middle;
+}

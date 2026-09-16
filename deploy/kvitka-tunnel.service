@@ -1,0 +1,26 @@
+# Туннель Cloudflare. Копировать в /etc/systemd/system/kvitka-tunnel.service
+#
+# Файл с ключами туннеля кладётся в /home/kvitka/.cloudflared/
+# Тот самый, что сейчас лежит у вас в C:\Users\vansu\.cloudflared\
+#
+#   sudo systemctl enable --now kvitka-tunnel
+#   journalctl -u kvitka-tunnel -f
+
+[Unit]
+Description=Cloudflare Tunnel для КВІТКА
+After=network-online.target kvitka.service
+Wants=network-online.target
+
+[Service]
+User=kvitka
+Group=kvitka
+ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate \
+    --config /home/kvitka/kvitka/deploy/cloudflared.yml run
+Restart=always
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

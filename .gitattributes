@@ -1,0 +1,7 @@
+# Скрипты для сервера (Linux) должны оставаться с LF, иначе bash их не поймёт
+deploy/** text eol=lf
+*.sh text eol=lf
+*.service text eol=lf
+*.timer text eol=lf
+# Батники для Windows
+*.bat text eol=crlf

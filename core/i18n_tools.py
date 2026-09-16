@@ -1,0 +1,235 @@
+"""Сбор строк перевода без GNU gettext.
+
+Штатная makemessages зовёт внешнюю программу xgettext, которой на
+Windows нет. Здесь то же самое своими силами: обходим шаблоны и код,
+вытаскиваем всё, что помечено для перевода, и сверяем с .po.
+
+Что понимаем:
+
+* в шаблонах — {% trans "…" %}, {% trans "…" as x %},
+  {% blocktrans … %}…{% endblocktrans %} (с {{ var }} → %(var)s,
+  с trimmed — схлопывание пробелов) и _("…") внутри тегов;
+* в Python — вызовы _(), gettext(), gettext_lazy(), gettext_noop(),
+  pgettext* не поддерживаем: контекстов в проекте нет.
+
+Файл .po пишем сами: заголовок, для каждой строки — где встречается
+и msgid/msgstr. Готовые переводы сохраняются, новые строки получают
+пустой msgstr, исчезнувшие — удаляются. В русском каталоге перевод
+всегда равен оригиналу: он нужен, чтобы русская версия не
+проваливалась в украинскую (v2 §11.2).
+"""
+
+from __future__ import annotations
+
+import ast
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+
+PO_HEADER = {
+    "uk": (
+        "# Украинский перевод сайта {name}.\n"
+        "# msgid — русский текст из шаблонов и кода, msgstr — украинский.\n"
+        "# Обновить список строк: python manage.py makelocales\n"
+        "# Собрать после правок:  python manage.py compilelocales\n"
+    ),
+    "ru": (
+        "# Русский каталог сайта {name}: перевод равен оригиналу.\n"
+        "# Нужен, чтобы русская версия не подставляла украинские строки.\n"
+        "# Заполняется командой makelocales, руками не правится.\n"
+    ),
+}
+
+# --- разбор шаблонов --------------------------------------------------------
+TRANS_RE = re.compile(
+    r"""{%\s*trans(?:late)?\s+(?P<q>["'])(?P<text>(?:\\.|(?!(?P=q)).)*)(?P=q)"""
+)
+BLOCKTRANS_RE = re.compile(
+    r"{%\s*blocktrans(?:late)?(?P<args>[^%]*)%}(?P<body>.*?){%\s*endblocktrans(?:late)?\s*%}",
+    re.DOTALL,
+)
+VAR_RE = re.compile(r"{{\s*([\w.]+)\s*}}")
+UNDERSCORE_RE = re.compile(r"""_\((?P<q>["'])(?P<text>(?:\\.|(?!(?P=q)).)*)(?P=q)\)""")
+
+# --- разбор Python ----------------------------------------------------------
+PY_FUNCS = {"_", "gettext", "gettext_lazy", "gettext_noop", "ugettext"}
+
+
+@dataclass
+class Message:
+    text: str
+    places: list[str] = field(default_factory=list)
+
+
+def _unescape(text: str) -> str:
+    return text.replace('\\"', '"').replace("\\'", "'")
+
+
+def template_messages(path: Path, root: Path) -> list[Message]:
+    """Все строки одного шаблона с номерами строк."""
+    source = path.read_text(encoding="utf-8")
+    found: list[Message] = []
+    rel = path.relative_to(root).as_posix()
+
+    def line_of(pos: int) -> int:
+        return source.count("\n", 0, pos) + 1
+
+    # blocktrans — сначала, чтобы {{ var }} внутри не считался отдельно
+    for match in BLOCKTRANS_RE.finditer(source):
+        body = match.group("body")
+        if "{% plural %}" in body:
+            body = body.split("{% plural %}")[0]
+        text = VAR_RE.sub(lambda m: f"%({m.group(1)})s", body)
+        if "trimmed" in match.group("args"):
+            text = " ".join(text.split())
+        found.append(Message(text, [f"{rel}:{line_of(match.start())}"]))
+
+    for match in TRANS_RE.finditer(source):
+        found.append(Message(_unescape(match.group("text")), [f"{rel}:{line_of(match.start())}"]))
+
+    for match in UNDERSCORE_RE.finditer(source):
+        found.append(Message(_unescape(match.group("text")), [f"{rel}:{line_of(match.start())}"]))
+    return found
+
+
+def python_messages(path: Path, root: Path) -> list[Message]:
+    """Строки из вызовов _(), gettext() и родни — через ast, а не regex:
+    строка может быть разбита на несколько литералов или перенесена."""
+    source = path.read_text(encoding="utf-8")
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    rel = path.relative_to(root).as_posix()
+    found: list[Message] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not node.args:
+            continue
+        func = node.func
+        name = func.id if isinstance(func, ast.Name) else (
+            func.attr if isinstance(func, ast.Attribute) else "")
+        if name not in PY_FUNCS:
+            continue
+        first = node.args[0]
+        if isinstance(first, ast.Constant) and isinstance(first.value, str):
+            found.append(Message(first.value, [f"{rel}:{node.lineno}"]))
+    return found
+
+
+def collect(root: Path, skip_dirs=(".venv", "node_modules", "staticfiles",
+                                   "migrations", "__pycache__", "locale", "docs")) -> dict[str, Message]:
+    """Все строки проекта: msgid → где встречается."""
+    messages: dict[str, Message] = {}
+
+    def keep(path: Path) -> bool:
+        return not any(part in skip_dirs for part in path.relative_to(root).parts)
+
+    files = [p for p in root.rglob("*.html") if keep(p)]
+    files += [p for p in root.rglob("*.txt") if keep(p) and "templates" in p.parts]
+    files += [p for p in root.rglob("*.py") if keep(p) and not p.name.startswith("test")]
+
+    for path in sorted(files):
+        finder = python_messages if path.suffix == ".py" else template_messages
+        for message in finder(path, root):
+            if not message.text.strip():
+                continue
+            entry = messages.setdefault(message.text, Message(message.text))
+            entry.places.extend(message.places)
+    return messages
+
+
+# --- чтение и запись .po ----------------------------------------------------
+def _po_quote(text: str) -> str:
+    escaped = (text.replace("\\", "\\\\").replace('"', '\\"')
+                   .replace("\n", "\\n").replace("\t", "\\t"))
+    return f'"{escaped}"'
+
+
+def read_po(path: Path) -> dict[str, str]:
+    """msgid → msgstr, включая пустые переводы (в отличие от compilelocales)."""
+    from core.management.commands.compilelocales import unquote
+
+    entries: dict[str, str] = {}
+    if not path.exists():
+        return entries
+    key: list[str] = []
+    value: list[str] = []
+    target: list[str] | None = None
+
+    def flush() -> None:
+        if target is None:
+            return
+        msgid = "".join(key)
+        if msgid:
+            entries[msgid] = "".join(value)
+
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("msgid "):
+            flush()
+            key, value = [unquote(line[6:])], []
+            target = key
+        elif line.startswith("msgstr "):
+            value = [unquote(line[7:])]
+            target = value
+        elif line.startswith('"') and target is not None:
+            target.append(unquote(line))
+    flush()
+    return entries
+
+
+def write_po(path: Path, language: str, shop_name: str,
+             messages: dict[str, Message], translations: dict[str, str]) -> None:
+    """Пишет .po заново: заголовок, потом строки в порядке первого
+    появления в файлах — так соседние строки шаблона лежат рядом."""
+    lines = [PO_HEADER[language].format(name=shop_name), 'msgid ""', 'msgstr ""',
+             '"Content-Type: text/plain; charset=UTF-8\\n"', f'"Language: {language}\\n"', ""]
+    ordered = sorted(messages.values(), key=lambda m: (m.places[0].rsplit(":", 1)[0],
+                                                       int(m.places[0].rsplit(":", 1)[1])))
+    for message in ordered:
+        for place in sorted(set(message.places)):
+            lines.append(f"#: {place}")
+        lines.append(f"msgid {_po_quote(message.text)}")
+        lines.append(f"msgstr {_po_quote(translations.get(message.text, ''))}")
+        lines.append("")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def sync(root: Path, locale_dir: Path, shop_name: str) -> dict[str, dict]:
+    """Обновляет оба каталога. Возвращает отчёт: что добавлено, что
+    удалено, что осталось без перевода."""
+    messages = collect(root)
+    report: dict[str, dict] = {}
+    for language in ("uk", "ru"):
+        po = locale_dir / language / "LC_MESSAGES" / "django.po"
+        existing = read_po(po)
+        translations = {}
+        for text in messages:
+            if language == "ru":
+                translations[text] = text
+            else:
+                translations[text] = existing.get(text, "")
+        added = [t for t in messages if t not in existing]
+        removed = [t for t in existing if t not in messages]
+        untranslated = [t for t, v in translations.items() if not v]
+        write_po(po, language, shop_name, messages, translations)
+        report[language] = {"added": added, "removed": removed,
+                            "untranslated": untranslated, "total": len(messages)}
+    return report
+
+
+def check(root: Path, locale_dir: Path) -> dict[str, list[str]]:
+    """Что не так: строки без перевода и строки, которых нет в .po."""
+    messages = collect(root)
+    problems: dict[str, list[str]] = {"missing": [], "untranslated": []}
+    uk = read_po(locale_dir / "uk" / "LC_MESSAGES" / "django.po")
+    ru = read_po(locale_dir / "ru" / "LC_MESSAGES" / "django.po")
+    for text in messages:
+        if text not in uk or text not in ru:
+            problems["missing"].append(text)
+        elif not uk[text]:
+            problems["untranslated"].append(text)
+    return problems

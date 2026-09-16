@@ -1,0 +1,25 @@
+/* KVITKA — page.css
+   Author: ISHOD · 2026 · all rights reserved. */
+/* Информационная страница: текст слева, контакты справа. */
+
+.info { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
+.info__main { background: var(--surface); border: 1px solid var(--line); padding: 34px 38px;  border-radius: var(--radius-card);}
+.info__title { font-family: var(--font-display); font-size: 38px; font-weight: 400; line-height: 1.12; }
+.info__lead { margin-top: 10px; font-size: 15.5px; color: var(--ink-soft); line-height: 1.55; }
+.info__body { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; font-size: 15px; line-height: 1.65; color: var(--ink-soft); }
+.info__subtitle { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--ink); margin-top: 10px; }
+.info__list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.info__list li { padding-left: 2px; }
+
+.info__aside { display: flex; flex-direction: column; gap: 16px; }
+.info__box { background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; display: flex; flex-direction: column; gap: 9px;  border-radius: var(--radius-card);}
+.info__box-title { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
+.info__phone { font-family: var(--font-mono); font-size: 17px; font-weight: 500; color: var(--ink); }
+.info__muted { font-size: 12.5px; color: var(--ink-muted); }
+.info__box .button { margin-top: 4px; }
+
+@media (max-width: 1080px) {
+  .info { grid-template-columns: minmax(0, 1fr); }
+  .info__main { padding: 26px 22px; }
+  .info__title { font-size: 30px; }
+}

@@ -1,0 +1,45 @@
+{% load i18n %}
+{% comment %}
+  Страница «ошибка на сервере».
+
+  Здесь намеренно нет наследования от base.html и нет ссылок на внешние
+  файлы стилей. Причина: 500 показывается тогда, когда что-то уже
+  сломалось, и Django рендерит её БЕЗ контекста — без shop, без
+  корзины, без всего, что шапка и подвал считают само собой
+  разумеющимся. Наследование дало бы полупустую страницу, а ссылка на
+  css — второй запрос, который может упасть следом.
+
+  Поэтому страница самодостаточная: разметка и стили внутри, ничего
+  снаружи не грузится. Она обязана показаться всегда.
+{% endcomment %}
+<style>
+  body { margin: 0; background: #F7F4F0; color: #191512;
+         font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; }
+  .oops { max-width: 560px; margin: 0 auto; padding: 90px 24px;
+          display: flex; flex-direction: column; align-items: center;
+          gap: 16px; text-align: center; }
+  .oops__brand { font-family: Georgia, serif; font-size: 26px; letter-spacing: 0.02em; }
+  .oops__code { font-family: "IBM Plex Mono", ui-monospace, monospace;
+                font-size: 13px; letter-spacing: 0.12em; color: #8C8079; }
+  .oops__title { font-size: 26px; font-weight: 600; margin: 0; }
+  .oops__text { color: #4A423C; margin: 0; }
+  .oops__phone { font-family: "IBM Plex Mono", ui-monospace, monospace;
+                 font-size: 18px; color: #191512; text-decoration: none; }
+  .oops__link { display: inline-flex; align-items: center; height: 44px;
+                padding: 0 22px; margin-top: 8px; background: #B23A5E;
+                color: #fff; text-decoration: none; font-weight: 500; }
+</style>
+
+<div class="oops">
+  <div class="oops__brand">КВІТКА</div>
+  <div class="oops__code">500</div>
+  <h1 class="oops__title">{% trans "Что-то сломалось на нашей стороне" %}</h1>
+  <p class="oops__text">
+    {% trans "Это не ваша вина и не проблема с заказом. Обновите страницу через минуту — обычно к этому времени всё уже работает." %}
+  </p>
+  <p class="oops__text">
+    {% trans "Если заказ срочный, позвоните — примем его по телефону:" %}
+  </p>
+  <a class="oops__phone" href="tel:+380000000000">+38 (0XX) XXX-XX-XX</a>
+  <a class="oops__link" href="/">{% trans "На главную" %}</a>
+</div>

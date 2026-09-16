@@ -1,0 +1,58 @@
+{% load shop i18n %}
+{% comment %}
+  Таблица позиций корзины. Отдельный файл, потому что после каждого
+  действия обновляется на месте, без перезагрузки страницы —
+  см. orders/views.py.
+
+  Каждая строка — обычная форма: без JavaScript «Обновить» и «Убрать»
+  уходят на orders:form-update с перезагрузкой, с ним cart.js
+  перехватывает и шлёт fetch. Кнопка «Обновить» видна только без
+  скрипта: с ним количество уходит само при изменении.
+{% endcomment %}
+{% if totals.lines %}
+  <div class="lines">
+    <div class="lines__head">
+      <span></span><span>{% trans "Товар" %}</span><span class="lines__right">{% trans "Количество" %}</span>
+      <span class="lines__right">{% trans "Цена" %}</span><span class="lines__right">{% trans "Сумма" %}</span><span></span>
+    </div>
+
+    {% for line in totals.lines %}
+      <form class="line" method="post" action="{% url 'orders:form-update' %}" novalidate
+            data-line data-product="{{ line.product_id }}" data-max="{{ line.product.stock_quantity }}">
+        {% csrf_token %}
+        <input type="hidden" name="product" value="{{ line.product_id }}">
+        <div class="line__media{% if not line.product.has_photo %} line__media--empty{% endif %}">
+          {% if line.product.has_photo %}
+            <img src="{{ line.product.cover.image.url }}" alt="{{ line.product.title }}">
+          {% endif %}
+        </div>
+        <div class="line__info">
+          <span class="line__article">{% trans "АРТ." %} {{ line.product.article }}</span>
+          <a class="line__name" href="{{ line.product.get_absolute_url }}">{{ line.product.title }}</a>
+          <span class="line__meta">{{ line.product.variant_label }}</span>
+        </div>
+        <div class="line__qty lines__right">
+          <span class="stepper stepper--card">
+            <button type="button" class="stepper__button" data-step-button="-1" aria-label="{% trans "Меньше" %}">−</button>
+            <input class="stepper__input" type="number" name="quantity" data-quantity
+                   min="0" max="{{ line.product.stock_quantity }}" step="1" value="{{ line.quantity }}"
+                   aria-label="{% trans "Количество, штук" %}">
+            <button type="button" class="stepper__button" data-step-button="1" aria-label="{% trans "Больше" %}">+</button>
+          </span>
+          <noscript><button type="submit" class="line__update">{% trans "Обновить" %}</button></noscript>
+        </div>
+        <span class="line__unit lines__right">{{ line.unit_price|money }}</span>
+        <span class="line__sum lines__right">{{ line.amount|money }}</span>
+        <button type="submit" name="remove" value="1" class="line__remove" data-remove-line aria-label="{% trans "Убрать позицию" %}" title="{% trans "Убрать позицию" %}">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </form>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">
+    <div class="empty__title">{% trans "В корзине пока пусто" %}</div>
+    <p>{% trans "Выберите букет в каталоге — а мы соберём его и привезём." %}</p>
+    <a class="button button--accent" href="{% url 'catalog:index' %}">{% trans "Перейти в каталог" %}</a>
+  </div>
+{% endif %}

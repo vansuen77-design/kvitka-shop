@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktrans with number=order.number name=shop.NAME %}{{ name }}: заказ {{ number }} принят{% endblocktrans %}

@@ -1,0 +1,142 @@
+{% load shop i18n %}
+{% get_current_language as LANG %}
+<div class="topbar">
+  <div class="topbar__inner">
+    {% comment %}
+      Верхняя полоса: город, часы и условия доставки. Значки разбивают
+      строку на три отдельных факта, и каждый виден сам по себе.
+    {% endcomment %}
+    <div class="topbar__facts">
+      <span class="topbar__fact">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        {{ shop.CITY }}
+      </span>
+      <span class="topbar__fact">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        {{ shop.HOURS }}
+      </span>
+      <span class="topbar__fact">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h12V6H3zM15 9h4l2 3v4h-6z"/><circle cx="7" cy="17" r="2"/><circle cx="17.5" cy="17" r="2"/></svg>
+        {% blocktrans with sum=shop.FREE_DELIVERY_FROM|money hours=shop.DELIVERY_HOURS %}Доставка за {{ hours }} · бесплатно от {{ sum }}{% endblocktrans %}
+      </span>
+    </div>
+
+    {% comment %}
+      Телефон здесь, а не только в шапке: шапка при прокрутке ужимается
+      и контакты из неё уходят, а верхняя полоса — первое, что видит
+      человек, открывший сайт.
+    {% endcomment %}
+    <a class="topbar__phone" href="tel:{{ shop.PHONE|cut:' '|cut:'-'|cut:'('|cut:')' }}">{{ shop.PHONE }}</a>
+
+    {% comment %}
+      Переключатель языка. Обычная форма POST на служебный адрес Django:
+      он запоминает выбор в куке и возвращает на ту же страницу.
+      Работает и с выключенным JavaScript.
+    {% endcomment %}
+    <form class="langs" action="{% url 'set_language' %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="langs__item{% if LANG == 'uk' %} is-active{% endif %}"
+              type="submit" name="language" value="uk" lang="uk">УКР</button>
+      <span class="langs__sep">/</span>
+      <button class="langs__item{% if LANG == 'ru' %} is-active{% endif %}"
+              type="submit" name="language" value="ru" lang="ru">РУС</button>
+    </form>
+  </div>
+</div>
+
+<header class="header">
+  <div class="header__inner">
+    <a class="brand" href="{% url 'catalog:index' %}">
+      {% comment %}
+        Знак отдельным файлом, а не фоном в CSS: так он попадает в печать
+        страницы и виден, даже если стили не загрузились. alt пустой —
+        рядом то же слово текстом, читалке незачем говорить его дважды.
+      {% endcomment %}
+      <img class="brand__logo" src="{% versioned 'img/logo.svg' %}" alt="" width="38" height="38">
+      <span class="brand__text">
+        <span class="brand__name">{{ shop.NAME }}</span>
+        <span class="brand__tagline">{{ shop.TAGLINE }}</span>
+      </span>
+    </a>
+
+    <form class="search" action="{% url 'catalog:index' %}" method="get" role="search">
+      <span class="search__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+      </span>
+      <input class="search__input" type="search" name="q" value="{{ request.GET.q|default:'' }}"
+             placeholder="{% trans "Букет, цветок или повод — например «пионы»" %}"
+             aria-label="{% trans "Поиск по каталогу" %}">
+      <button class="search__submit" type="submit">{% trans "Найти" %}</button>
+    </form>
+
+    {% comment %}
+      Избранное: сердечки на карточках складываются сюда, счётчик
+      обновляется без перезагрузки (core.js, Favorites.count).
+      Гостю ссылка тоже видна — он уйдёт на вход и вернётся обратно.
+    {% endcomment %}
+    <a class="fav-link" href="{% url 'accounts:favorites' %}">
+      <span class="fav-link__icon">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.3 4.6 13a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8A4.7 4.7 0 0 1 19.4 13Z"/></svg>
+        <span class="fav-link__count" data-favorites-count
+              {% if not favorites_count %}hidden{% endif %}>{{ favorites_count }}</span>
+      </span>
+      <span class="fav-link__text">{% trans "Избранное" %}</span>
+    </a>
+
+    {% comment %}Кабинет: вошёл — имя и ссылка внутрь, гость — «Вход».{% endcomment %}
+    <a class="account-link" href="{% if user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg>
+      <span class="account-link__text">
+        {% if user.is_authenticated %}
+          <span class="account-link__name">{{ user.first_name|default:_("Кабинет") }}</span>
+          <span class="account-link__note">{% trans "мои заказы" %}</span>
+        {% else %}
+          <span class="account-link__name">{% trans "Вход" %}</span>
+          <span class="account-link__note">{% trans "и регистрация" %}</span>
+        {% endif %}
+      </span>
+    </a>
+
+    <a class="cart-badge" href="{% url 'orders:cart' %}" data-cart-badge>
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16l-1.3 12H5.3L4 7Z"/><path d="M8.5 7V5.6A3.5 3.5 0 0 1 12 2.1a3.5 3.5 0 0 1 3.5 3.5V7"/></svg>
+      <span class="cart-badge__text">
+        <span class="cart-badge__count" data-cart-positions>
+          {% trans "позиция,позиции,позиций" as position_forms %}
+          {{ cart_totals.positions }} {{ cart_totals.positions|plural:position_forms }}
+        </span>
+        <span class="cart-badge__sum" data-cart-amount>{{ cart_totals.amount|money }}</span>
+      </span>
+    </a>
+  </div>
+
+  <nav class="sections">
+    <div class="sections__inner">
+      <a class="sections__link {% if not current_category %}is-active{% endif %}" href="{% url 'catalog:index' %}">{% trans "Весь каталог" %}</a>
+      {% for category in root_categories %}
+        <a class="sections__link {% if current_category and current_category.slug == category.slug %}is-active{% endif %}"
+           href="{{ category.get_absolute_url }}">{{ category.title }}</a>
+      {% endfor %}
+
+      {% comment %}
+        «Акции» — не раздел каталога, а фильтр: тот же список товаров,
+        но только те, у кого заполнена старая цена. Поэтому пункт стоит
+        отдельно, у правого края, и покрашен акцентом — чтобы его не
+        принимали за ещё один раздел.
+
+        Работает в пределах открытого раздела: стоите в «Букетах» —
+        покажет скидки только на букеты. Раздел живёт в адресе, поэтому
+        просто дописываем фильтр к его адресу.
+      {% endcomment %}
+      <a class="sections__link sections__sale{% if request.GET.discount %} is-active{% endif %}"
+         href="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'catalog:index' %}{% endif %}?discount=1">
+        <span class="sections__sale-mark" aria-hidden="true">%</span>
+        {% trans "Акции" %}
+      </a>
+    </div>
+  </nav>
+</header>

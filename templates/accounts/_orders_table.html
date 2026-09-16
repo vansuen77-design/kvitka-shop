@@ -1,0 +1,15 @@
+{% load shop i18n %}
+<div class="orders">
+  {% for order in orders %}
+    <a class="order" href="{% url 'accounts:order' order.pk %}">
+      <span class="order__number">{{ order.number }}</span>
+      <span class="order__date">{{ order.created_at|date:"d.m.Y" }}</span>
+      <span class="order__items">
+        {% trans "позиция,позиции,позиций" as position_forms %}
+        {{ order.lines.count }} {{ order.lines.count|plural:position_forms }} · {% blocktrans with qty=order.total_quantity %}{{ qty }} шт{% endblocktrans %}
+      </span>
+      <span class="order__sum">{{ order.total_amount|money }}</span>
+      <span class="order__status order__status--{{ order.status }}">{{ order.get_status_display }}</span>
+    </a>
+  {% endfor %}
+</div>

@@ -1,0 +1,16 @@
+{% extends "accounts/_cabinet.html" %}
+{% load shop i18n %}
+
+{% block cabinet_title %}{% trans "Мои заказы" %}{% endblock %}
+
+{% block cabinet_body %}
+  {% if orders %}
+    {% include "accounts/_orders_table.html" with orders=orders %}
+  {% else %}
+    <div class="empty">
+      <div class="empty__title">{% trans "Заказов пока нет" %}</div>
+      <p>{% trans "Здесь будут все заказы, которые вы оформите из кабинета." %}</p>
+      <a class="button button--ghost" href="{% url 'catalog:index' %}">{% trans "В каталог" %}</a>
+    </div>
+  {% endif %}
+{% endblock %}

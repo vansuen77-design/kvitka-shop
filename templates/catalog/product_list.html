@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+
+{% block styles %}<link rel="stylesheet" href="{% versioned 'css/catalog.css' %}">{% endblock %}
+
+{% block content %}
+
+{% if banner_products %}
+  {% comment %}
+    Баннер над каталогом: новинки текущего раздела.
+
+    Ничего не крутится и не переключается: смена кадра каждые
+    10 секунд дёргает глаз. Здесь фото маленькие и сразу три штуки,
+    а весь текст лежит на чистом фоне слева.
+
+    Товары выбирает сервер (CatalogView.banner_products). В разделе —
+    три последних добавленных сюда, статус «Новинка» вперёд. В общем
+    каталоге — по одной новинке из каждого раздела верхнего уровня,
+    поэтому на главной сразу видно и букеты, и композиции, и растения.
+    JavaScript блоку не нужен вообще.
+  {% endcomment %}
+  <section class="hero" aria-label="{% trans "Новинки каталога" %}">
+    <div class="hero__lead">
+      {% comment %}
+        Название раздела вынесено в отдельный span: на телефоне вся эта
+        строка стоит в ряд со ссылкой «Смотреть новинки», и вдвоём они
+        туда не помещаются — раздел там прячется, он и так написан
+        в заголовке страницы прямо под баннером.
+      {% endcomment %}
+      <span class="hero__eyebrow">
+        {% if current_category %}{% trans "Новинки раздела" %}<span
+          class="hero__eyebrow-cat"> · {{ current_category.title }}</span>
+        {% else %}{% trans "Новинки каталога" %}{% endif %}
+      </span>
+      <h2 class="hero__title">{% trans "Свежие букеты уже в наличии" %}</h2>
+      <p class="hero__note">
+        {% if current_category %}{% blocktrans with hours=shop.DELIVERY_HOURS %}Соберём и привезём за {{ hours }}{% endblocktrans %}
+        {% else %}{% blocktrans with hours=shop.DELIVERY_HOURS %}По одной новинке из каждого раздела · доставка за {{ hours }}{% endblocktrans %}{% endif %}
+      </p>
+      {% comment %}
+        Кнопка ведёт в текущий раздел с сортировкой «сначала новые»,
+        а не в общий каталог: иначе из «Рослин» человек уезжал бы
+        смотреть букеты.
+      {% endcomment %}
+      <a class="hero__btn"
+         href="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'catalog:index' %}{% endif %}?sort=new">
+        {% trans "Смотреть новинки" %}
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+
+    <div class="hero__cards">
+      {% for item in banner_products %}
+        <a class="hero__card" href="{{ item.get_absolute_url }}">
+          <span class="hero__photo">
+            <img src="{{ item.cover.image.url }}"
+                 alt="{{ item.cover.alt|default:item.title }}" loading="lazy">
+            <span class="hero__flag">{% trans "Новинка" %}</span>
+          </span>
+          {% comment %}
+            В общем каталоге подписываем раздел: иначе непонятно, почему
+            рядом лежат орхидея и коробка с розами. Берём родительский
+            раздел — товар лежит в «Розах», а показать надо «Букети».
+          {% endcomment %}
+          {% if not current_category and item.category %}
+            <span class="hero__cat">{{ item.category.parent.title|default:item.category.title }}</span>
+          {% endif %}
+          <span class="hero__name">{{ item.title }}</span>
+          <span class="hero__price">
+            {{ item.price|money }}
+            {% if item.has_discount %}<s>{{ item.old_price|money }}</s>{% endif %}
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+<div class="catalog" data-catalog data-catalog-url="{% url 'catalog:index' %}">
+
+  <aside class="filters" data-filters>
+    {% comment %}
+      Заголовок вынесен из формы: кнопка сворачивает саму форму,
+      а шапка с названием остаётся видна и в свёрнутом виде.
+    {% endcomment %}
+    <div class="filters__head">
+      <button class="filters__toggle" type="button" data-filters-toggle
+              aria-expanded="true" aria-controls="catalog-filters">
+        <svg class="filters__chevron" viewBox="0 0 24 24" width="14" height="14"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        <span class="filters__title">{% trans "Подбор" %}</span>
+      </button>
+      <a class="filters__reset" href="{% url 'catalog:index' %}">{% trans "Сбросить" %}</a>
+    </div>
+
+    {% comment %}
+      Форма уходит на адрес открытого раздела, а не на корень каталога.
+      Раздел живёт в адресе (/katalog/bukety/), в полях формы его
+      нет — и при отправке на корень он просто терялся: сортировка
+      применялась ко всему каталогу, хотя в заголовке оставался раздел.
+    {% endcomment %}
+    <form class="filters__form" id="catalog-filters" method="get"
+          action="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'catalog:index' %}{% endif %}"
+          data-filters-form>
+      {% comment %}
+        Поиск и «Акции» задаются не галочками, а адресом: поиск — строкой
+        в шапке, скидка — кнопкой в меню. Скрипт собирает запрос из полей
+        ЭТОЙ формы, поэтому без скрытых полей оба фильтра слетали бы при
+        первом же клике по любой галке в подборе. Чип над сеткой снимает
+        их как обычно: он чистит поле с таким же именем.
+      {% endcomment %}
+      {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+      {% if request.GET.discount %}<input type="hidden" name="discount" value="1">{% endif %}
+
+      {% for group in facet_groups %}
+        <details class="facet" open>
+          <summary class="facet__head">
+            <svg class="facet__chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            {{ group.label }}
+          </summary>
+
+          {% if group.searchable %}
+            <input class="facet__search" type="search" placeholder="{% trans "Поиск" %}"
+                   data-facet-search
+                   aria-label="{% blocktrans with group=group.label %}Поиск по группе {{ group }}{% endblocktrans %}">
+          {% endif %}
+
+          <div class="facet__list {% if group.searchable %}facet__list--scroll{% endif %}">
+            {% for value in group.values %}
+              {% comment %}
+                Каталог разнородный: у растений нет повода, у коробок —
+                размера. Значения без товаров прячем, кроме выбранных —
+                иначе снять галку было бы нечем. Пустая группа целиком
+                не показывается (см. views.get_facets).
+              {% endcomment %}
+              {% if not value.empty or value.slug in selected|get_item:group.param %}
+              <label class="check facet__item{% if value.empty %} is-empty{% endif %}"
+                     data-facet-name="{{ value.name|lower }}">
+                <input type="checkbox" name="{{ group.param }}" value="{{ value.slug }}"
+                       {% if value.slug in selected|get_item:group.param %}checked{% endif %}>
+                <span class="check__box"></span>
+                <span class="check__label">{{ value.name }}</span>
+                <sup class="facet__count">{{ value.total }}</sup>
+              </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </details>
+      {% endfor %}
+
+      <details class="facet" open>
+        <summary class="facet__head">
+          <svg class="facet__chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          {% trans "Цена" %}
+        </summary>
+        <div class="range">
+          <input class="input input--small" type="number" name="price_min" min="0" step="1"
+                 value="{{ request.GET.price_min }}" placeholder="{% trans "от" %}"
+                 aria-label="{% trans "Цена от" %}">
+          <span class="range__dash">—</span>
+          <input class="input input--small" type="number" name="price_max" min="0" step="1"
+                 value="{{ request.GET.price_max }}" placeholder="{% trans "до" %}"
+                 aria-label="{% trans "Цена до" %}">
+        </div>
+      </details>
+
+      <button class="button button--dark filters__submit" type="submit">{% trans "Показать букеты" %}</button>
+    </form>
+  </aside>
+
+  <section class="catalog__content">
+    <header class="catalog__header">
+      <div>
+        <h1 class="catalog__title">{{ page_title }}</h1>
+        <span class="catalog__count" data-catalog-count>
+          {% trans "букет,букета,букетов" as model_forms %}
+          {{ total_count }} {{ total_count|plural:model_forms }}
+        </span>
+      </div>
+
+      <div class="toolbar">
+        <label class="toolbar__sort">
+          <span>{% trans "Сортировка:" %}</span>
+          <select name="sort" form="catalog-filters" data-sort>
+            {% for option in sorting.as_choices %}
+              <option value="{{ option.key }}" {% if option.selected %}selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <noscript>
+          <button class="button button--ghost" type="submit" form="catalog-filters">{% trans "Применить" %}</button>
+        </noscript>
+      </div>
+    </header>
+
+    {% if chips %}
+      <div class="chips chips--active">
+        <span class="chips__label">{% trans "Выбрано:" %}</span>
+        {% for chip in chips %}
+          <button class="chip" type="button" data-drop-filter="{{ chip.param }}"
+                  data-drop-extra="{{ chip.extra|default:'' }}">
+            {{ chip.label }}
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div data-catalog-results>
+      {% include "includes/product_grid.html" %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}<script src="{% versioned 'js/catalog.js' %}"></script>{% endblock %}

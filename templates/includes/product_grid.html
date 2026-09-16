@@ -1,0 +1,39 @@
+{% load shop i18n %}
+{% if products %}
+  <div class="grid grid--products">
+    {% for product in products %}
+      {% include "includes/product_card.html" with product=product %}
+    {% endfor %}
+  </div>
+
+  {% if is_paginated %}
+    <div class="pagination">
+      <span class="pagination__info">
+        {% trans "букета,букетов,букетов" as shown_forms %}
+        {% blocktrans with shown=products|length total=total_count forms=total_count|plural:shown_forms %}Показано {{ shown }} из {{ total }} {{ forms }}{% endblocktrans %}
+      </span>
+      <div class="pagination__pages">
+        {% for number in paginator.page_range %}
+          {% if number == page_obj.number %}
+            <span class="pagination__page is-active">{{ number }}</span>
+          {% elif number <= 3 or number > paginator.num_pages|add:"-2" or number == page_obj.number|add:"-1" or number == page_obj.number|add:"1" %}
+            <a class="pagination__page" href="?{% query_replace page=number %}">{{ number }}</a>
+          {% elif number == 4 %}
+            <span class="pagination__page pagination__page--gap">…</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% if page_obj.has_next %}
+        <a class="button button--ghost" href="?{% query_replace page=page_obj.next_page_number %}">{% trans "Показать ещё" %}</a>
+      {% else %}
+        <span class="pagination__info">{% trans "Это все букеты по фильтру" %}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+{% else %}
+  <div class="empty">
+    <div class="empty__title">{% trans "По этим фильтрам ничего нет" %}</div>
+    <p>{% trans "Снимите часть галок в подборе слева или расширьте диапазон цены — многое собираем под заказ." %}</p>
+    <a class="button button--ghost" href="{% url 'catalog:index' %}">{% trans "Сбросить фильтры" %}</a>
+  </div>
+{% endif %}

@@ -1,0 +1,41 @@
+# Сайт КВІТКА. Копировать в /etc/systemd/system/kvitka.service
+#
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now kvitka
+#   sudo systemctl status kvitka
+#   journalctl -u kvitka -f        — смотреть, что происходит
+
+[Unit]
+Description=KVITKA — магазин цветов
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=kvitka
+Group=kvitka
+WorkingDirectory=/home/kvitka/kvitka
+Environment=PYTHONUNBUFFERED=1
+
+# Слушаем только 127.0.0.1: наружу сервер не смотрит вообще, весь трафик
+# приходит через туннель Cloudflare. Именно поэтому заголовку
+# CF-Connecting-IP можно доверять — подделать его снаружи некому.
+ExecStart=/home/kvitka/kvitka/.venv/bin/waitress-serve \
+    --host=127.0.0.1 --port=8000 --threads=6 \
+    config.wsgi:application
+
+Restart=always
+RestartSec=3
+
+# Ограничения на случай, если в сайте найдут дыру: писать можно только
+# в свою папку, получить права root из процесса нельзя.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/kvitka/kvitka
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

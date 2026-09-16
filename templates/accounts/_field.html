@@ -1,0 +1,8 @@
+{% load i18n %}
+{% comment %}Одно поле формы: подпись, само поле, ошибка под ним.{% endcomment %}
+<label class="field">
+  <span class="field__label">{{ field.label }}{% if field.field.required %} <i>*</i>{% else %} <em class="field__optional">{% trans "необязательно" %}</em>{% endif %}</span>
+  {{ field }}
+  {% if field.help_text %}<span class="field__hint">{{ field.help_text }}</span>{% endif %}
+  {% if field.errors %}<span class="field__error">{{ field.errors|join:" " }}</span>{% endif %}
+</label>

@@ -1,0 +1,106 @@
+{% load static shop i18n %}<!doctype html>
+<!--
+  КВІТКА — цветы с доставкой.
+  Разработка и код: ISHOD, 2026.
+  Все права на исходный код принадлежат автору.
+-->
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="ISHOD">
+  <meta name="generator" content="KVITKA shop engine — built by ISHOD, 2026">
+  <meta name="copyright" content="© 2026 ISHOD">
+  <title>{% block title %}{{ page_title }} — {{ shop.NAME }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{% blocktrans with name=shop.NAME city=shop.CITY %}Магазин цветов {{ name }}: букеты, композиции и растения с доставкой по городу {{ city }} за 2–3 часа.{% endblocktrans %}{% endblock %}">
+  {% comment %}
+    Значок сайта. SVG — основной: он чёткий на любом экране. PNG рядом
+    для браузеров постарше, apple-touch-icon — для ярлыка на телефоне.
+    Во вкладке знак идёт на розовой плашке: без неё лепесток
+    пропадал бы на тёмной теме браузера.
+  {% endcomment %}
+  <link rel="icon" href="{% versioned 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% versioned 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="{% versioned 'img/apple-touch-icon.png' %}">
+  <meta name="theme-color" content="#B23A5E">
+
+  {% comment %}
+    Картинка и подпись для ссылки, отправленной в мессенджер: без них
+    вместо превью приходит голый адрес. Адрес картинки должен быть
+    полным — относительный Telegram и Viber не покажут.
+  {% endcomment %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ shop.NAME }}">
+  <meta property="og:title" content="{{ page_title }} — {{ shop.NAME }}">
+  <meta property="og:description" content="{% blocktrans with name=shop.NAME city=shop.CITY %}Магазин цветов {{ name }}: букеты, композиции и растения с доставкой по городу {{ city }} за 2–3 часа.{% endblocktrans %}">
+  <meta property="og:image" content="{{ site_url }}{% static 'img/og-image.png' %}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta name="twitter:card" content="summary_large_image">
+
+  {% comment %}
+    Основной адрес страницы. Каталог открывается по десяткам ссылок —
+    с сортировкой, поиском, галками фильтров в произвольном порядке, —
+    и для поисковика это разные страницы с одинаковыми товарами. Без
+    этой строки он сам выберет, какую показывать, и выберет не ту.
+    Номер страницы в адресе сохраняется: вторая страница списка — это
+    другие товары, склеивать её с первой нельзя.
+  {% endcomment %}
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap">
+  <link rel="stylesheet" href="{% versioned 'css/base.css' %}">
+  {% block styles %}{% endblock %}
+</head>
+<body data-csrf="{{ csrf_token }}" data-add-url="{% url 'orders:api-add' %}"
+      data-cart-url="{% url 'orders:cart' %}"
+      data-favorite-url="{% url 'accounts:favorite-toggle' %}"
+      data-favorites-url="{% url 'accounts:favorites' %}"
+      data-login-url="{% url 'accounts:login' %}">
+
+{% include "includes/header.html" %}
+
+<main class="page">
+  {% if breadcrumbs %}
+    <nav class="breadcrumbs" aria-label="{% trans "Навигация" %}">
+      {% for crumb in breadcrumbs %}
+        {% if crumb.url %}<a href="{{ crumb.url }}">{{ crumb.title }}</a>{% else %}<span>{{ crumb.title }}</span>{% endif %}
+        {% if not forloop.last %}<span class="breadcrumbs__sep">·</span>{% endif %}
+      {% endfor %}
+    </nav>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+{% include "includes/footer.html" %}
+
+{% comment %}
+  Подписи для JavaScript. Скрипты нельзя перевести средствами Django,
+  поэтому кладём готовые строки в страницу, а core.js их читает.
+{% endcomment %}
+<script type="application/json" id="kvitka-i18n">
+{
+  "positions": "{% trans "позиция,позиции,позиций" %}",
+  "models": "{% trans "букет,букета,букетов" %}",
+  "pieces": "{% trans "шт" %}",
+  "expand": "{% trans "Развернуть подбор" %}",
+  "collapse": "{% trans "Свернуть подбор" %}",
+  "emptyAnswer": "{% trans "Пустой ответ" %}",
+  "requestFailed": "{% trans "Не удалось выполнить запрос" %}",
+  "listFailed": "{% trans "Не удалось загрузить список" %}",
+  "added": "{% trans "Добавлено" %}",
+  "addToCart": "{% trans "В корзину" %}",
+  "clear": "{% trans "Очистить" %}",
+  "loginToSave": "{% trans "Войдите в кабинет, чтобы сохранять товары" %}",
+  "inCart": "{% trans "в корзине" %}",
+  "goToCart": "{% trans "Перейти в корзину" %}",
+  "inFavorites": "{% trans "в избранном" %}",
+  "fromFavorites": "{% trans "убрано из избранного" %}",
+  "goToFavorites": "{% trans "Перейти в избранное" %}"
+}
+</script>
+<script src="{% versioned 'js/core.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

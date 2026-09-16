@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% load static shop %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} · {% endif %}{{ title }} — {{ shop.NAME }}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif&display=swap">
+  {# стили виджетов Django: без них разъезжаются поля со стрелкой «выбрать» #}
+  <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  {# наш файл идёт последним: change_form.html добавляет forms.css
+     внутри extrastyle, и он перебивал бы наши правила #}
+  <link rel="stylesheet" href="{% versioned 'css/admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+      <span class="brand-mark">
+        <span class="brand-mark__name">{{ shop.NAME }}</span>
+        <span class="brand-mark__sub">панель управления</span>
+      </span>
+    </a>
+  </h1>
+{% endblock %}
+
+{% block usertools %}
+  {% if has_permission %}
+    <div id="user-tools">
+      <a class="header-store-link" href="/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+        Открыть сайт
+      </a>
+      {% block welcome-msg %}
+        <span style="margin-left: 14px;">{% firstof user.get_short_name user.get_username %}</span>
+      {% endblock %}
+      {% block userlinks %}
+        {% if user.has_usable_password %}
+          <a href="{% url 'admin:password_change' %}" style="margin-left: 12px;">Сменить пароль</a>
+        {% endif %}
+        <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="display: inline; margin-left: 12px;">
+          {% csrf_token %}
+          <button type="submit">Выйти</button>
+        </form>
+      {% endblock %}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

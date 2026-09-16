@@ -1,0 +1,28 @@
+{% extends "admin/delete_confirmation.html" %}
+{% comment %}
+  Django ищет шаблон по цепочке admin/<приложение>/<модель>/… →
+  admin/<приложение>/… → admin/…, поэтому этот файл накрывает все модели
+  каталога, а extends спокойно берёт стандартный шаблон Django.
+{% endcomment %}
+
+{% block content %}
+  {% if kvitka_unpublish %}
+    <div class="kvitka-warning">
+      <div class="kvitka-warning__title">{{ kvitka_unpublish.title }}</div>
+      <p>
+        {% if kvitka_unpublish.published %}
+          После удаления {{ kvitka_unpublish.published }} из них пропадут из каталога,
+          поиска и выгрузок на площадки.
+        {% else %}
+          Все они и так скрыты с сайта.
+        {% endif %}
+        Сами товары останутся в базе вместе с фотографиями и ценами — вернуть их
+        можно галкой «Показывать на сайте» в списке товаров.
+      </p>
+      <p class="kvitka-warning__list">
+        Артикулы: {{ kvitka_unpublish.articles|join:", " }}{% if kvitka_unpublish.more %} и ещё {{ kvitka_unpublish.more }}{% endif %}
+      </p>
+    </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

@@ -1,0 +1,1235 @@
+# Русский каталог сайта КВІТКА: перевод равен оригиналу.
+# Нужен, чтобы русская версия не подставляла украинские строки.
+# Заполняется командой makelocales, руками не правится.
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\n"
+
+#: accounts/forms.py:25
+#: orders/forms.py:119
+msgid "Похоже, в номере не хватает цифр — проверьте, пожалуйста."
+msgstr "Похоже, в номере не хватает цифр — проверьте, пожалуйста."
+
+#: accounts/forms.py:137
+#: accounts/forms.py:46
+msgid "Имя"
+msgstr "Имя"
+
+#: accounts/forms.py:111
+#: accounts/forms.py:47
+#: accounts/models.py:32
+#: orders/forms.py:30
+#: templates/accounts/profile.html:16
+msgid "Почта"
+msgstr "Почта"
+
+#: accounts/forms.py:138
+#: accounts/forms.py:48
+#: orders/forms.py:29
+#: templates/orders/success.html:32
+msgid "Телефон"
+msgstr "Телефон"
+
+#: accounts/forms.py:139
+#: accounts/forms.py:49
+#: orders/forms.py:32
+msgid "Адрес доставки"
+msgstr "Адрес доставки"
+
+#: accounts/forms.py:114
+#: accounts/forms.py:50
+msgid "Пароль"
+msgstr "Пароль"
+
+#: accounts/forms.py:51
+msgid "Пароль ещё раз"
+msgstr "Пароль ещё раз"
+
+#: accounts/forms.py:52
+msgid "Согласен на обработку данных"
+msgstr "Согласен на обработку данных"
+
+#: accounts/forms.py:55
+#: orders/forms.py:44
+msgid "Как к вам обращаться"
+msgstr "Как к вам обращаться"
+
+#: accounts/forms.py:56
+msgid "почта для входа"
+msgstr "почта для входа"
+
+#: accounts/forms.py:58
+msgid "необязательно — подставится в заказ"
+msgstr "необязательно — подставится в заказ"
+
+#: accounts/forms.py:59
+msgid "не короче 8 символов"
+msgstr "не короче 8 символов"
+
+#: accounts/forms.py:73
+msgid "На эту почту уже есть кабинет. Войдите или восстановите пароль."
+msgstr "На эту почту уже есть кабинет. Войдите или восстановите пароль."
+
+#: accounts/forms.py:84
+msgid "Пароли не совпадают."
+msgstr "Пароли не совпадают."
+
+#: accounts/forms.py:117
+msgid "Неверная почта или пароль."
+msgstr "Неверная почта или пароль."
+
+#: accounts/forms.py:140
+msgid "Удобная связь"
+msgstr "Удобная связь"
+
+#: accounts/models.py:29
+msgid "Звонок"
+msgstr "Звонок"
+
+#: accounts/views.py:24
+#: catalog/views.py:256
+#: catalog/views.py:288
+#: orders/views.py:45
+#: templates/includes/footer.html:39
+msgid "Каталог"
+msgstr "Каталог"
+
+#: accounts/views.py:34
+#: templates/includes/header.html:99
+msgid "Вход"
+msgstr "Вход"
+
+#: accounts/views.py:60
+msgid "Кабинет создан. Данные теперь подставляются в заказ сами."
+msgstr "Кабинет создан. Данные теперь подставляются в заказ сами."
+
+#: accounts/views.py:65
+msgid "Регистрация"
+msgstr "Регистрация"
+
+#: accounts/views.py:83
+#: templates/includes/header.html:96
+msgid "Кабинет"
+msgstr "Кабинет"
+
+#: accounts/views.py:96
+#: templates/accounts/_cabinet.html:27
+#: templates/accounts/dashboard.html:14
+#: templates/accounts/orders.html:4
+msgid "Мои заказы"
+msgstr "Мои заказы"
+
+#: accounts/views.py:108
+msgid "Заказ №%(number)s"
+msgstr "Заказ №%(number)s"
+
+#: accounts/views.py:122
+#: templates/accounts/_cabinet.html:28
+#: templates/accounts/dashboard.html:19
+#: templates/accounts/dashboard.html:51
+#: templates/accounts/favorites.html:4
+#: templates/includes/header.html:88
+msgid "Избранное"
+msgstr "Избранное"
+
+#: accounts/views.py:133
+msgid "Сохранено."
+msgstr "Сохранено."
+
+#: accounts/views.py:137
+#: templates/accounts/_cabinet.html:29
+#: templates/accounts/dashboard.html:24
+#: templates/accounts/profile.html:4
+msgid "Мои данные"
+msgstr "Мои данные"
+
+#: accounts/views.py:147
+#: templates/base.html:95
+msgid "Войдите в кабинет, чтобы сохранять товары"
+msgstr "Войдите в кабинет, чтобы сохранять товары"
+
+#: accounts/views.py:151
+#: orders/views.py:143
+#: orders/views.py:169
+msgid "Товар не найден"
+msgstr "Товар не найден"
+
+#: catalog/facets.py:44
+msgid "Тип"
+msgstr "Тип"
+
+#: catalog/facets.py:45
+msgid "Цветы"
+msgstr "Цветы"
+
+#: catalog/facets.py:47
+msgid "Повод"
+msgstr "Повод"
+
+#: catalog/facets.py:49
+msgid "Цвет"
+msgstr "Цвет"
+
+#: catalog/facets.py:50
+#: templates/catalog/product_detail.html:105
+msgid "Размер"
+msgstr "Размер"
+
+#: catalog/filters.py:97
+msgid "Поиск: «%(text)s»"
+msgstr "Поиск: «%(text)s»"
+
+#: catalog/filters.py:104
+#: templates/catalog/product_list.html:157
+#: templates/orders/_cart_lines.html:16
+msgid "Цена"
+msgstr "Цена"
+
+#: catalog/filters.py:132
+msgid "от %(sum)s ₴"
+msgstr "от %(sum)s ₴"
+
+#: catalog/filters.py:134
+msgid "до %(sum)s ₴"
+msgstr "до %(sum)s ₴"
+
+#: catalog/filters.py:166
+msgid "сначала популярные"
+msgstr "сначала популярные"
+
+#: catalog/filters.py:167
+msgid "сначала дешевле"
+msgstr "сначала дешевле"
+
+#: catalog/filters.py:168
+msgid "сначала дороже"
+msgstr "сначала дороже"
+
+#: catalog/filters.py:169
+msgid "сначала новые"
+msgstr "сначала новые"
+
+#: catalog/filters.py:170
+msgid "сначала со скидкой"
+msgstr "сначала со скидкой"
+
+#: catalog/filters.py:263
+msgid "Раздел"
+msgstr "Раздел"
+
+#: catalog/filters.py:273
+#: templates/catalog/product_list.html:126
+msgid "Поиск"
+msgstr "Поиск"
+
+#: catalog/filters.py:274
+msgid "Статус"
+msgstr "Статус"
+
+#: catalog/filters.py:284
+#: catalog/views.py:86
+msgid "Наличие"
+msgstr "Наличие"
+
+#: catalog/filters.py:285
+#: catalog/models.py:369
+#: catalog/views.py:89
+#: templates/includes/product_card.html:70
+msgid "В наличии"
+msgstr "В наличии"
+
+#: catalog/filters.py:285
+#: catalog/models.py:368
+#: catalog/views.py:90
+msgid "Нет в наличии"
+msgstr "Нет в наличии"
+
+#: catalog/filters.py:289
+msgid "Только со скидкой"
+msgstr "Только со скидкой"
+
+#: catalog/models.py:401
+#: catalog/models.py:489
+#: templates/base.html:86
+msgid "шт"
+msgstr "шт"
+
+#: catalog/models.py:489
+msgid "см"
+msgstr "см"
+
+#: catalog/models.py:492
+msgid "Цветков в букете"
+msgstr "Цветков в букете"
+
+#: catalog/models.py:493
+msgid "Высота"
+msgstr "Высота"
+
+#: catalog/models.py:494
+msgid "Состав"
+msgstr "Состав"
+
+#: catalog/views.py:157
+#: catalog/views.py:161
+#: templates/includes/header.html:138
+msgid "Акции"
+msgstr "Акции"
+
+#: catalog/views.py:162
+#: templates/includes/header.html:119
+msgid "Весь каталог"
+msgstr "Весь каталог"
+
+#: orders/forms.py:28
+msgid "Ваше имя"
+msgstr "Ваше имя"
+
+#: orders/forms.py:31
+#: templates/accounts/order_detail.html:47
+#: templates/orders/email_body.txt:7
+#: templates/orders/success.html:18
+msgid "Как получить"
+msgstr "Как получить"
+
+#: orders/forms.py:33
+msgid "Дата"
+msgstr "Дата"
+
+#: orders/forms.py:34
+msgid "Время"
+msgstr "Время"
+
+#: orders/forms.py:35
+msgid "Имя получателя"
+msgstr "Имя получателя"
+
+#: orders/forms.py:36
+msgid "Телефон получателя"
+msgstr "Телефон получателя"
+
+#: orders/forms.py:37
+msgid "Текст открытки"
+msgstr "Текст открытки"
+
+#: orders/forms.py:38
+#: templates/accounts/order_detail.html:52
+#: templates/orders/success.html:31
+msgid "Оплата"
+msgstr "Оплата"
+
+#: orders/forms.py:39
+msgid "Комментарий"
+msgstr "Комментарий"
+
+#: orders/forms.py:40
+msgid "Согласен на обработку данных для связи по заказу"
+msgstr "Согласен на обработку данных для связи по заказу"
+
+#: orders/forms.py:46
+#: templates/accounts/_field.html:4
+#: templates/orders/_field.html:5
+msgid "необязательно"
+msgstr "необязательно"
+
+#: orders/forms.py:47
+msgid "Улица, дом, квартира, этаж"
+msgstr "Улица, дом, квартира, этаж"
+
+#: orders/forms.py:48
+msgid "если букет получает другой человек"
+msgstr "если букет получает другой человек"
+
+#: orders/forms.py:49
+msgid "курьер позвонит перед доставкой"
+msgstr "курьер позвонит перед доставкой"
+
+#: orders/forms.py:50
+msgid "несколько слов — напишем от руки"
+msgstr "несколько слов — напишем от руки"
+
+#: orders/forms.py:51
+msgid "Что учесть: код домофона, время звонка, замена цветов"
+msgstr "Что учесть: код домофона, время звонка, замена цветов"
+
+#: orders/forms.py:72
+msgid "любое время"
+msgstr "любое время"
+
+#: orders/forms.py:141
+msgid "Эта дата уже прошла."
+msgstr "Эта дата уже прошла."
+
+#: orders/forms.py:144
+msgid "Так далеко вперёд не планируем — выберите дату ближе."
+msgstr "Так далеко вперёд не планируем — выберите дату ближе."
+
+#: orders/forms.py:153
+msgid "Куда везти? Укажите адрес."
+msgstr "Куда везти? Укажите адрес."
+
+#: orders/forms.py:155
+msgid "Выберите дату доставки."
+msgstr "Выберите дату доставки."
+
+#: orders/models.py:44
+msgid "Курьером по городу"
+msgstr "Курьером по городу"
+
+#: orders/models.py:45
+#: templates/orders/email_body.txt:7
+msgid "Самовывоз из магазина"
+msgstr "Самовывоз из магазина"
+
+#: orders/models.py:48
+msgid "Наличными при получении"
+msgstr "Наличными при получении"
+
+#: orders/models.py:49
+msgid "Переводом на карту"
+msgstr "Переводом на карту"
+
+#: orders/views.py:36
+#: orders/views.py:46
+#: templates/404.html:34
+#: templates/orders/cart.html:17
+msgid "Корзина"
+msgstr "Корзина"
+
+#: orders/views.py:71
+msgid "Сначала добавьте букеты из каталога."
+msgstr "Сначала добавьте букеты из каталога."
+
+#: orders/views.py:94
+msgid "Заказ принят"
+msgstr "Заказ принят"
+
+#: orders/views.py:145
+msgid "Этот букет сейчас нельзя добавить в корзину"
+msgstr "Этот букет сейчас нельзя добавить в корзину"
+
+#: orders/views.py:149
+#: orders/views.py:172
+msgid "Не понял количество"
+msgstr "Не понял количество"
+
+#: orders/views.py:151
+msgid "Укажите количество"
+msgstr "Укажите количество"
+
+#: orders/views.py:156
+msgid "Этого букета не осталось"
+msgstr "Этого букета не осталось"
+
+#: orders/views.py:182
+msgid "Не указана позиция"
+msgstr "Не указана позиция"
+
+#: templates/404.html:13
+msgid "Страница не найдена"
+msgstr "Страница не найдена"
+
+#: templates/404.html:20
+msgid "Такой страницы нет"
+msgstr "Такой страницы нет"
+
+#: templates/404.html:22
+msgid "Возможно, товар сняли с продажи или в адресе опечатка. Каталог на месте — начните оттуда или найдите нужное по артикулу."
+msgstr "Возможно, товар сняли с продажи или в адресе опечатка. Каталог на месте — начните оттуда или найдите нужное по артикулу."
+
+#: templates/404.html:27
+msgid "Название или цветок — например «пионы»"
+msgstr "Название или цветок — например «пионы»"
+
+#: templates/404.html:28
+#: templates/includes/header.html:72
+msgid "Поиск по каталогу"
+msgstr "Поиск по каталогу"
+
+#: templates/404.html:29
+#: templates/includes/header.html:73
+msgid "Найти"
+msgstr "Найти"
+
+#: templates/404.html:33
+#: templates/accounts/dashboard.html:43
+#: templates/accounts/favorites.html:19
+#: templates/accounts/orders.html:13
+#: templates/accounts/password_reset_done.html:25
+msgid "В каталог"
+msgstr "В каталог"
+
+#: templates/404.html:38
+msgid "Не нашли нужное — позвоните %(phone)s, флорист подскажет замену."
+msgstr "Не нашли нужное — позвоните %(phone)s, флорист подскажет замену."
+
+#: templates/500.html:36
+msgid "Что-то сломалось на нашей стороне"
+msgstr "Что-то сломалось на нашей стороне"
+
+#: templates/500.html:38
+msgid "Это не ваша вина и не проблема с заказом. Обновите страницу через минуту — обычно к этому времени всё уже работает."
+msgstr "Это не ваша вина и не проблема с заказом. Обновите страницу через минуту — обычно к этому времени всё уже работает."
+
+#: templates/500.html:41
+msgid "Если заказ срочный, позвоните — примем его по телефону:"
+msgstr "Если заказ срочный, позвоните — примем его по телефону:"
+
+#: templates/500.html:44
+msgid "На главную"
+msgstr "На главную"
+
+#: templates/accounts/_cabinet.html:26
+msgid "Обзор"
+msgstr "Обзор"
+
+#: templates/accounts/_cabinet.html:33
+msgid "Выйти"
+msgstr "Выйти"
+
+#: templates/accounts/_orders_table.html:8
+#: templates/base.html:84
+#: templates/includes/header.html:109
+#: templates/orders/cart.html:41
+msgid "позиция,позиции,позиций"
+msgstr "позиция,позиции,позиций"
+
+#: templates/accounts/_orders_table.html:9
+#: templates/accounts/order_detail.html:29
+#: templates/orders/success.html:40
+msgid "%(qty)s шт"
+msgstr "%(qty)s шт"
+
+#: templates/accounts/dashboard.html:9
+msgid "Здравствуйте, %(name)s"
+msgstr "Здравствуйте, %(name)s"
+
+#: templates/accounts/dashboard.html:9
+msgid "Ваш кабинет"
+msgstr "Ваш кабинет"
+
+#: templates/accounts/dashboard.html:16
+msgid "заказ,заказа,заказов"
+msgstr "заказ,заказа,заказов"
+
+#: templates/accounts/dashboard.html:16
+msgid "за всё время"
+msgstr "за всё время"
+
+#: templates/accounts/dashboard.html:21
+msgid "отмечено сердечком"
+msgstr "отмечено сердечком"
+
+#: templates/accounts/dashboard.html:26
+msgid "подставляются в заказ"
+msgstr "подставляются в заказ"
+
+#: templates/accounts/dashboard.html:32
+msgid "Последние заказы"
+msgstr "Последние заказы"
+
+#: templates/accounts/dashboard.html:33
+msgid "Все заказы"
+msgstr "Все заказы"
+
+#: templates/accounts/dashboard.html:40
+#: templates/accounts/orders.html:11
+msgid "Заказов пока нет"
+msgstr "Заказов пока нет"
+
+#: templates/accounts/dashboard.html:41
+msgid "Выберите букет в каталоге — заказ заполнится вашими данными сам."
+msgstr "Выберите букет в каталоге — заказ заполнится вашими данными сам."
+
+#: templates/accounts/dashboard.html:52
+msgid "Всё избранное"
+msgstr "Всё избранное"
+
+#: templates/accounts/favorites.html:9
+msgid "товар,товара,товаров"
+msgstr "товар,товара,товаров"
+
+#: templates/accounts/favorites.html:17
+msgid "Избранное пустое"
+msgstr "Избранное пустое"
+
+#: templates/accounts/favorites.html:18
+msgid "Нажмите сердечко на карточке товара — он останется здесь до следующего раза."
+msgstr "Нажмите сердечко на карточке товара — он останется здесь до следующего раза."
+
+#: templates/accounts/login.html:4
+msgid "Вход в кабинет"
+msgstr "Вход в кабинет"
+
+#: templates/accounts/login.html:7
+msgid "Кабинет нужен, чтобы видеть свои заказы и не вводить контакты заново."
+msgstr "Кабинет нужен, чтобы видеть свои заказы и не вводить контакты заново."
+
+#: templates/accounts/login.html:18
+#: templates/accounts/password_reset_complete.html:8
+#: templates/accounts/register.html:33
+msgid "Войти"
+msgstr "Войти"
+
+#: templates/accounts/login.html:22
+msgid "Забыли пароль?"
+msgstr "Забыли пароль?"
+
+#: templates/accounts/login.html:24
+#: templates/accounts/register.html:4
+msgid "Создать кабинет"
+msgstr "Создать кабинет"
+
+#: templates/accounts/order_detail.html:4
+msgid "Заказ %(number)s"
+msgstr "Заказ %(number)s"
+
+#: templates/accounts/order_detail.html:9
+msgid "оформлен %(date)s"
+msgstr "оформлен %(date)s"
+
+#: templates/accounts/order_detail.html:14
+#: templates/orders/_cart_lines.html:15
+msgid "Товар"
+msgstr "Товар"
+
+#: templates/accounts/order_detail.html:15
+#: templates/catalog/product_detail.html:134
+#: templates/orders/_cart_lines.html:15
+msgid "Количество"
+msgstr "Количество"
+
+#: templates/accounts/order_detail.html:16
+msgid "Цена за шт"
+msgstr "Цена за шт"
+
+#: templates/accounts/order_detail.html:17
+#: templates/orders/_cart_lines.html:16
+msgid "Сумма"
+msgstr "Сумма"
+
+#: templates/accounts/order_detail.html:22
+#: templates/catalog/product_detail.html:66
+#: templates/orders/_cart_lines.html:30
+msgid "АРТ."
+msgstr "АРТ."
+
+#: templates/accounts/order_detail.html:35
+#: templates/accounts/order_detail.html:45
+#: templates/orders/cart.html:46
+#: templates/orders/email_body.txt:8
+#: templates/orders/success.html:46
+msgid "Доставка"
+msgstr "Доставка"
+
+#: templates/accounts/order_detail.html:36
+#: templates/orders/cart.html:48
+#: templates/orders/email_body.txt:8
+#: templates/orders/success.html:48
+msgid "самовывоз"
+msgstr "самовывоз"
+
+#: templates/accounts/order_detail.html:36
+#: templates/orders/cart.html:48
+#: templates/orders/cart.html:49
+#: templates/orders/email_body.txt:8
+#: templates/orders/success.html:48
+msgid "бесплатно"
+msgstr "бесплатно"
+
+#: templates/accounts/order_detail.html:39
+msgid "Итого на момент заказа"
+msgstr "Итого на момент заказа"
+
+#: templates/accounts/order_detail.html:48
+#: templates/orders/success.html:20
+msgid "Адрес"
+msgstr "Адрес"
+
+#: templates/accounts/order_detail.html:49
+#: templates/orders/success.html:23
+msgid "Когда"
+msgstr "Когда"
+
+#: templates/accounts/order_detail.html:50
+#: templates/orders/success.html:26
+msgid "Получатель"
+msgstr "Получатель"
+
+#: templates/accounts/order_detail.html:51
+#: templates/orders/success.html:29
+msgid "Открытка"
+msgstr "Открытка"
+
+#: templates/accounts/order_detail.html:60
+msgid "Наличие цветов и время доставки подтверждает флорист при звонке."
+msgstr "Наличие цветов и время доставки подтверждает флорист при звонке."
+
+#: templates/accounts/order_detail.html:64
+msgid "Ваш комментарий"
+msgstr "Ваш комментарий"
+
+#: templates/accounts/order_detail.html:70
+msgid "Ко всем заказам"
+msgstr "Ко всем заказам"
+
+#: templates/accounts/orders.html:12
+msgid "Здесь будут все заказы, которые вы оформите из кабинета."
+msgstr "Здесь будут все заказы, которые вы оформите из кабинета."
+
+#: templates/accounts/password_reset.html:4
+msgid "Восстановление пароля"
+msgstr "Восстановление пароля"
+
+#: templates/accounts/password_reset.html:7
+msgid "Напишите почту, на которую заведён кабинет — пришлём ссылку для нового пароля."
+msgstr "Напишите почту, на которую заведён кабинет — пришлём ссылку для нового пароля."
+
+#: templates/accounts/password_reset.html:14
+msgid "Отправить ссылку"
+msgstr "Отправить ссылку"
+
+#: templates/accounts/password_reset.html:16
+msgid "Вернуться ко входу"
+msgstr "Вернуться ко входу"
+
+#: templates/accounts/password_reset_complete.html:4
+msgid "Пароль изменён"
+msgstr "Пароль изменён"
+
+#: templates/accounts/password_reset_complete.html:7
+msgid "Готово. Теперь можно войти с новым паролем."
+msgstr "Готово. Теперь можно войти с новым паролем."
+
+#: templates/accounts/password_reset_confirm.html:4
+msgid "Новый пароль"
+msgstr "Новый пароль"
+
+#: templates/accounts/password_reset_confirm.html:11
+msgid "Сохранить пароль"
+msgstr "Сохранить пароль"
+
+#: templates/accounts/password_reset_confirm.html:14
+msgid "Ссылка больше не работает: ею уже воспользовались или прошло больше трёх часов."
+msgstr "Ссылка больше не работает: ею уже воспользовались или прошло больше трёх часов."
+
+#: templates/accounts/password_reset_confirm.html:15
+msgid "Запросить новую ссылку"
+msgstr "Запросить новую ссылку"
+
+#: templates/accounts/password_reset_done.html:4
+msgid "Письмо отправлено"
+msgstr "Письмо отправлено"
+
+#: templates/accounts/password_reset_done.html:11
+msgid "Если кабинет с такой почтой есть, письмо со ссылкой уже в пути."
+msgstr "Если кабинет с такой почтой есть, письмо со ссылкой уже в пути."
+
+#: templates/accounts/password_reset_done.html:20
+msgid "Не пришло за пару минут?"
+msgstr "Не пришло за пару минут?"
+
+#: templates/accounts/password_reset_done.html:21
+msgid "Загляните в папку «Спам» или «Промоакции» — письмо часто оказывается там. Если нашли, отметьте его «Не спам», и следующие придут во «Входящие»."
+msgstr "Загляните в папку «Спам» или «Промоакции» — письмо часто оказывается там. Если нашли, отметьте его «Не спам», и следующие придут во «Входящие»."
+
+#: templates/accounts/password_reset_done.html:24
+msgid "Ссылка действует 3 часа."
+msgstr "Ссылка действует 3 часа."
+
+#: templates/accounts/password_reset_email.txt:1
+msgid "Здравствуйте!"
+msgstr "Здравствуйте!"
+
+#: templates/accounts/password_reset_email.txt:3
+msgid "Кто-то попросил новый пароль для кабинета %(name)s."
+msgstr "Кто-то попросил новый пароль для кабинета %(name)s."
+
+#: templates/accounts/password_reset_email.txt:4
+msgid "Если это были вы — откройте ссылку и придумайте новый пароль:"
+msgstr "Если это были вы — откройте ссылку и придумайте новый пароль:"
+
+#: templates/accounts/password_reset_email.txt:8
+msgid "Ссылка действует 3 часа и сработает один раз."
+msgstr "Ссылка действует 3 часа и сработает один раз."
+
+#: templates/accounts/password_reset_email.txt:9
+msgid "Если вы ничего не просили — просто удалите это письмо, пароль останется прежним."
+msgstr "Если вы ничего не просили — просто удалите это письмо, пароль останется прежним."
+
+#: templates/accounts/password_reset_subject.txt:1
+msgid "%(name)s: восстановление пароля"
+msgstr "%(name)s: восстановление пароля"
+
+#: templates/accounts/profile.html:7
+msgid "Эти данные подставляются в заказ — вводить их каждый раз больше не нужно."
+msgstr "Эти данные подставляются в заказ — вводить их каждый раз больше не нужно."
+
+#: templates/accounts/profile.html:18
+msgid "Почта — это логин, поменять её может только владелец магазина."
+msgstr "Почта — это логин, поменять её может только владелец магазина."
+
+#: templates/accounts/profile.html:34
+msgid "Сохранить"
+msgstr "Сохранить"
+
+#: templates/accounts/profile.html:38
+msgid "Сменить пароль"
+msgstr "Сменить пароль"
+
+#: templates/accounts/register.html:7
+msgid "Займёт минуту. Дальше адрес и телефон будут подставляться сами, а все заказы останутся в истории."
+msgstr "Займёт минуту. Дальше адрес и телефон будут подставляться сами, а все заказы останутся в истории."
+
+#: templates/accounts/register.html:29
+msgid "Зарегистрироваться"
+msgstr "Зарегистрироваться"
+
+#: templates/accounts/register.html:33
+msgid "Уже есть кабинет?"
+msgstr "Уже есть кабинет?"
+
+#: templates/base.html:15
+#: templates/base.html:35
+msgid "Магазин цветов %(name)s: букеты, композиции и растения с доставкой по городу %(city)s за 2–3 часа."
+msgstr "Магазин цветов %(name)s: букеты, композиции и растения с доставкой по городу %(city)s за 2–3 часа."
+
+#: templates/base.html:66
+msgid "Навигация"
+msgstr "Навигация"
+
+#: templates/base.html:85
+#: templates/catalog/product_list.html:179
+msgid "букет,букета,букетов"
+msgstr "букет,букета,букетов"
+
+#: templates/base.html:87
+msgid "Развернуть подбор"
+msgstr "Развернуть подбор"
+
+#: templates/base.html:88
+msgid "Свернуть подбор"
+msgstr "Свернуть подбор"
+
+#: templates/base.html:89
+msgid "Пустой ответ"
+msgstr "Пустой ответ"
+
+#: templates/base.html:90
+msgid "Не удалось выполнить запрос"
+msgstr "Не удалось выполнить запрос"
+
+#: templates/base.html:91
+msgid "Не удалось загрузить список"
+msgstr "Не удалось загрузить список"
+
+#: templates/base.html:92
+msgid "Добавлено"
+msgstr "Добавлено"
+
+#: templates/base.html:93
+#: templates/catalog/product_detail.html:148
+#: templates/includes/product_card.html:63
+msgid "В корзину"
+msgstr "В корзину"
+
+#: templates/base.html:94
+#: templates/orders/cart.html:24
+msgid "Очистить"
+msgstr "Очистить"
+
+#: templates/base.html:96
+msgid "в корзине"
+msgstr "в корзине"
+
+#: templates/base.html:97
+msgid "Перейти в корзину"
+msgstr "Перейти в корзину"
+
+#: templates/base.html:98
+msgid "в избранном"
+msgstr "в избранном"
+
+#: templates/base.html:99
+msgid "убрано из избранного"
+msgstr "убрано из избранного"
+
+#: templates/base.html:100
+msgid "Перейти в избранное"
+msgstr "Перейти в избранное"
+
+#: templates/catalog/product_detail.html:4
+msgid "%(name)s — купить с доставкой, %(city)s | %(shop)s"
+msgstr "%(name)s — купить с доставкой, %(city)s | %(shop)s"
+
+#: templates/catalog/product_detail.html:30
+msgid "Открыть фото на весь экран"
+msgstr "Открыть фото на весь экран"
+
+#: templates/catalog/product_detail.html:34
+msgid "Увеличить"
+msgstr "Увеличить"
+
+#: templates/catalog/product_detail.html:222
+#: templates/catalog/product_detail.html:38
+msgid "Предыдущее фото"
+msgstr "Предыдущее фото"
+
+#: templates/catalog/product_detail.html:226
+#: templates/catalog/product_detail.html:42
+msgid "Следующее фото"
+msgstr "Следующее фото"
+
+#: templates/catalog/product_detail.html:93
+msgid "%(count)s шт в букете"
+msgstr "%(count)s шт в букете"
+
+#: templates/catalog/product_detail.html:93
+msgid "высота %(height)s см"
+msgstr "высота %(height)s см"
+
+#: templates/catalog/product_detail.html:104
+msgid "Размер букета"
+msgstr "Размер букета"
+
+#: templates/catalog/product_detail.html:136
+msgid "можно собрать сегодня: %(stock)s шт"
+msgstr "можно собрать сегодня: %(stock)s шт"
+
+#: templates/catalog/product_detail.html:141
+#: templates/includes/product_card.html:57
+#: templates/orders/_cart_lines.html:36
+msgid "Меньше"
+msgstr "Меньше"
+
+#: templates/catalog/product_detail.html:144
+#: templates/includes/product_card.html:60
+#: templates/orders/_cart_lines.html:39
+msgid "Количество, штук"
+msgstr "Количество, штук"
+
+#: templates/catalog/product_detail.html:145
+#: templates/includes/product_card.html:61
+#: templates/orders/_cart_lines.html:40
+msgid "Больше"
+msgstr "Больше"
+
+#: templates/catalog/product_detail.html:153
+#: templates/includes/product_card.html:27
+msgid "В избранное"
+msgstr "В избранное"
+
+#: templates/catalog/product_detail.html:160
+msgid "доставка за %(hours)s · бесплатно от %(sum)s"
+msgstr "доставка за %(hours)s · бесплатно от %(sum)s"
+
+#: templates/catalog/product_detail.html:166
+msgid "Оплаты на сайте нет. Оформите заказ — флорист %(manager)s перезвонит, уточнит время доставки и подтвердит наличие цветов."
+msgstr "Оплаты на сайте нет. Оформите заказ — флорист %(manager)s перезвонит, уточнит время доставки и подтвердит наличие цветов."
+
+#: templates/catalog/product_detail.html:170
+msgid "Этого букета сейчас нет. Позвоните — соберём похожий или подскажем замену."
+msgstr "Этого букета сейчас нет. Позвоните — соберём похожий или подскажем замену."
+
+#: templates/catalog/product_detail.html:176
+msgid "Характеристики"
+msgstr "Характеристики"
+
+#: templates/catalog/product_detail.html:192
+msgid "Описание"
+msgstr "Описание"
+
+#: templates/catalog/product_detail.html:207
+msgid "Фотографии: %(name)s"
+msgstr "Фотографии: %(name)s"
+
+#: templates/catalog/product_detail.html:212
+msgid "Закрыть"
+msgstr "Закрыть"
+
+#: templates/catalog/product_detail.html:230
+msgid "Нажмите на фото, чтобы приблизить"
+msgstr "Нажмите на фото, чтобы приблизить"
+
+#: templates/catalog/product_detail.html:238
+msgid "Фото %(number)s"
+msgstr "Фото %(number)s"
+
+#: templates/catalog/product_detail.html:253
+msgid "Из этого же раздела"
+msgstr "Из этого же раздела"
+
+#: templates/catalog/product_list.html:22
+#: templates/catalog/product_list.html:33
+msgid "Новинки каталога"
+msgstr "Новинки каталога"
+
+#: templates/catalog/product_list.html:31
+msgid "Новинки раздела"
+msgstr "Новинки раздела"
+
+#: templates/catalog/product_list.html:35
+msgid "Свежие букеты уже в наличии"
+msgstr "Свежие букеты уже в наличии"
+
+#: templates/catalog/product_list.html:37
+msgid "Соберём и привезём за %(hours)s"
+msgstr "Соберём и привезём за %(hours)s"
+
+#: templates/catalog/product_list.html:38
+msgid "По одной новинке из каждого раздела · доставка за %(hours)s"
+msgstr "По одной новинке из каждого раздела · доставка за %(hours)s"
+
+#: templates/catalog/product_list.html:47
+msgid "Смотреть новинки"
+msgstr "Смотреть новинки"
+
+#: templates/catalog/product_list.html:60
+msgid "Новинка"
+msgstr "Новинка"
+
+#: templates/catalog/product_list.html:94
+msgid "Подбор"
+msgstr "Подбор"
+
+#: templates/catalog/product_list.html:96
+msgid "Сбросить"
+msgstr "Сбросить"
+
+#: templates/catalog/product_list.html:128
+msgid "Поиск по группе %(group)s"
+msgstr "Поиск по группе %(group)s"
+
+#: templates/catalog/product_list.html:161
+msgid "от"
+msgstr "от"
+
+#: templates/catalog/product_list.html:162
+msgid "Цена от"
+msgstr "Цена от"
+
+#: templates/catalog/product_list.html:165
+msgid "до"
+msgstr "до"
+
+#: templates/catalog/product_list.html:166
+msgid "Цена до"
+msgstr "Цена до"
+
+#: templates/catalog/product_list.html:170
+msgid "Показать букеты"
+msgstr "Показать букеты"
+
+#: templates/catalog/product_list.html:186
+msgid "Сортировка:"
+msgstr "Сортировка:"
+
+#: templates/catalog/product_list.html:194
+msgid "Применить"
+msgstr "Применить"
+
+#: templates/catalog/product_list.html:201
+msgid "Выбрано:"
+msgstr "Выбрано:"
+
+#: templates/includes/footer.html:19
+msgid "Свежие цветы каждый день. Собираем букеты под заказ и привозим по городу %(city)s."
+msgstr "Свежие цветы каждый день. Собираем букеты под заказ и привозим по городу %(city)s."
+
+#: templates/includes/footer.html:24
+msgid "Доставка за %(hours)s"
+msgstr "Доставка за %(hours)s"
+
+#: templates/includes/footer.html:28
+msgid "Бесплатно от %(sum)s"
+msgstr "Бесплатно от %(sum)s"
+
+#: templates/includes/footer.html:32
+msgid "Оплата при получении"
+msgstr "Оплата при получении"
+
+#: templates/includes/footer.html:48
+#: templates/pages/page_detail.html:33
+msgid "Покупателю"
+msgstr "Покупателю"
+
+#: templates/includes/footer.html:57
+msgid "Компаниям"
+msgstr "Компаниям"
+
+#: templates/includes/footer.html:65
+msgid "Связь"
+msgstr "Связь"
+
+#: templates/includes/footer.html:67
+#: templates/pages/page_detail.html:42
+msgid "флорист %(manager)s, %(hours)s"
+msgstr "флорист %(manager)s, %(hours)s"
+
+#: templates/includes/footer.html:83
+msgid "Букет на фото — образец: цветы живые, каждый собираем заново"
+msgstr "Букет на фото — образец: цветы живые, каждый собираем заново"
+
+#: templates/includes/header.html:23
+msgid "Доставка за %(hours)s · бесплатно от %(sum)s"
+msgstr "Доставка за %(hours)s · бесплатно от %(sum)s"
+
+#: templates/includes/header.html:71
+msgid "Букет, цветок или повод — например «пионы»"
+msgstr "Букет, цветок или повод — например «пионы»"
+
+#: templates/includes/header.html:97
+msgid "мои заказы"
+msgstr "мои заказы"
+
+#: templates/includes/header.html:100
+msgid "и регистрация"
+msgstr "и регистрация"
+
+#: templates/includes/no_photo.html:8
+msgid "фото не загружено"
+msgstr "фото не загружено"
+
+#: templates/includes/product_grid.html:12
+msgid "букета,букетов,букетов"
+msgstr "букета,букетов,букетов"
+
+#: templates/includes/product_grid.html:13
+msgid "Показано %(shown)s из %(total)s %(forms)s"
+msgstr "Показано %(shown)s из %(total)s %(forms)s"
+
+#: templates/includes/product_grid.html:27
+msgid "Показать ещё"
+msgstr "Показать ещё"
+
+#: templates/includes/product_grid.html:29
+msgid "Это все букеты по фильтру"
+msgstr "Это все букеты по фильтру"
+
+#: templates/includes/product_grid.html:35
+msgid "По этим фильтрам ничего нет"
+msgstr "По этим фильтрам ничего нет"
+
+#: templates/includes/product_grid.html:36
+msgid "Снимите часть галок в подборе слева или расширьте диапазон цены — многое собираем под заказ."
+msgstr "Снимите часть галок в подборе слева или расширьте диапазон цены — многое собираем под заказ."
+
+#: templates/includes/product_grid.html:37
+msgid "Сбросить фильтры"
+msgstr "Сбросить фильтры"
+
+#: templates/orders/_cart_lines.html:42
+msgid "Обновить"
+msgstr "Обновить"
+
+#: templates/orders/_cart_lines.html:46
+msgid "Убрать позицию"
+msgstr "Убрать позицию"
+
+#: templates/orders/_cart_lines.html:54
+msgid "В корзине пока пусто"
+msgstr "В корзине пока пусто"
+
+#: templates/orders/_cart_lines.html:55
+msgid "Выберите букет в каталоге — а мы соберём его и привезём."
+msgstr "Выберите букет в каталоге — а мы соберём его и привезём."
+
+#: templates/orders/_cart_lines.html:56
+msgid "Перейти в каталог"
+msgstr "Перейти в каталог"
+
+#: templates/orders/cart.html:19
+msgid "Оплаты на сайте нет — укажите, куда и когда привезти, флорист %(manager)s перезвонит и подтвердит."
+msgstr "Оплаты на сайте нет — укажите, куда и когда привезти, флорист %(manager)s перезвонит и подтвердит."
+
+#: templates/orders/cart.html:42
+msgid "%(count)s %(forms)s, %(qty)s шт"
+msgstr "%(count)s %(forms)s, %(qty)s шт"
+
+#: templates/orders/cart.html:60
+#: templates/orders/cart.html:63
+msgid "Доставка бесплатно — сумма от %(sum)s."
+msgstr "Доставка бесплатно — сумма от %(sum)s."
+
+#: templates/orders/cart.html:61
+msgid "До бесплатной доставки не хватает"
+msgstr "До бесплатной доставки не хватает"
+
+#: templates/orders/cart.html:65
+msgid "До бесплатной доставки не хватает %(gap)s."
+msgstr "До бесплатной доставки не хватает %(gap)s."
+
+#: templates/orders/cart.html:76
+msgid "Кто заказывает"
+msgstr "Кто заказывает"
+
+#: templates/orders/cart.html:87
+msgid "%(sum)s, бесплатно от %(free)s"
+msgstr "%(sum)s, бесплатно от %(free)s"
+
+#: templates/orders/cart.html:102
+msgid "Это подарок: получатель и открытка"
+msgstr "Это подарок: получатель и открытка"
+
+#: templates/orders/cart.html:135
+msgid "Оформить заказ"
+msgstr "Оформить заказ"
+
+#: templates/orders/cart.html:137
+msgid "Ничего не списываем — оплата при получении или после подтверждения."
+msgstr "Ничего не списываем — оплата при получении или после подтверждения."
+
+#: templates/orders/email_body.txt:1
+msgid "Здравствуйте, %(name)s!"
+msgstr "Здравствуйте, %(name)s!"
+
+#: templates/orders/email_body.txt:3
+msgid "Мы получили ваш заказ %(number)s. Флорист перезвонит, подтвердит наличие цветов и время доставки."
+msgstr "Мы получили ваш заказ %(number)s. Флорист перезвонит, подтвердит наличие цветов и время доставки."
+
+#: templates/orders/email_body.txt:9
+#: templates/orders/success.html:52
+msgid "Итого"
+msgstr "Итого"
+
+#: templates/orders/email_body.txt:11
+msgid "Оплата — при получении или переводом после подтверждения флористом."
+msgstr "Оплата — при получении или переводом после подтверждения флористом."
+
+#: templates/orders/email_subject.txt:1
+msgid "%(name)s: заказ %(number)s принят"
+msgstr "%(name)s: заказ %(number)s принят"
+
+#: templates/orders/success.html:12
+msgid "Заказ %(number)s принят"
+msgstr "Заказ %(number)s принят"
+
+#: templates/orders/success.html:14
+msgid "%(client)s, флорист %(manager)s перезвонит вам в ближайшее время, подтвердит наличие цветов и время доставки."
+msgstr "%(client)s, флорист %(manager)s перезвонит вам в ближайшее время, подтвердит наличие цветов и время доставки."
+
+#: templates/orders/success.html:59
+msgid "Если каких-то цветов не окажется, флорист предложит замену той же стоимости. Ничего оплачивать сейчас не нужно."
+msgstr "Если каких-то цветов не окажется, флорист предложит замену той же стоимости. Ничего оплачивать сейчас не нужно."
+
+#: templates/orders/success.html:62
+msgid "Вернуться в каталог"
+msgstr "Вернуться в каталог"
+
+#: templates/pages/page_detail.html:25
+msgid "Текст этой страницы пока не заполнен — добавьте его в админке."
+msgstr "Текст этой страницы пока не заполнен — добавьте его в админке."
+
+#: templates/pages/page_detail.html:33
+msgid "Партнёрам"
+msgstr "Партнёрам"
+
+#: templates/pages/page_detail.html:40
+msgid "Остались вопросы"
+msgstr "Остались вопросы"
+
+#: templates/pages/page_detail.html:43
+msgid "Выбрать букет"
+msgstr "Выбрать букет"

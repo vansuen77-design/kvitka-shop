@@ -1,0 +1,42 @@
+# Telegram-бот КВІТКА: показывает заказы и покупателей владельцу.
+# Копировать в /etc/systemd/system/kvitka-bot.service
+#
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now kvitka-bot
+#   sudo systemctl status kvitka-bot
+#   journalctl -u kvitka-bot -f     — смотреть, что происходит
+#
+# Бот только читает базу. Ничего не меняет и никому, кроме владельца,
+# не отвечает: чужой id отбрасывается молча.
+
+[Unit]
+Description=KVITKA — Telegram-бот для владельца
+After=network-online.target kvitka.service
+Wants=network-online.target
+
+[Service]
+User=kvitka
+Group=kvitka
+WorkingDirectory=/home/kvitka/kvitka
+Environment=PYTHONUNBUFFERED=1
+
+ExecStart=/home/kvitka/kvitka/.venv/bin/python manage.py telegram_bot
+
+# Бот висит на длинных опросах: соединение рвётся штатно, это не ошибка.
+# Поэтому перезапускаем всегда и без спешки.
+Restart=always
+RestartSec=10
+
+# Те же ограничения, что у сайта: писать можно только в свою папку,
+# root из процесса не получить.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/kvitka/kvitka
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

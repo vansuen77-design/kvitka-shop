@@ -1,0 +1,59 @@
+{% extends "accounts/_cabinet.html" %}
+{% load shop i18n %}
+
+{% comment %}
+  Имя есть — здороваемся по имени. Нет (учётку завели командой,
+  а не через регистрацию) — нейтральный заголовок: почта в шапке
+  страницы выглядит как ошибка, а не как приветствие.
+{% endcomment %}
+{% block cabinet_title %}{% if user.first_name %}{% blocktrans with name=user.first_name %}Здравствуйте, {{ name }}{% endblocktrans %}{% else %}{% trans "Ваш кабинет" %}{% endif %}{% endblock %}
+
+{% block cabinet_body %}
+  <div class="tiles">
+    <a class="tile" href="{% url 'accounts:orders' %}">
+      <span class="tile__label">{% trans "Мои заказы" %}</span>
+      <span class="tile__value">{{ orders_total }}</span>
+      <span class="tile__note">{% trans "заказ,заказа,заказов" as order_forms %}{{ orders_total|plural:order_forms }} {% trans "за всё время" %}</span>
+    </a>
+    <a class="tile" href="{% url 'accounts:favorites' %}">
+      <span class="tile__label">{% trans "Избранное" %}</span>
+      <span class="tile__value">{{ favorites_total }}</span>
+      <span class="tile__note">{% trans "отмечено сердечком" %}</span>
+    </a>
+    <a class="tile" href="{% url 'accounts:profile' %}">
+      <span class="tile__label">{% trans "Мои данные" %}</span>
+      <span class="tile__value tile__value--text">{{ user.email }}</span>
+      <span class="tile__note">{% trans "подставляются в заказ" %}</span>
+    </a>
+  </div>
+
+  <section class="block">
+    <div class="block__head">
+      <h2 class="block__title">{% trans "Последние заказы" %}</h2>
+      {% if orders %}<a class="block__more" href="{% url 'accounts:orders' %}">{% trans "Все заказы" %}</a>{% endif %}
+    </div>
+    {% if orders %}
+      {% include "accounts/_orders_table.html" with orders=orders %}
+    {% else %}
+      <div class="empty empty--compact">
+        <div>
+          <div class="empty__title">{% trans "Заказов пока нет" %}</div>
+          <p>{% trans "Выберите букет в каталоге — заказ заполнится вашими данными сам." %}</p>
+        </div>
+        <a class="button button--ghost" href="{% url 'catalog:index' %}">{% trans "В каталог" %}</a>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if favorites %}
+    <section class="block">
+      <div class="block__head">
+        <h2 class="block__title">{% trans "Избранное" %}</h2>
+        <a class="block__more" href="{% url 'accounts:favorites' %}">{% trans "Всё избранное" %}</a>
+      </div>
+      <div class="grid grid--products">
+        {% for item in favorites %}{% include "includes/product_card.html" with product=item.product %}{% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

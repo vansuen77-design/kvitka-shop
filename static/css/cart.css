@@ -1,0 +1,113 @@
+/* KVITKA — cart.css
+   Author: ISHOD · 2026 · all rights reserved. */
+/* Корзина: собранные позиции, форма заказа с доставкой, страница «спасибо». */
+
+.cart-page { display: flex; gap: 32px; align-items: flex-start; }
+.cart-page__main { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.cart-page__side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+
+.cart-page__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.cart-page__title { font-family: var(--font-display); font-size: 36px; font-weight: 400; line-height: 1; }
+.cart-page__subtitle { display: block; margin-top: 6px; font-size: 13.5px; color: var(--ink-soft); max-width: 560px; line-height: 1.5; }
+
+/* --- позиции --------------------------------------------------------- */
+.lines { background: var(--surface); border: 1px solid var(--line);  border-radius: var(--radius-card);}
+.lines__head, .line { display: grid; grid-template-columns: 62px minmax(0, 1fr) 150px 110px 118px 34px; align-items: center; gap: 16px; padding: 14px 18px; }
+.lines__head { border-bottom: 1px solid var(--line); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+.lines__right { text-align: right; }
+.line { border-bottom: 1px solid var(--line-soft); }
+.line:last-child { border-bottom: 0; }
+.line__media { width: 62px; height: 72px; background: #FFFFFF; border: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: center; padding: 3px; }
+.line__media--empty { background: var(--surface-muted); }
+.line__media img { width: 100%; height: 100%; object-fit: contain; }
+.line__info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.line__article { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-muted); }
+.line__name { font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.line__name:hover { color: var(--accent); }
+.line__meta { font-size: 12.5px; color: var(--ink-soft); }
+.line__qty { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+/* счётчик — тот же, что в плитке каталога (catalog.css), но корзина
+   catalog.css не грузит: держим копию здесь, чтобы не тянуть лишний файл */
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--field);
+           background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+.stepper__button { width: 28px; height: 32px; border: 0; background: none; font: inherit; font-size: 15px; color: var(--ink-soft); cursor: pointer; }
+.stepper__button:hover { color: var(--ink); }
+.stepper__input {
+  width: 52px; height: 32px; border: 0;
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  text-align: center; font-family: var(--font-mono); font-size: 13.5px; font-weight: 500;
+  background: transparent; -moz-appearance: textfield;
+}
+.stepper__input::-webkit-outer-spin-button, .stepper__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.line__update { height: 30px; padding: 0 10px; border: 1px solid var(--field); background: var(--surface); font-size: 12.5px; cursor: pointer; border-radius: var(--radius); }
+.line__unit { font-family: var(--font-mono); font-size: 15px; }
+.line__sum { font-family: var(--font-mono); font-size: 16px; font-weight: 500; }
+.line__remove { border: 0; background: none; color: #B0A69E; cursor: pointer; padding: 4px; justify-self: center; }
+.line__remove:hover { color: var(--accent); }
+
+/* --- итоги и форма ---------------------------------------------------- */
+.totals { background: var(--surface); border: 1px solid var(--line);  border-radius: var(--radius-card);}
+.totals__rows { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.totals__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; }
+.totals__row span:first-child { color: var(--ink-soft); }
+.totals__row span:last-child { font-family: var(--font-mono); font-size: 17px; font-weight: 500; }
+.totals__row--muted span:last-child { font-family: var(--font-ui); font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+.progress { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 7px; }
+.progress__bar { height: 5px; background: var(--line-soft); }
+.progress__bar span { display: block; height: 100%; background: var(--ok); }
+.progress__note { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
+
+.contact__card { background: var(--surface); border: 1px solid var(--line); padding: 18px; display: flex; flex-direction: column; gap: 14px; margin-top: 16px;  border-radius: var(--radius-card);}
+.contact__title { font-size: 15px; font-weight: 600; }
+.contact__title:not(:first-child) { margin-top: 6px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.radios--column { flex-direction: column; }
+.radios--column .radio { width: 100%; align-items: flex-start; border-radius: var(--radius); }
+.radios--column .radio input { margin-top: 3px; }
+.radio__note { display: block; font-style: normal; font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+/* Получатель и открытка спрятаны под раскрывашку: половине заказов
+   они не нужны, а длинная форма отпугивает. */
+.contact__more { border: 1px dashed var(--field); border-radius: var(--radius); padding: 0 12px; }
+.contact__more[open] { padding-bottom: 12px; display: flex; flex-direction: column; gap: 12px; }
+.contact__more-title { cursor: pointer; padding: 10px 0; font-size: 13.5px; font-weight: 600; color: var(--accent); list-style: none; }
+.contact__more-title::-webkit-details-marker { display: none; }
+.contact__more-title::before { content: "+ "; }
+.contact__more[open] .contact__more-title::before { content: "− "; }
+.contact__submit { width: 100%; }
+.contact__note { font-size: 12.5px; color: var(--ink-muted); text-align: center; line-height: 1.5; }
+
+
+/* --- спасибо ---------------------------------------------------------- */
+.success { max-width: 660px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 24px 0 40px; }
+.success__badge { width: 56px; height: 56px; border-radius: 50%; background: var(--ok); color: #fff; display: flex; align-items: center; justify-content: center; }
+.success__title { font-family: var(--font-display); font-size: 34px; font-weight: 400; }
+.success__lead { font-size: 15px; color: var(--ink-soft); line-height: 1.6; }
+.success__card { width: 100%; background: var(--surface); border: 1px solid var(--line); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;  border-radius: var(--radius-card);}
+.success__row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.success__row span:first-child { color: var(--ink-soft); }
+.success__row span:last-child { font-family: var(--font-mono); font-weight: 500; }
+.success__lines { width: 100%; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.success__line { display: grid; grid-template-columns: 84px minmax(0, 1fr) 110px 100px; gap: 12px; align-items: center; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line-soft); font-size: 13px; }
+.success__article, .success__size, .success__amount { font-family: var(--font-mono); }
+.success__amount { text-align: right; font-weight: 500; }
+.success__line--muted { color: var(--ink-soft); background: transparent; border-color: transparent; }
+.success__line--total { font-weight: 600; font-size: 14px; }
+.success__note { font-size: 12.5px; color: var(--ink-muted); line-height: 1.55; }
+
+@media (max-width: 1180px) {
+  .cart-page { flex-direction: column; }
+  .cart-page__side { width: 100%; }
+}
+@media (max-width: 860px) {
+  .lines__head { display: none; }
+  .line { grid-template-columns: 62px minmax(0, 1fr) 34px; grid-template-areas: "media info remove" "qty qty qty" "unit sum sum"; row-gap: 10px; }
+  .field-row { grid-template-columns: 1fr; }
+  .line__media { grid-area: media; }
+  .line__info { grid-area: info; }
+  .line__remove { grid-area: remove; }
+  .line__qty { grid-area: qty; align-items: flex-start; }
+  .line__unit { grid-area: unit; text-align: left; }
+  .line__sum { grid-area: sum; text-align: right; }
+  .success__line { grid-template-columns: 80px minmax(0, 1fr); }
+  .success__size, .success__amount { text-align: left; }
+}

@@ -1,0 +1,40 @@
+{% extends "accounts/_cabinet.html" %}
+{% load i18n %}
+
+{% block cabinet_title %}{% trans "Мои данные" %}{% endblock %}
+
+{% block cabinet_body %}
+  <p class="hint">{% trans "Эти данные подставляются в заказ — вводить их каждый раз больше не нужно." %}</p>
+
+  <form class="auth__form auth__form--wide" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="form-error">{{ form.non_field_errors|join:" " }}</div>
+    {% endif %}
+
+    <label class="field">
+      <span class="field__label">{% trans "Почта" %}</span>
+      <input class="input" type="email" value="{{ user.email }}" disabled>
+      <span class="field__hint">{% trans "Почта — это логин, поменять её может только владелец магазина." %}</span>
+    </label>
+
+    {% for field in form %}
+      {% if field.name != "preferred_contact" %}{% include "accounts/_field.html" with field=field %}{% endif %}
+    {% endfor %}
+
+    <div class="field">
+      <span class="field__label">{{ form.preferred_contact.label }}</span>
+      <div class="radios">
+        {% for radio in form.preferred_contact %}
+          <label class="radio">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button class="button button--accent button--large" type="submit">{% trans "Сохранить" %}</button>
+  </form>
+
+  <div class="auth__links">
+    <a href="{% url 'accounts:password_reset' %}">{% trans "Сменить пароль" %}</a>
+  </div>
+{% endblock %}

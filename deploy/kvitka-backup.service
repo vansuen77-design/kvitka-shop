@@ -1,0 +1,9 @@
+# Разовый запуск бэкапа. Копировать в /etc/systemd/system/
+[Unit]
+Description=Резервная копия КВІТКА
+
+[Service]
+Type=oneshot
+User=kvitka
+Group=kvitka
+ExecStart=/home/kvitka/kvitka/deploy/backup.sh

@@ -1,0 +1,15 @@
+{% load i18n shop %}{% autoescape off %}{% blocktrans with name=order.name %}Здравствуйте, {{ name }}!{% endblocktrans %}
+
+{% blocktrans with number=order.number %}Мы получили ваш заказ {{ number }}. Флорист перезвонит, подтвердит наличие цветов и время доставки.{% endblocktrans %}
+
+{% for line in order.lines.all %}— {{ line.article }} {{ line.product_name }} × {{ line.quantity }} = {{ line.amount|money }}
+{% endfor %}
+{% trans "Как получить" %}: {% if order.is_pickup %}{% trans "Самовывоз из магазина" %}{% else %}{{ order.address }}{% if order.delivery_date %}, {{ order.delivery_date|date:"d.m.Y" }}{% endif %}{% if order.delivery_time %} {{ order.get_delivery_time_display }}{% endif %}{% endif %}
+{% trans "Доставка" %}: {% if order.is_pickup %}{% trans "самовывоз" %}{% elif order.delivery_cost %}{{ order.delivery_cost|money }}{% else %}{% trans "бесплатно" %}{% endif %}
+{% trans "Итого" %}: {{ order.total_amount|money }}
+
+{% trans "Оплата — при получении или переводом после подтверждения флористом." %}
+
+{{ shop.NAME }} · {{ shop.PHONE }}
+{{ SITE_URL }}
+{% endautoescape %}

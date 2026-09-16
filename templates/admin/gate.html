@@ -1,0 +1,91 @@
+{% comment %}
+  Шлюз перед админкой. Своя страница, а не шаблон Django-админки:
+  человек сюда попадает ДО входа, и грузить ради этого всю админскую
+  вёрстку незачем. Стили внутри — страница должна открыться, даже если
+  со статикой что-то не так.
+
+  Автор кода: ISHOD, 2026.
+{% endcomment %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Вход в управление</title>
+  <style>
+    body { margin: 0; background: #F7F4F0; color: #191512;
+           font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+           display: flex; align-items: center; justify-content: center;
+           min-height: 100vh; padding: 24px; }
+    .gate { width: 100%; max-width: 380px; background: #fff;
+            border: 1px solid #E3DBD2; border-radius: 12px; padding: 28px;
+            box-shadow: 0 2px 8px rgba(25,21,18,.05); }
+    .gate__brand { font-family: Georgia, serif; font-size: 24px; letter-spacing: .02em; }
+    .gate__title { font-size: 17px; font-weight: 600; margin: 18px 0 6px; }
+    .gate__text { color: #4A423C; font-size: 13.5px; margin: 0 0 18px; }
+    .gate__note { background: #F2F6F0; border-left: 2px solid #4A6B45;
+                  padding: 9px 12px; font-size: 13px; margin-bottom: 16px; }
+    .gate__error { background: #FBF3F5; border-left: 2px solid #8A3A52;
+                   padding: 9px 12px; font-size: 13px; margin-bottom: 16px; }
+    .gate__input { width: 100%; height: 46px; border: 1px solid #D6CBC0;
+                   border-radius: 6px; padding: 0 12px; font: inherit;
+                   font-family: "IBM Plex Mono", ui-monospace, monospace;
+                   font-size: 20px; letter-spacing: .3em; text-align: center;
+                   box-sizing: border-box; margin-bottom: 12px; }
+    .gate__input:focus { outline: none; border-color: #8A3A52;
+                         box-shadow: 0 0 0 3px rgba(138,58,82,.12); }
+    .gate__button { width: 100%; height: 46px; border: 0; border-radius: 6px;
+                    background: #8A3A52; color: #fff; font: inherit;
+                    font-weight: 500; cursor: pointer; }
+    .gate__button:hover { background: #6E2C41; }
+    .gate__button--ghost { background: #fff; color: #191512;
+                           border: 1px solid #D6CBC0; margin-top: 10px; }
+    .gate__button--ghost:hover { background: #FCFAF8; }
+    .gate__hint { font-size: 12px; color: #8C8079; margin-top: 16px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="gate">
+    <div class="gate__brand">{{ shop.NAME }}</div>
+    <h1 class="gate__title">Вход в управление</h1>
+    <p class="gate__text">
+      Чтобы открыть админку, нужен одноразовый код. Он придёт в Telegram
+      владельца.
+    </p>
+
+    {% if note %}<div class="gate__note">{{ note }}</div>{% endif %}
+    {% if error %}<div class="gate__error">{{ error }}</div>{% endif %}
+
+    {% if waiting %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input class="gate__input" type="text" name="code" inputmode="numeric"
+               autocomplete="one-time-code" maxlength="6" placeholder="000000"
+               autofocus aria-label="Код из Telegram">
+        <button class="gate__button" type="submit">Войти</button>
+      </form>
+      <form method="post">
+        {% csrf_token %}
+        <button class="gate__button gate__button--ghost" type="submit" name="send" value="1">
+          Прислать код заново
+        </button>
+      </form>
+      <p class="gate__hint">
+        Код действует {{ minutes }} мин. После пяти неверных попыток
+        аннулируется — тогда запросите новый.
+      </p>
+    {% else %}
+      <form method="post">
+        {% csrf_token %}
+        <button class="gate__button" type="submit" name="send" value="1">
+          Прислать код в Telegram
+        </button>
+      </form>
+      <p class="gate__hint">
+        Если Telegram недоступен, в админку всегда можно зайти через
+        SSH-туннель — с самого сервера код не спрашивается.
+      </p>
+    {% endif %}
+  </div>
+</body>
+</html>

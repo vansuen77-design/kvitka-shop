@@ -1,0 +1,16 @@
+# Проверка каждые 5 минут. Копировать в /etc/systemd/system/
+#
+#   sudo systemctl enable --now kvitka-monitor.timer
+#   systemctl list-timers kvitka-monitor
+#   sudo systemctl start kvitka-monitor     — проверить прямо сейчас
+
+[Unit]
+Description=Проверять сайт КВІТКА каждые 5 минут
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target

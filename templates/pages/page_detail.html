@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+
+{% block title %}{{ page.title }} — {{ shop.NAME }}{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% versioned 'css/page.css' %}">{% endblock %}
+
+{% block content %}
+<article class="info">
+  <div class="info__main">
+    <h1 class="info__title">{{ page.title }}</h1>
+    {% if page.lead_text %}<p class="info__lead">{{ page.lead_text }}</p>{% endif %}
+
+    <div class="info__body">
+      {% for block in blocks %}
+        {% if block.kind == "title" %}
+          <h2 class="info__subtitle">{{ block.text }}</h2>
+        {% elif block.kind == "list" %}
+          <ul class="info__list">
+            {% for item in block.items %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+        {% else %}
+          <p>{{ block.text }}</p>
+        {% endif %}
+      {% empty %}
+        <p>{% trans "Текст этой страницы пока не заполнен — добавьте его в админке." %}</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="info__aside">
+    {% if neighbours %}
+      <div class="info__box">
+        <div class="info__box-title">{% if page.group == "buyer" %}{% trans "Покупателю" %}{% elif page.group == "partner" %}{% trans "Партнёрам" %}{% else %}{{ page.get_group_display }}{% endif %}</div>
+        {% for other in neighbours %}
+          <a href="{{ other.get_absolute_url }}">{{ other.title }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="info__box">
+      <div class="info__box-title">{% trans "Остались вопросы" %}</div>
+      <span class="info__phone">{{ shop.PHONE }}</span>
+      <span class="info__muted">{% blocktrans with manager=shop.MANAGER hours=shop.HOURS %}флорист {{ manager }}, {{ hours }}{% endblocktrans %}</span>
+      <a class="button button--dark" href="{% url 'catalog:index' %}">{% trans "Выбрать букет" %}</a>
+    </div>
+  </aside>
+</article>
+{% endblock %}

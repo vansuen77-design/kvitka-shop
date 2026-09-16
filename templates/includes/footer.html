@@ -1,0 +1,86 @@
+{% load shop i18n %}
+{% comment %}
+  Подвал. Пять колонок: кто мы, разделы каталога, страницы для покупателя,
+  страницы для компаний и связь. Разделы берём из того же списка, что
+  и меню в шапке (context_processors.navigation), страницы — из таблицы
+  pages: завели страницу в админке, она появилась в своей колонке сама.
+
+  Нижняя строка отделена линией: там копирайт и оговорка про фото —
+  то, что читают один раз и больше не возвращаются.
+{% endcomment %}
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__about">
+      <div class="footer__brand">
+        {% comment %}Подвал тёмный — здесь светлая версия знака.{% endcomment %}
+        <img src="{% versioned 'img/logo-dark.svg' %}" alt="" width="34" height="34">
+        {{ shop.NAME }}
+      </div>
+      <p>{% blocktrans with city=shop.CITY %}Свежие цветы каждый день. Собираем букеты под заказ и привозим по городу {{ city }}.{% endblocktrans %}</p>
+
+      <ul class="footer__perks">
+        <li>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+          {% blocktrans with hours=shop.DELIVERY_HOURS %}Доставка за {{ hours }}{% endblocktrans %}
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h12V6H3zM15 9h4l2 3v4h-6z"/><circle cx="7" cy="17" r="2"/><circle cx="17.5" cy="17" r="2"/></svg>
+          {% blocktrans with sum=shop.FREE_DELIVERY_FROM|money %}Бесплатно от {{ sum }}{% endblocktrans %}
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7.5v9l-8 4.5-8-4.5v-9L12 3z"/><path d="m4.3 7.4 7.7 4.3 7.7-4.3M12 20.8v-9.1"/></svg>
+          {% trans "Оплата при получении" %}
+        </li>
+      </ul>
+    </div>
+
+    {% if root_categories %}
+      <div class="footer__column">
+        <div class="footer__title">{% trans "Каталог" %}</div>
+        {% for category in root_categories %}
+          <a href="{{ category.get_absolute_url }}">{{ category.title }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if footer_buyer %}
+      <div class="footer__column">
+        <div class="footer__title">{% trans "Покупателю" %}</div>
+        {% for page in footer_buyer %}
+          <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if footer_partner %}
+      <div class="footer__column">
+        <div class="footer__title">{% trans "Компаниям" %}</div>
+        {% for page in footer_partner %}
+          <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="footer__column footer__column--contacts">
+      <div class="footer__title">{% trans "Связь" %}</div>
+      <a class="footer__phone" href="tel:{{ shop.PHONE|cut:' '|cut:'-'|cut:'('|cut:')' }}">{{ shop.PHONE }}</a>
+      <span class="footer__hours">{% blocktrans with manager=shop.MANAGER hours=shop.HOURS %}флорист {{ manager }}, {{ hours }}{% endblocktrans %}</span>
+
+      <span class="footer__messengers">
+        <a href="{{ shop.TELEGRAM }}">Telegram</a>
+        <a href="{{ shop.VIBER }}">Viber</a>
+        <a href="{{ shop.INSTAGRAM }}">Instagram</a>
+      </span>
+
+      {% if shop.ADDRESS %}<span>{{ shop.CITY }}, {{ shop.ADDRESS }}</span>
+      {% elif shop.CITY %}<span>{{ shop.CITY }}</span>{% endif %}
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="footer__bottom-inner">
+      <span>© {% now "Y" %} {{ shop.NAME }} · {{ shop.TAGLINE }}</span>
+      <span>{% trans "Букет на фото — образец: цветы живые, каждый собираем заново" %}</span>
+    </div>
+  </div>
+</footer>

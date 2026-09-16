@@ -1,0 +1,12 @@
+{% extends "admin/delete_selected_confirmation.html" %}
+
+{% block content %}
+  <div class="kvitka-warning">
+    <div class="kvitka-warning__title">Товары, привязанные к этим значениям, пропадут из каталога</div>
+    <p>
+      Они останутся в базе вместе с фотографиями и ценами — вернуть их можно
+      галкой «Показывать на сайте» в списке товаров.
+    </p>
+  </div>
+  {{ block.super }}
+{% endblock %}

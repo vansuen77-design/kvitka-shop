@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+{% comment %}
+  Страница «адрес не найден». Django подставляет её сам, когда ни один
+  адрес не подошёл — но только при выключенной отладке, то есть на
+  сервере. На копии вместо неё видно жёлтую отладочную страницу
+  со списком адресов, и это правильно: разработчику нужна она.
+
+  Контекст здесь обычный, с шапкой и подвалом: Django рендерит 404
+  вместе с запросом. У 500.html так не выйдет — см. соседний файл.
+{% endcomment %}
+
+{% block title %}{% trans "Страница не найдена" %} — {{ shop.NAME }}{% endblock %}
+
+{% block styles %}<link rel="stylesheet" href="{% versioned 'css/error.css' %}">{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div class="error-page__code">404</div>
+  <h1 class="error-page__title">{% trans "Такой страницы нет" %}</h1>
+  <p class="error-page__lead">
+    {% trans "Возможно, товар сняли с продажи или в адресе опечатка. Каталог на месте — начните оттуда или найдите нужное по артикулу." %}
+  </p>
+
+  <form class="error-page__search" action="{% url 'catalog:index' %}" method="get" role="search">
+    <input class="input" type="search" name="q"
+           placeholder="{% trans "Название или цветок — например «пионы»" %}"
+           aria-label="{% trans "Поиск по каталогу" %}">
+    <button class="button button--dark" type="submit">{% trans "Найти" %}</button>
+  </form>
+
+  <div class="error-page__links">
+    <a class="button button--accent" href="{% url 'catalog:index' %}">{% trans "В каталог" %}</a>
+    <a class="button button--ghost" href="{% url 'orders:cart' %}">{% trans "Корзина" %}</a>
+  </div>
+
+  <p class="error-page__note">
+    {% blocktrans with phone=shop.PHONE %}Не нашли нужное — позвоните {{ phone }}, флорист подскажет замену.{% endblocktrans %}
+  </p>
+</div>
+{% endblock %}

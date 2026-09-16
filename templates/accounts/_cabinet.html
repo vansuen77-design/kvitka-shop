@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+{% comment %}
+  Каркас кабинета: слева разделы, справа содержимое страницы.
+{% endcomment %}
+{% comment %}
+  Кабинет показывает те же карточки товаров, что и каталог (избранное,
+  сводка на обзоре), а вся их вёрстка живёт в catalog.css. Без него
+  карточка разваливалась: фотография во всю ширину, цена и счётчик
+  строчками подряд. Подключаем его первым, чтобы правила кабинета
+  могли что-то в нём перебить.
+{% endcomment %}
+{% block styles %}
+  <link rel="stylesheet" href="{% versioned 'css/catalog.css' %}">
+  <link rel="stylesheet" href="{% versioned 'css/account.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cabinet">
+  <aside class="cabinet__side">
+    <div class="cabinet__who">
+      <span class="cabinet__name">{{ user.first_name|default:user.email }}</span>
+      <span class="cabinet__email">{{ user.email }}</span>
+    </div>
+    <nav class="cabinet__nav">
+      <a class="cabinet__link{% if section == 'dashboard' %} is-active{% endif %}" href="{% url 'accounts:dashboard' %}">{% trans "Обзор" %}</a>
+      <a class="cabinet__link{% if section == 'orders' %} is-active{% endif %}" href="{% url 'accounts:orders' %}">{% trans "Мои заказы" %}</a>
+      <a class="cabinet__link{% if section == 'favorites' %} is-active{% endif %}" href="{% url 'accounts:favorites' %}">{% trans "Избранное" %}{% if favorites_count %} <span class="cabinet__count">{{ favorites_count }}</span>{% endif %}</a>
+      <a class="cabinet__link{% if section == 'profile' %} is-active{% endif %}" href="{% url 'accounts:profile' %}">{% trans "Мои данные" %}</a>
+    </nav>
+    <form class="cabinet__exit" method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="cabinet__logout">{% trans "Выйти" %}</button>
+    </form>
+  </aside>
+
+  <div class="cabinet__main">
+    {% if messages %}
+      <div class="notes">
+        {% for message in messages %}<div class="note">{{ message }}</div>{% endfor %}
+      </div>
+    {% endif %}
+    <h1 class="cabinet__title">{% block cabinet_title %}{% endblock %}</h1>
+    {% block cabinet_body %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

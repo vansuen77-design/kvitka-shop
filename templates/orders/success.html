@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+
+{% block styles %}<link rel="stylesheet" href="{% versioned 'css/cart.css' %}">{% endblock %}
+
+{% block content %}
+<div class="success">
+  <div class="success__badge">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+  </div>
+
+  <h1 class="success__title">{% blocktrans with number=order.number %}Заказ {{ number }} принят{% endblocktrans %}</h1>
+  <p class="success__lead">
+    {% blocktrans with client=order.name manager=shop.MANAGER %}{{ client }}, флорист {{ manager }} перезвонит вам в ближайшее время, подтвердит наличие цветов и время доставки.{% endblocktrans %}
+  </p>
+
+  <div class="success__card">
+    <div class="success__row"><span>{% trans "Как получить" %}</span><span>{{ order.get_delivery_display }}</span></div>
+    {% if not order.is_pickup %}
+      <div class="success__row"><span>{% trans "Адрес" %}</span><span>{{ order.address }}</span></div>
+    {% endif %}
+    {% if order.delivery_date %}
+      <div class="success__row"><span>{% trans "Когда" %}</span><span>{{ order.delivery_date|date:"d.m.Y" }}{% if order.delivery_time %} · {{ order.get_delivery_time_display }}{% endif %}</span></div>
+    {% endif %}
+    {% if order.recipient_name or order.recipient_phone %}
+      <div class="success__row"><span>{% trans "Получатель" %}</span><span>{{ order.recipient_name }} {{ order.recipient_phone }}</span></div>
+    {% endif %}
+    {% if order.card_text %}
+      <div class="success__row"><span>{% trans "Открытка" %}</span><span>«{{ order.card_text }}»</span></div>
+    {% endif %}
+    <div class="success__row"><span>{% trans "Оплата" %}</span><span>{{ order.get_payment_display }}</span></div>
+    <div class="success__row"><span>{% trans "Телефон" %}</span><span>{{ order.phone }}</span></div>
+  </div>
+
+  <div class="success__lines">
+    {% for line in order.lines.all %}
+      <div class="success__line">
+        <span class="success__article">{{ line.article }}</span>
+        <span>{{ line.product_name }}</span>
+        <span class="success__size">{% blocktrans with qty=line.quantity %}{{ qty }} шт{% endblocktrans %}</span>
+        <span class="success__amount">{{ line.amount|money }}</span>
+      </div>
+    {% endfor %}
+    <div class="success__line success__line--muted">
+      <span></span>
+      <span>{% trans "Доставка" %}</span>
+      <span></span>
+      <span class="success__amount">{% if order.is_pickup %}{% trans "самовывоз" %}{% elif order.delivery_cost %}{{ order.delivery_cost|money }}{% else %}{% trans "бесплатно" %}{% endif %}</span>
+    </div>
+    <div class="success__line success__line--total">
+      <span></span>
+      <span>{% trans "Итого" %}</span>
+      <span></span>
+      <span class="success__amount">{{ order.total_amount|money }}</span>
+    </div>
+  </div>
+
+  <p class="success__note">
+    {% trans "Если каких-то цветов не окажется, флорист предложит замену той же стоимости. Ничего оплачивать сейчас не нужно." %}
+  </p>
+
+  <a class="button button--accent button--large" href="{% url 'catalog:index' %}">{% trans "Вернуться в каталог" %}</a>
+</div>
+{% endblock %}

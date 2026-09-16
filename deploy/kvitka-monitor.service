@@ -1,0 +1,14 @@
+# Разовая проверка сайта. Запускается таймером, сам по себе не работает.
+# Копировать в /etc/systemd/system/
+
+[Unit]
+Description=Проверка доступности сайта КВІТКА
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=kvitka
+Group=kvitka
+ExecStart=/bin/bash /home/kvitka/kvitka/deploy/monitor.sh
+NoNewPrivileges=true
+PrivateTmp=true

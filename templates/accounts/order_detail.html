@@ -1,0 +1,72 @@
+{% extends "accounts/_cabinet.html" %}
+{% load shop i18n %}
+
+{% block cabinet_title %}{% blocktrans with number=order.number %}Заказ {{ number }}{% endblocktrans %}{% endblock %}
+
+{% block cabinet_body %}
+  <div class="order-head">
+    <span class="order__status order__status--{{ order.status }}">{{ order.get_status_display }}</span>
+    <span class="order-head__date">{% blocktrans with date=order.created_at|date:"d.m.Y H:i" %}оформлен {{ date }}{% endblocktrans %}</span>
+  </div>
+
+  <div class="lines lines--plain">
+    <div class="lines__head">
+      <span>{% trans "Товар" %}</span>
+      <span class="lines__right">{% trans "Количество" %}</span>
+      <span class="lines__right">{% trans "Цена за шт" %}</span>
+      <span class="lines__right">{% trans "Сумма" %}</span>
+    </div>
+    {% for line in order.lines.all %}
+      <div class="line line--plain">
+        <div class="line__info">
+          <span class="line__article">{% trans "АРТ." %} {{ line.article }}</span>
+          {% if line.product %}
+            <a class="line__name" href="{{ line.product.get_absolute_url }}">{{ line.product_name }}</a>
+          {% else %}
+            <span class="line__name">{{ line.product_name }}</span>
+          {% endif %}
+        </div>
+        <span class="lines__right">{% blocktrans with qty=line.quantity %}{{ qty }} шт{% endblocktrans %}</span>
+        <span class="lines__right">{{ line.unit_price|money }}</span>
+        <span class="lines__right">{{ line.amount|money }}</span>
+      </div>
+    {% endfor %}
+    <div class="lines__foot lines__foot--muted">
+      <span>{% trans "Доставка" %}</span>
+      <span>{% if order.is_pickup %}{% trans "самовывоз" %}{% elif order.delivery_cost %}{{ order.delivery_cost|money }}{% else %}{% trans "бесплатно" %}{% endif %}</span>
+    </div>
+    <div class="lines__foot">
+      <span>{% trans "Итого на момент заказа" %}</span>
+      <span class="lines__total">{{ order.total_amount|money }}</span>
+    </div>
+  </div>
+
+  <section class="block">
+    <h2 class="block__title">{% trans "Доставка" %}</h2>
+    <dl class="order-delivery">
+      <div><dt>{% trans "Как получить" %}</dt><dd>{{ order.get_delivery_display }}</dd></div>
+      {% if not order.is_pickup %}<div><dt>{% trans "Адрес" %}</dt><dd>{{ order.address }}</dd></div>{% endif %}
+      {% if order.delivery_date %}<div><dt>{% trans "Когда" %}</dt><dd>{{ order.delivery_date|date:"d.m.Y" }}{% if order.delivery_time %} · {{ order.get_delivery_time_display }}{% endif %}</dd></div>{% endif %}
+      {% if order.recipient_name or order.recipient_phone %}<div><dt>{% trans "Получатель" %}</dt><dd>{{ order.recipient_name }} {{ order.recipient_phone }}</dd></div>{% endif %}
+      {% if order.card_text %}<div><dt>{% trans "Открытка" %}</dt><dd>«{{ order.card_text }}»</dd></div>{% endif %}
+      <div><dt>{% trans "Оплата" %}</dt><dd>{{ order.get_payment_display }}</dd></div>
+    </dl>
+  </section>
+
+  {% comment %}
+    Цены сохранены на момент заказа — через месяц видно, о чём
+    договаривались, даже если прайс с тех пор поменялся.
+  {% endcomment %}
+  <p class="hint">{% trans "Наличие цветов и время доставки подтверждает флорист при звонке." %}</p>
+
+  {% if order.comment %}
+    <section class="block">
+      <h2 class="block__title">{% trans "Ваш комментарий" %}</h2>
+      <p class="order-comment">{{ order.comment|linebreaksbr }}</p>
+    </section>
+  {% endif %}
+
+  <div class="order-foot">
+    <a class="button button--ghost" href="{% url 'accounts:orders' %}">{% trans "Ко всем заказам" %}</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,467 @@
+/* KVITKA — base.css
+   Author: ISHOD · 2026 · all rights reserved. */
+/* Базовые токены, сетка страницы, шапка, подвал и общие элементы. */
+
+:root {
+  /* Палитра магазина: тёплый сливочный фон, розово-малиновый акцент,
+     зелёный для «в наличии». Меняется только здесь. */
+  --bg: #FAF6F2;
+  --surface: #FFFFFF;
+  --surface-muted: #FDF9F6;
+  --ink: #1F1719;
+  --ink-soft: #4E4246;
+  --ink-muted: #8E8085;
+  --line: #E9DCD9;
+  --line-soft: #F5ECE9;
+  --field: #DCCBC8;
+  --accent: #B23A5E;
+  --accent-dark: #8E2C4A;
+  --ok: #4F7A4B;
+  --warn: #B0711F;
+
+  --font-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-display: "Instrument Serif", Georgia, serif;
+
+  --page-width: 1360px;
+  /* Скругления. Было 2px — почти прямой угол, из-за чего сетка карточек
+     читалась как таблица с острыми краями; потом 6/12. Сейчас 10/16:
+     так же, как в соседних магазинах на этом же движке, — округлость
+     заметна сразу и держит всю страницу мягче. Три ступени: мелкая для
+     полей и кнопок, средняя для карточек и блоков, полная для бейджей.
+     Меняется только здесь: всё остальное берёт значения отсюда. */
+  --radius: 10px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+
+  /* Тени вместо жёстких рамок. Рамку глаз видит как линию, тень —
+     как глубину: сетка перестаёт рябить контурами. */
+  --shadow: 0 1px 2px rgba(25, 21, 18, 0.04), 0 2px 8px rgba(25, 21, 18, 0.04);
+  --shadow-hover: 0 2px 4px rgba(25, 21, 18, 0.05), 0 8px 24px rgba(25, 21, 18, 0.09);
+
+  /* Одна кривая на весь сайт: движение выглядит собранным,
+     когда всё замедляется одинаково. */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-dark); }
+h1, h2, h3 { margin: 0; font-weight: 600; }
+p { margin: 0; }
+img { max-width: 100%; display: block; }
+
+.page {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 24px 40px 56px;
+}
+
+/* --- служебная полоса --------------------------------------------- */
+.topbar { background: var(--ink); color: #CDBFB4; font-size: 12.5px; }
+.topbar__inner {
+  max-width: var(--page-width); margin: 0 auto; padding: 0 40px;
+  min-height: 38px; display: flex; align-items: center;
+  gap: 24px; flex-wrap: wrap;
+}
+.topbar__facts { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+/* значок + текст одним блоком: значок задаёт цвет акцентом, текст
+   остаётся приглушённым, иначе полоса начинает спорить с шапкой */
+.topbar__fact { display: inline-flex; align-items: center; gap: 7px; }
+.topbar__fact svg { color: #C08FA0; flex: none; }
+.topbar__sep { color: #4A4038; }
+.topbar__phone {
+  margin-left: auto; font-family: var(--font-mono); font-size: 13px;
+  font-weight: 500; color: #F2E9E2; letter-spacing: 0.02em; white-space: nowrap;
+}
+.topbar__phone:hover { color: #fff; }
+
+/* Переключатель языка. Это кнопки внутри формы, а не ссылки: выбор
+   уходит на сервер обычным POST, поэтому работает и без JavaScript. */
+.langs { display: flex; align-items: center; gap: 6px; }
+.langs__item {
+  border: 0; background: none; padding: 2px 0; margin: 0;
+  font: inherit; font-size: 12px; letter-spacing: 0.06em;
+  color: #8C7F74; cursor: pointer;
+}
+.langs__item:hover { color: #F2E9E2; }
+.langs__item.is-active { color: #F2E9E2; font-weight: 600; cursor: default; }
+.langs__sep { color: #4A4038; }
+
+/* --- шапка --------------------------------------------------------- */
+/* --- шапка ------------------------------------------------------------ */
+/* Шапка липнет к верху окна: каталог длинный, а поиск и корзина нужны
+   на любой высоте страницы. Прокрутили — шапка сама ужимается:
+   уходят подпись под логотипом, контакты менеджера и строка разделов,
+   остаётся узкая полоса. Верхняя тёмная полоса с условиями не липкая
+   и просто уезжает вверх — она информационная, читают её один раз.
+   Класс на <body> ставит StickyHeader из core.js. */
+.header {
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 40;
+  transition: box-shadow 0.2s var(--ease);
+}
+body.is-scrolled .header { box-shadow: 0 2px 14px rgba(25, 21, 18, 0.09); }
+body.is-scrolled .header__inner { padding-top: 9px; padding-bottom: 9px; }
+body.is-scrolled .brand__name { font-size: 23px; }
+body.is-scrolled .brand__tagline,
+body.is-scrolled .fav-link__text,
+body.is-scrolled .sections { display: none; }
+body.is-scrolled .search,
+body.is-scrolled .cart-badge { height: 40px; }
+.header__inner {
+  max-width: var(--page-width); margin: 0 auto; padding: 16px 40px;
+  display: flex; align-items: center; gap: 28px;
+}
+.brand { display: flex; align-items: center; gap: 11px; color: var(--ink); }
+.brand:hover { color: var(--ink); }
+.brand__text { display: flex; flex-direction: column; gap: 1px; }
+/* знак не сжимается вместе с шапкой в тесноте и не растягивается */
+.brand__logo { width: 38px; height: 38px; flex: none;
+               transition: width 0.18s var(--ease), height 0.18s var(--ease); }
+body.is-scrolled .brand__logo { width: 31px; height: 31px; }
+.brand__name { font-family: var(--font-display); font-size: 30px; line-height: 1; letter-spacing: 0.02em; }
+.brand__tagline { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); }
+
+.search {
+  flex-grow: 1; display: flex; align-items: stretch; height: 46px;
+  border: 1px solid var(--field); background: #FDFBF9;
+  border-radius: var(--radius); overflow: hidden;
+  transition: height 0.18s var(--ease);
+}
+.search__icon { display: flex; align-items: center; padding: 0 10px 0 14px; color: var(--ink-muted); }
+.search__input { flex-grow: 1; border: 0; background: transparent; font: inherit; padding: 0 4px; outline: none; }
+.search__input::placeholder { color: #9A8F87; }
+.search__submit { border: 0; padding: 0 22px; background: var(--accent); color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
+.search__submit:hover { background: var(--accent-dark); }
+
+.header__contacts { display: flex; flex-direction: column; text-align: right; gap: 2px; }
+.header__phone { font-family: var(--font-mono); font-size: 15px; font-weight: 500; }
+.header__manager { font-size: 12px; color: var(--ink-muted); }
+
+.cart-badge {
+  display: flex; align-items: center; gap: 12px; height: 46px;
+  padding: 0 18px; background: var(--ink); color: #fff;
+  border-radius: var(--radius); transition: height 0.18s var(--ease);
+}
+.cart-badge:hover { color: #fff; background: #2A231D; }
+.cart-badge__text { display: flex; flex-direction: column; line-height: 1.15; }
+.cart-badge__count { font-size: 12px; color: #B9AAA0; }
+.cart-badge__sum { font-family: var(--font-mono); font-size: 14px; font-weight: 500; }
+
+.sections__inner {
+  max-width: var(--page-width); margin: 0 auto; padding: 0 40px;
+  display: flex; align-items: center; gap: 26px; height: 48px;
+  border-top: 1px solid var(--line-soft); font-size: 14.5px; overflow-x: auto;
+}
+.sections__link { color: var(--ink-soft); white-space: nowrap; }
+.sections__link.is-active { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); height: 48px; display: flex; align-items: center; }
+
+/* «Акции» — не раздел, а фильтр по скидке. Отбиваем вправо и красим
+   акцентом, чтобы пункт не читался как ещё одна категория.
+   Правило стоит ПОСЛЕ .sections__link.is-active: специфичность у них
+   одинаковая, и активное состояние акций должно перебивать общее. */
+.sections__sale {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent); font-weight: 600; padding-left: 18px;
+}
+.sections__sale:hover { color: var(--accent-dark); }
+.sections__sale.is-active {
+  color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent);
+  height: 48px;
+}
+.sections__sale-mark { font-family: var(--font-mono); font-size: 13px; }
+
+/* --- хлебные крошки ------------------------------------------------ */
+.breadcrumbs { display: flex; gap: 8px; font-size: 13px; color: var(--ink-muted); margin-bottom: 16px; }
+.breadcrumbs a { color: var(--ink-muted); }
+.breadcrumbs a:hover { color: var(--accent); }
+
+/* --- кнопки и поля ------------------------------------------------- */
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 18px; border: 1px solid transparent; border-radius: var(--radius);
+  font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background 0.18s var(--ease), border-color 0.18s var(--ease),
+              color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+.button--accent { background: var(--accent); color: #fff; }
+.button--accent:hover { background: var(--accent-dark); color: #fff; }
+.button--dark { background: var(--ink); color: #fff; }
+.button--dark:hover { background: #2A231D; color: #fff; }
+.button--ghost { background: var(--surface); border-color: var(--field); color: var(--ink); }
+.button--ghost:hover { border-color: var(--ink); color: var(--ink); }
+.button--large { height: 50px; padding: 0 26px; font-size: 15.5px; }
+.button[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.link-button { border: 0; background: none; padding: 0; font: inherit; font-size: 12.5px; color: var(--accent); cursor: pointer; }
+.link-button:hover { color: var(--accent-dark); }
+
+.input, .textarea, select {
+  border: 1px solid var(--field); background: #FDFBF9; font: inherit;
+  padding: 0 12px; height: 40px; border-radius: var(--radius); color: var(--ink);
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+/* фокус подсвечиваем мягким кольцом, а не системной синей рамкой */
+.input:focus, .textarea:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(138, 58, 82, 0.12);
+}
+.input--small { height: 38px; width: 100%; font-family: var(--font-mono); font-size: 13.5px; }
+.textarea { height: auto; padding: 11px 13px; width: 100%; resize: vertical; }
+.textarea--mono { font-family: var(--font-mono); font-size: 13px; line-height: 1.7; }
+
+/* Родные стрелки у числовых полей убраны везде: попасть по ним мышью
+   трудно, зато колесо мыши над полем случайно меняет цену или количество.
+   Значение вводится с клавиатуры, а количество — кнопками − и +. */
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* --- поля форм ------------------------------------------------------
+   Общее для заказа, регистрации и кабинета: подпись сверху, поле,
+   ошибка под ним. Живёт здесь, а не в request.css, потому что формы
+   есть на нескольких страницах, а стиль у них один. */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field__label { font-size: 12.5px; color: var(--ink-soft); }
+.field__label i { color: var(--accent); font-style: normal; }
+/* серая пометка у полей, которые можно пропустить: без неё покупатель
+   видит пустое поле и не понимает, ждут от него чего-то или нет */
+.field__optional { font-style: normal; font-size: 11.5px; color: var(--ink-muted); }
+.field__error { font-size: 12.5px; color: var(--accent); }
+.field .input, .field .textarea { width: 100%; }
+.form-error { padding: 10px 12px; border-left: 2px solid var(--accent); background: var(--surface-muted); font-size: 13px; color: var(--ink-soft); }
+
+.radios { display: flex; flex-wrap: wrap; gap: 8px; }
+.radio { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid var(--field); font-size: 13.5px; cursor: pointer; }
+.radio input { accent-color: var(--accent); }
+.agree { display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; cursor: pointer; }
+.agree input { margin-top: 2px; accent-color: var(--accent); }
+
+/* ссылка на политику под галкой согласия */
+.agree__link {
+  display: inline-block; margin: -4px 0 0 26px;
+  font-size: 12.5px; color: var(--ink-muted);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.agree__link:hover { color: var(--accent); }
+
+/* --- общие блоки --------------------------------------------------- */
+/* Бейджи. Были плотными прямоугольниками во всю яркость цвета —
+   на пёстрых фотографиях это первое, что бросалось в глаза, хотя
+   важнее сам товар. Теперь пилюля, меньше кегль, лёгкая тень. */
+.badge {
+  position: absolute; left: 10px; top: 10px; padding: 4px 10px;
+  color: #fff; font-size: 11px; font-weight: 500; letter-spacing: 0.01em;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 4px rgba(25, 21, 18, 0.18);
+}
+/* скидка висит справа, чтобы не спорить со статусом в левом углу */
+.badge--sale { left: auto; right: 10px; background: var(--accent);
+               font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.02em; }
+
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+.no-photo { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #B7ABA1; font-size: 12px; }
+
+.notice { border: 1px solid var(--field); background: var(--surface-muted); padding: 14px 16px; font-size: 14px; color: var(--ink-soft); border-radius: var(--radius); }
+
+.specs { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.specs__row { display: flex; gap: 10px; font-size: 13px; }
+.specs__row dt { color: var(--ink-muted); flex-shrink: 0; width: 100px; margin: 0; }
+.specs__row dd { margin: 0; }
+
+.grid--products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+
+.empty { background: var(--surface); border: 1px solid var(--line); padding: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; border-radius: var(--radius-card); }
+.empty__title { font-size: 18px; font-weight: 600; }
+.empty p { color: var(--ink-soft); max-width: 460px; }
+
+.tag { padding: 8px 12px; border: 1px solid var(--field); background: var(--surface); font-size: 13px; border-radius: var(--radius-pill); }
+
+/* --- сердечко --------------------------------------------------------- */
+.card__fav, .fav-button {
+  border: 1px solid var(--field); background: rgba(255, 255, 255, 0.92);
+  color: var(--ink-muted); cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius);
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease),
+              transform 0.18s var(--ease);
+}
+.card__fav:active, .fav-button:active { transform: scale(0.92); }
+/* на карточке лежит поверх фотографии, в правом нижнем её углу:
+   левый верхний занят статусом, правый верхний — скидкой */
+.card__fav { position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px;
+             border-radius: var(--radius-pill); backdrop-filter: blur(4px); }
+.card { position: relative; }
+.fav-button { width: 50px; height: 50px; flex-shrink: 0; }
+.card__fav:hover, .fav-button:hover { color: var(--accent); border-color: var(--accent); }
+.card__fav.is-active, .fav-button.is-active { color: var(--accent); border-color: var(--accent); }
+.card__fav.is-active svg, .fav-button.is-active svg { fill: currentColor; }
+.card__fav[disabled], .fav-button[disabled] { opacity: 0.5; cursor: default; }
+
+/* --- ссылка на кабинет в шапке ---------------------------------------- */
+.account-link { display: flex; align-items: center; gap: 8px; color: var(--ink); }
+.account-link:hover { color: var(--accent); }
+.account-link__text { display: flex; flex-direction: column; line-height: 1.2; }
+.account-link__name { font-size: 13.5px; font-weight: 600; }
+.account-link__note { font-size: 11.5px; color: var(--ink-muted); }
+
+/* --- избранное в шапке ------------------------------------------------ */
+/* Сердечки с карточек складываются сюда. Счётчик — кружок на уголке
+   значка: число меняется без перезагрузки, поэтому отдельной строкой
+   его писать нельзя — она прыгала бы по ширине. Пустое избранное
+   счётчик не показывает вовсе (атрибут hidden ставит шаблон, снимает
+   и возвращает Favorites.count в core.js). */
+/* отступ шире обычного: кружок счётчика вылезает за значок вправо
+   и при gap:9px почти касался подписи */
+.fav-link { display: flex; align-items: center; gap: 14px; color: var(--ink); }
+.fav-link:hover { color: var(--accent); }
+.fav-link__icon { position: relative; display: flex; }
+.fav-link__count {
+  position: absolute; top: -6px; right: -9px;
+  min-width: 17px; height: 17px; padding: 0 4px;
+  border-radius: var(--radius-pill); background: var(--accent); color: #fff;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+.fav-link__text { font-size: 13.5px; font-weight: 600; }
+
+/* --- подвал ---------------------------------------------------------- */
+/* Пять колонок в строке: о магазине, каталог, покупателю, партнёрам,
+   связь. Сетка, а не flex с межколоночными отступами: колонок может
+   стать на одну меньше (нет партнёрских страниц), и подвал не должен
+   от этого расползаться — auto-fit сам пересоберёт строку. */
+.footer { background: var(--ink); color: #B9AAA0; margin-top: 28px; }
+.footer__inner {
+  max-width: var(--page-width); margin: 0 auto; padding: 38px 40px 30px;
+  display: grid; gap: 34px 40px;
+  grid-template-columns: minmax(240px, 1.4fr) repeat(auto-fit, minmax(140px, 1fr));
+  align-items: start;
+}
+.footer__about { display: flex; flex-direction: column; gap: 12px; max-width: 320px; }
+.footer__brand {
+  font-family: var(--font-display); font-size: 26px; color: #F2E9E2;
+  display: flex; align-items: center; gap: 10px;
+}
+.footer__brand img { width: 34px; height: 34px; flex: none; }
+.footer__about p { font-size: 13.5px; line-height: 1.55; }
+
+/* три строки «почему мы» — те же, что в верхней полосе, но здесь
+   человек читает их спокойно, дойдя до конца страницы */
+.footer__perks { list-style: none; margin: 2px 0 0; padding: 0;
+                 display: flex; flex-direction: column; gap: 9px; }
+.footer__perks li { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+.footer__perks svg { color: #C08FA0; flex: none; }
+
+.footer__column { display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; }
+.footer__column--contacts { gap: 8px; }
+.footer__title { color: #F2E9E2; font-weight: 600; margin-bottom: 2px; }
+.footer a, .footer span, .footer li { color: #B9AAA0; }
+.footer a:hover { color: #F2E9E2; }
+.footer__phone {
+  font-family: var(--font-mono); font-size: 17px; font-weight: 500;
+  color: #F2E9E2 !important; letter-spacing: 0.02em;
+}
+.footer__hours { font-size: 12.5px; }
+.footer__messengers { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 2px; }
+
+/* нижняя строка: копирайт и оговорка про цены */
+.footer__bottom { border-top: 1px solid rgba(242, 233, 226, 0.09); }
+.footer__bottom-inner {
+  max-width: var(--page-width); margin: 0 auto; padding: 16px 40px;
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  font-size: 12.5px; color: #8A7C72;
+}
+.footer__bottom-inner span { color: #8A7C72; }
+
+/* --- адаптив ------------------------------------------------------- */
+@media (max-width: 1180px) {
+  .grid--products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* в шапке становится тесно: от избранного оставляем значок */
+  .fav-link__text { display: none; }
+}
+@media (max-width: 900px) {
+  .page, .header__inner, .topbar__inner, .sections__inner, .footer__inner { padding-left: 16px; padding-right: 16px; }
+  /* в тесной шапке от кабинета остаётся только значок */
+  .account-link__text { display: none; }
+  .brand__logo { width: 32px; height: 32px; }
+  .header__inner { flex-wrap: wrap; gap: 14px; }
+  .search { order: 3; width: 100%; flex-basis: 100%; }
+  /* в полосе остаётся только город: остальное не влезает, а телефон
+     важнее — он уходит вправо и остаётся видимым */
+  .topbar__facts .topbar__fact:not(:first-child) { display: none; }
+  .langs { margin-left: auto; }
+  .topbar__sep { display: none; }
+}
+@media (max-width: 640px) {
+  .grid--products { grid-template-columns: minmax(0, 1fr); }
+  .footer__inner {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 26px 24px; padding-top: 30px;
+  }
+  .footer__about { grid-column: 1 / -1; max-width: none; }
+  .footer__bottom-inner { padding-left: 16px; padding-right: 16px; }
+}
+
+/* --- всплывающие уведомления ----------------------------------------- */
+/* Появляются в правом нижнем углу, когда товар уходит в корзину.
+   Ниже корзины и поверх всего остального; на телефоне растягиваются
+   по ширине экрана, потому что угол там занимать нечем. */
+.toasts {
+  position: fixed; right: 20px; bottom: 20px; z-index: 60;
+  display: flex; flex-direction: column; gap: 10px;
+  max-width: min(380px, calc(100vw - 40px));
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-radius: var(--radius-card);
+  background: var(--ink); color: #F2E9E2;
+  box-shadow: 0 6px 24px rgba(25, 21, 18, 0.22);
+  font-size: 14px; line-height: 1.35;
+  animation: toast-in 0.22s var(--ease);
+}
+.toast__text {
+  /* длинное название режем двумя строками: сообщение не должно
+     вырастать в половину экрана */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.toast__link {
+  margin-left: auto; flex: none; color: #E7B9C8;
+  border-bottom: 1px solid rgba(231, 185, 200, 0.45); padding-bottom: 1px;
+  white-space: nowrap;
+}
+.toast__link:hover { color: #fff; border-bottom-color: #fff; }
+.toast.is-leaving { animation: toast-out 0.22s var(--ease) forwards; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(6px); }
+}
+
+@media (max-width: 620px) {
+  .toasts { right: 12px; left: 12px; bottom: 12px; max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast, .toast.is-leaving { animation: none; }
+  .header, .search, .cart-badge { transition: none; }
+}

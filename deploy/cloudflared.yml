@@ -1,0 +1,19 @@
+# Настройка туннеля на сервере. Тот же туннель, что работает сейчас:
+# идентификатор и файл ключей — ваши, менять не нужно.
+
+tunnel: ИДЕНТИФИКАТОР-ТУННЕЛЯ
+credentials-file: /home/kvitka/.cloudflared/ИДЕНТИФИКАТОР-ТУННЕЛЯ.json
+
+protocol: http2
+edge-ip-version: "4"
+
+# Боевой адрес — kvitka.example. Прежний testprogram.com.ua убран
+# намеренно: запросы на него теперь падают в заглушку внизу и получают
+# 404. Если когда-нибудь понадобится вернуть, достаточно дописать его
+# двумя строками выше заглушки.
+ingress:
+  - hostname: kvitka.example
+    service: http://127.0.0.1:8000
+  - hostname: www.kvitka.example
+    service: http://127.0.0.1:8000
+  - service: http_status:404

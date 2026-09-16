@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static shop i18n %}
+{% comment %}
+  Каркас для узких страниц кабинета: вход, регистрация, пароль.
+  Одна колонка по центру — здесь меню кабинета только мешало бы.
+{% endcomment %}
+{% block styles %}<link rel="stylesheet" href="{% versioned 'css/account.css' %}">{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <div class="auth__card">
+    <h1 class="auth__title">{% block auth_title %}{% endblock %}</h1>
+    {% block auth_lead %}{% endblock %}
+    {% block auth_body %}{% endblock %}
+  </div>
+  {% block auth_aside %}{% endblock %}
+</div>
+{% endblock %}
