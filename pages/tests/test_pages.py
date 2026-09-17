@@ -1,4 +1,4 @@
-"""Информационные страницы: разметка текста, подвал, страница согласия."""
+"""Info pages: text markup, footer, consent page."""
 
 from io import StringIO
 from django.core.management import call_command

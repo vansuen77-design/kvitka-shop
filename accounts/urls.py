@@ -1,4 +1,4 @@
-"""Адреса кабинета покупателя."""
+"""Customer account URLs."""
 
 from django.conf import settings
 from django.contrib.auth import views as auth_views
@@ -19,13 +19,13 @@ urlpatterns = [
     path("dannye/", views.profile_edit, name="profile"),
     path("api/izbrannoe/", views.FavoriteToggle.as_view(), name="favorite-toggle"),
 
-    # --- восстановление пароля: страницы Django, шаблоны наши -----------
+    # --- password reset: Django views, our templates ----------------------
     path("parol/", auth_views.PasswordResetView.as_view(
         template_name="accounts/password_reset.html",
         email_template_name="accounts/password_reset_email.txt",
         subject_template_name="accounts/password_reset_subject.txt",
-        # письмо рендерится без контекстных процессоров — имя магазина
-        # передаём явно, чтобы не писать его в шаблоне руками
+        # the e-mail is rendered without context processors — the shop name
+        # is passed explicitly rather than hard-coded in the template
         extra_email_context={"shop": settings.SHOP},
         success_url="/kabinet/parol/otpravleno/",
     ), name="password_reset"),

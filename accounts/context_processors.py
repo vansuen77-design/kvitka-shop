@@ -1,8 +1,8 @@
-"""Что нужно каждой странице от кабинета.
+"""What every page needs from the account.
 
-Одним запросом достаём отмеченные товары — иначе каждая карточка в сетке
-ходила бы в базу за своим сердечком (двенадцать запросов на страницу).
-Гостю не достаём ничего.
+Favourite products are fetched in one query — otherwise every tile in the
+grid would hit the database for its own heart (twelve queries per page).
+Nothing is fetched for a guest.
 """
 
 from __future__ import annotations

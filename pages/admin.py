@@ -1,4 +1,4 @@
-"""Админка информационных страниц."""
+"""Info page admin."""
 
 from django.contrib import admin
 

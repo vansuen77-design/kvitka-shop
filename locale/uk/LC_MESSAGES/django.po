@@ -1,7 +1,7 @@
-# Украинский перевод сайта КВІТКА.
-# msgid — русский текст из шаблонов и кода, msgstr — украинский.
-# Обновить список строк: python manage.py makelocales
-# Собрать после правок:  python manage.py compilelocales
+# Ukrainian translation of the КВІТКА site.
+# msgid — Russian text from templates and code, msgstr — Ukrainian.
+# Refresh the string list: python manage.py makelocales
+# Compile after editing:   python manage.py compilelocales
 
 msgid ""
 msgstr ""
@@ -20,7 +20,7 @@ msgstr "Ім’я"
 
 #: accounts/forms.py:111
 #: accounts/forms.py:47
-#: accounts/models.py:32
+#: accounts/models.py:31
 #: orders/forms.py:30
 #: templates/accounts/profile.html:16
 msgid "Почта"
@@ -85,14 +85,15 @@ msgstr "Невірна пошта або пароль."
 msgid "Удобная связь"
 msgstr "Зручний зв’язок"
 
-#: accounts/models.py:29
+#: accounts/models.py:28
 msgid "Звонок"
 msgstr "Дзвінок"
 
 #: accounts/views.py:24
-#: catalog/views.py:256
-#: catalog/views.py:288
+#: catalog/views.py:272
+#: catalog/views.py:304
 #: orders/views.py:45
+#: pages/views.py:24
 #: templates/includes/footer.html:39
 msgid "Каталог"
 msgstr "Каталог"
@@ -230,20 +231,20 @@ msgid "Статус"
 msgstr "Статус"
 
 #: catalog/filters.py:284
-#: catalog/views.py:86
+#: catalog/views.py:88
 msgid "Наличие"
 msgstr "Наявність"
 
 #: catalog/filters.py:285
-#: catalog/models.py:369
-#: catalog/views.py:89
+#: catalog/models.py:368
+#: catalog/views.py:91
 #: templates/includes/product_card.html:70
 msgid "В наличии"
 msgstr "Є в наявності"
 
 #: catalog/filters.py:285
-#: catalog/models.py:368
-#: catalog/views.py:90
+#: catalog/models.py:367
+#: catalog/views.py:92
 msgid "Нет в наличии"
 msgstr "Немає в наявності"
 
@@ -251,7 +252,7 @@ msgstr "Немає в наявності"
 msgid "Только со скидкой"
 msgstr "Тільки зі знижкою"
 
-#: catalog/models.py:401
+#: catalog/models.py:400
 #: catalog/models.py:489
 #: templates/base.html:86
 msgid "шт"
@@ -273,13 +274,13 @@ msgstr "Висота"
 msgid "Состав"
 msgstr "Склад"
 
-#: catalog/views.py:157
-#: catalog/views.py:161
+#: catalog/views.py:173
+#: catalog/views.py:177
 #: templates/includes/header.html:138
 msgid "Акции"
 msgstr "Акції"
 
-#: catalog/views.py:162
+#: catalog/views.py:178
 #: templates/includes/header.html:119
 msgid "Весь каталог"
 msgstr "Весь каталог"
@@ -375,20 +376,20 @@ msgstr "Куди везти? Вкажіть адресу."
 msgid "Выберите дату доставки."
 msgstr "Оберіть дату доставки."
 
-#: orders/models.py:44
+#: orders/models.py:45
 msgid "Курьером по городу"
 msgstr "Кур'єром по місту"
 
-#: orders/models.py:45
+#: orders/models.py:46
 #: templates/orders/email_body.txt:7
 msgid "Самовывоз из магазина"
 msgstr "Самовивіз із магазину"
 
-#: orders/models.py:48
+#: orders/models.py:49
 msgid "Наличными при получении"
 msgstr "Готівкою при отриманні"
 
-#: orders/models.py:49
+#: orders/models.py:50
 msgid "Переводом на карту"
 msgstr "Переказом на картку"
 
@@ -399,11 +400,11 @@ msgstr "Переказом на картку"
 msgid "Корзина"
 msgstr "Кошик"
 
-#: orders/views.py:71
+#: orders/views.py:72
 msgid "Сначала добавьте букеты из каталога."
 msgstr "Спочатку додайте букети з каталогу."
 
-#: orders/views.py:94
+#: orders/views.py:95
 msgid "Заказ принят"
 msgstr "Замовлення прийнято"
 

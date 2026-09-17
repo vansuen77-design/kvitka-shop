@@ -1,4 +1,4 @@
-"""Вход по почте: без учёта регистра, дубль почты не пускает никого."""
+"""Login by e-mail: case-insensitive, a duplicate e-mail lets nobody in."""
 
 from django.contrib.auth import authenticate, get_user_model
 from django.test import TestCase

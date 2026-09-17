@@ -1,8 +1,8 @@
-"""Заполняет информационные страницы стартовым текстом.
+"""Fills the info pages with starter text.
 
-Текст рабочий, но общий — под свои условия правьте в админке:
-Страницы → страницы сайта. Суммы и часы здесь совпадают с settings.SHOP
-на момент сборки; поменяли настройки — поправьте и текст.
+The text is usable but generic — adjust it to your terms in the admin:
+Pages → site pages. Amounts and hours here match settings.SHOP at build
+time; changed the settings — fix the text too.
 """
 
 from django.core.management.base import BaseCommand
@@ -193,7 +193,7 @@ PAGES = [
 
 
 class Command(BaseCommand):
-    help = "Создаёт информационные страницы сайта"
+    help = "Creates the site's info pages"
 
     def handle(self, *args, **options):
         created = kept = 0
@@ -203,9 +203,9 @@ class Command(BaseCommand):
             page, is_new = InfoPage.objects.get_or_create(slug=slug, defaults=data)
             if is_new:
                 created += 1
-                self.stdout.write(f"  {page.name} — создана")
+                self.stdout.write(f"  {page.name} — created")
             else:
                 kept += 1
         self.stdout.write(self.style.SUCCESS(
-            f"Страницы: создано {created}, уже было {kept}."
+            f"Pages: created {created}, already existed {kept}."
         ))

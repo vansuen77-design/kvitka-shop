@@ -1,11 +1,11 @@
-"""Вход по почте вместо имени пользователя.
+"""Login by e-mail instead of username.
 
-Django по умолчанию сверяет username. Покупателю помнить ещё и его
-незачем, поэтому при регистрации мы кладём в username ту же почту,
-а здесь ищем по email — без учёта регистра.
+Django checks username by default. A customer has no reason to remember
+one, so at registration the same e-mail is put into username, and here
+the lookup is by email — case-insensitively.
 
-Отдельная тонкость: если почта почему-то досталась двум записям,
-не пускаем никого. Пустить «первого попавшегося» — это дыра.
+One subtlety: if the e-mail somehow belongs to two records, nobody is let
+in. Letting "the first one found" in would be a hole.
 """
 
 from django.contrib.auth import get_user_model
@@ -22,8 +22,8 @@ class EmailBackend(ModelBackend):
         try:
             user = User.objects.get(email__iexact=login.strip())
         except (User.DoesNotExist, User.MultipleObjectsReturned):
-            # прогоняем хеширование вхолостую: иначе по времени ответа
-            # видно, есть такая почта в базе или нет
+            # run the hashing anyway: otherwise the response time reveals
+            # whether that e-mail exists in the database
             User().set_password(password)
             return None
         if user.check_password(password) and self.user_can_authenticate(user):

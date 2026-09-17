@@ -1,7 +1,7 @@
-"""Информационные страницы: «Доставка», «Оплата», «О магазине» и прочее.
+"""Info pages: "Delivery", "Payment", "About the shop" and so on.
 
-Текст правится в админке, ссылки в подвале собираются из этой же таблицы —
-добавили страницу, она сама появилась в нужной колонке.
+The text is edited in the admin; footer links are built from the same
+table — add a page and it appears in the right column by itself.
 """
 
 from django.db import models
@@ -12,7 +12,7 @@ from core.models import NamedModel
 
 
 class InfoPage(NamedModel):
-    """Одна страница с текстом."""
+    """One page of text."""
 
     class Group(models.TextChoices):
         BUYER = "buyer", "Покупателю"
@@ -54,17 +54,17 @@ class InfoPage(NamedModel):
 
     @property
     def lead_text(self) -> str:
-        """Подзаголовок на языке посетителя."""
+        """Subtitle in the visitor's language."""
         if get_language() == "uk" and self.lead_uk:
             return self.lead_uk
         return self.lead
 
     @property
     def body_text(self) -> str:
-        """Текст страницы на языке посетителя.
+        """Page text in the visitor's language.
 
-        Перевода нет - показываем русский: пустая страница хуже
-        непереведённой.
+        No translation — show Russian: an empty page is worse than an
+        untranslated one.
         """
         if get_language() == "uk" and self.body_uk:
             return self.body_uk
@@ -76,7 +76,7 @@ class InfoPage(NamedModel):
         return reverse("pages:detail", kwargs={"slug": self.slug})
 
     def blocks(self) -> list[dict]:
-        """Разбирает текст на абзацы, списки и подзаголовки."""
+        """Splits the text into paragraphs, lists and subheadings."""
         result: list[dict] = []
         bullets: list[str] = []
 

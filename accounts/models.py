@@ -1,14 +1,13 @@
-"""Кабинет покупателя: анкета и избранное.
+"""Customer account: profile and favourites.
 
-Своей модели пользователя мы не заводим — берём стандартную Django,
-а телефон и адрес доставки держим рядом в анкете.
-Так остаются целыми админка, смена пароля и восстановление доступа,
-которые Django уже умеет.
+No custom user model — Django's standard one is used, with the phone and
+delivery address kept next to it in the profile. This keeps the admin,
+password change and password reset that Django already provides intact.
 
-Вход по почте: username мы заполняем той же почтой, а сверяет
-их accounts/backends.py.
+Login by e-mail: username is filled with the same e-mail, and
+accounts/backends.py checks them.
 
-Автор кода: ISHOD, 2026. Все права на исходный код принадлежат автору.
+Code by ISHOD, 2026. All rights to the source code belong to the author.
 """
 
 from __future__ import annotations
@@ -22,9 +21,9 @@ from core.models import TimeStampedModel
 
 
 class Profile(TimeStampedModel):
-    """Данные покупателя, которые подставляются в заказ."""
+    """Customer data that is pre-filled into the order."""
 
-    # подписи показываются покупателю — помечены для makelocales
+    # labels are shown to the customer — marked for makelocales
     class Contact(models.TextChoices):
         PHONE = "phone", gettext_noop("Звонок")
         TELEGRAM = "telegram", "Telegram"
@@ -54,7 +53,7 @@ class Profile(TimeStampedModel):
         return self.user.first_name or self.user.get_username()
 
     def as_order_initial(self) -> dict:
-        """Чем заполнить форму заказа, когда человек уже вошёл."""
+        """What to pre-fill the order form with when the person is logged in."""
         return {
             "name": self.user.first_name,
             "phone": self.phone,
@@ -64,7 +63,7 @@ class Profile(TimeStampedModel):
 
 
 class Favorite(TimeStampedModel):
-    """Товар, отмеченный сердечком."""
+    """A product marked with a heart."""
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name="покупатель",

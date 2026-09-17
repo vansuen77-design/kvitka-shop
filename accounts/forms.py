@@ -1,4 +1,4 @@
-"""Формы кабинета: регистрация, вход, анкета."""
+"""Account forms: registration, login, profile."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ def clean_phone_value(phone: str) -> str:
 
 
 class RegisterForm(forms.Form):
-    """Регистрация. Почта служит и логином, и адресом для восстановления."""
+    """Registration. The e-mail serves both as login and as the reset address."""
 
     name = forms.CharField(max_length=120, widget=forms.TextInput(attrs=INPUT))
     email = forms.EmailField(widget=forms.EmailInput(attrs={**INPUT, "autocomplete": "email"}))
@@ -83,7 +83,7 @@ class RegisterForm(forms.Form):
         if first and second and first != second:
             self.add_error("password2", _("Пароли не совпадают."))
         elif first:
-            # проверки Django: длина, не только цифры, не из словаря частых
+            # Django checks: length, not all digits, not in the common list
             validate_password(first)
         return data
 
@@ -104,7 +104,7 @@ class RegisterForm(forms.Form):
 
 
 class LoginForm(AuthenticationForm):
-    """Вход по почте. Подпись поля меняем, механику Django оставляем."""
+    """Login by e-mail. The field label changes, Django's mechanics stay."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -120,7 +120,7 @@ class LoginForm(AuthenticationForm):
 
 
 class ProfileForm(forms.ModelForm):
-    """Анкета в кабинете. Имя и почта лежат в самой учётной записи."""
+    """Profile in the account. Name and e-mail live in the user record itself."""
 
     name = forms.CharField(max_length=120, widget=forms.TextInput(attrs=INPUT))
 

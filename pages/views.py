@@ -1,5 +1,6 @@
-"""Показ информационной страницы."""
+"""Displaying an info page."""
 
+from django.utils.translation import gettext as _
 from django.views.generic import DetailView
 
 from core.mixins import PageTitleMixin
@@ -20,7 +21,7 @@ class InfoPageView(PageTitleMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"title": "Каталог", "url": "/"},
+            {"title": _("Каталог"), "url": "/"},
             {"title": self.object.title, "url": None},
         ]
         context["blocks"] = self.object.blocks()

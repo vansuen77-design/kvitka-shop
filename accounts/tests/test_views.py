@@ -1,4 +1,4 @@
-"""Кабинет: регистрация, свои и чужие заказы, избранное, next."""
+"""Account: registration, own and foreign orders, favourites, next."""
 
 import json
 
@@ -84,7 +84,7 @@ class FavoritesTests(TestCase):
 
 class LoginRedirectTests(TestCase):
     def test_next_to_foreign_host_is_ignored(self):
-        """Любой next проверяется — открытого редиректа нет (инвариант 21)."""
+        """Every next is validated — no open redirect."""
         make_user(email="a@example.com", password="strong-pass-2026")
         response = self.client.post(reverse("accounts:login") + "?next=https://evil.example/",
                                     {"username": "a@example.com", "password": "strong-pass-2026"})

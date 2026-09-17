@@ -1,4 +1,4 @@
-"""Кабинет покупателя."""
+"""Customer account."""
 
 from __future__ import annotations
 
@@ -41,8 +41,8 @@ class Logout(LogoutView):
 
 @method_decorator(never_cache, name="dispatch")
 class Register(View):
-    """Регистрация. Сразу после неё человек уже вошёл — второй раз
-    вводить те же данные было бы издевательством."""
+    """Registration. Right after it the person is logged in — typing the
+    same data a second time would be cruel."""
 
     template_name = "accounts/register.html"
 
@@ -140,7 +140,7 @@ def profile_edit(request):
 
 
 class FavoriteToggle(JsonRequestMixin, View):
-    """Сердечко на карточке товара. Отвечает, в каком состоянии оно теперь."""
+    """The heart on a product tile. Answers with its new state."""
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

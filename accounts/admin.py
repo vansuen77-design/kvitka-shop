@@ -1,12 +1,12 @@
-"""Покупатели в админке.
+"""Customers in the admin.
 
-Отдельного раздела не заводим: анкета показывается прямо внутри
-учётной записи, там же, где имя и почта.
+No separate section: the profile is shown right inside the user account,
+next to the name and e-mail.
 
-Наследуемся от SingleAdminUserAdmin из core, а не от стандартного
-UserAdmin: приложение accounts регистрируется после core и перекрывает
-его настройку, а защита «последнего администратора нельзя удалить»
-должна остаться. В эталоне АМИГО она здесь терялась.
+Inherits from SingleAdminUserAdmin in core rather than the stock UserAdmin:
+the accounts app registers after core and overrides its setup, and the
+"last administrator cannot be deleted" guard must survive. In the
+original template it was lost here.
 """
 
 from django.contrib import admin

@@ -1,4 +1,4 @@
-"""Корневые адреса проекта."""
+"""Root URLs of the project."""
 
 from django.conf import settings
 from django.contrib import admin
@@ -10,32 +10,32 @@ from core.sitemaps import SITEMAPS
 from core.views import robots_txt
 from django.views.static import serve
 
-# Заголовки админки — из настроек магазина, чтобы имя жило в одном месте
+# Admin titles come from the shop settings so the name lives in one place
 admin.site.site_header = f"{settings.SHOP['NAME']} — управление магазином"
 admin.site.site_title = settings.SHOP["NAME"]
 admin.site.index_title = "Цветы с доставкой"
 
 urlpatterns = [
-    # Для поисковых систем. robots.txt и sitemap.xml обязаны лежать
-    # в корне сайта: роботы ищут их только там.
+    # For search engines. robots.txt and sitemap.xml must live at the site
+    # root: crawlers look for them only there.
     #
-    # sitemap.xml — не сам список адресов, а оглавление: в нём ссылки на
-    # четыре части (главная, разделы, товары, информационные страницы).
-    # Лишний слой нужен на вырост. В одну карту помещается ограниченное
-    # число адресов, и когда товаров станет больше этого предела, карта
-    # молча разобьётся на страницы — а поисковик увидит только первую
-    # и о новых товарах не узнает. С оглавлением этого не случится.
+    # sitemap.xml is not the address list itself but an index: it links to
+    # four parts (home, categories, products, info pages). The extra layer
+    # is for growth. One sitemap holds a limited number of addresses, and
+    # once there are more products than that, the sitemap would silently
+    # split into pages — and the crawler would see only the first one and
+    # never learn about new products. With an index that cannot happen.
     path("robots.txt", robots_txt, name="robots"),
     path("sitemap.xml", sitemap_index,
          {"sitemaps": SITEMAPS, "sitemap_url_name": "sitemap-section"},
          name="sitemap"),
     path("sitemap-<section>.xml", sitemap,
          {"sitemaps": SITEMAPS}, name="sitemap-section"),
-    # шлюз перед админкой: одноразовый код из Telegram.
-    # Стоит выше самой админки, чтобы адрес не перехватывался ею.
+    # the gate before the admin: a one-time code from Telegram.
+    # Placed above the admin itself so that the admin does not capture the URL.
     path("vhod-v-upravlenie/", gate_view, name="admin-gate"),
     path("admin/", admin.site.urls),
-    # переключатель языка: обычная форма POST, работает и без JavaScript
+    # language switcher: a plain POST form, works without JavaScript
     path("i18n/", include("django.conf.urls.i18n")),
     path("korzina/", include(("orders.urls", "orders"), namespace="orders")),
     path("kabinet/", include(("accounts.urls", "accounts"), namespace="accounts")),
@@ -43,11 +43,11 @@ urlpatterns = [
     path("", include(("catalog.urls", "catalog"), namespace="catalog")),
 ]
 
-# Фотографии товаров и собранная статика.
+# Product photos and collected static files.
 #
-# Обычно этим занимается веб-сервер, но здесь сервер — сам компьютер,
-# и раздавать файлы больше некому. Нагрузка у небольшого магазина
-# невелика, а Cloudflare перед нами всё равно кэширует картинки.
+# Usually a web server does this, but here the server is the computer
+# itself and there is nobody else to serve files. The load of a small shop
+# is low, and Cloudflare in front of us caches the images anyway.
 urlpatterns += [
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
