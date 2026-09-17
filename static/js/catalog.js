@@ -2,15 +2,15 @@
    Author: ISHOD · 2026 · all rights reserved. */
 const FILTERS_KEY = 'kvitka:filters-collapsed';
 
-// параметры, у которых может быть несколько значений: ключи из
-// catalog/facets.py плюс статус и наличие
+// parameters that may carry several values: the keys from
+// catalog/facets.py plus status and availability
 const MULTI_PARAMS = ['type', 'flower', 'occasion', 'color', 'size',
   'status', 'stock'];
 
 /**
- * Каталог: фильтры применяются без перезагрузки страницы.
- * Форма остаётся рабочей и без JavaScript — здесь мы только перехватываем
- * изменения и подменяем сетку товаров.
+ * Catalog: filters apply without a page reload.
+ * The form stays functional without JavaScript — here we only intercept
+ * changes and swap the product grid.
  */
 
 class CatalogPage {
@@ -40,14 +40,14 @@ class CatalogPage {
     });
 
     if (this.sortSelect) {
-      // select связан с формой через form="catalog-filters",
-      // поэтому FormData уже видит его — достаточно перезапросить список
+      // the select is tied to the form via form="catalog-filters", so
+      // FormData already sees it — refetching the list is enough
       this.sortSelect.addEventListener('change', () => this.fetchResults());
     }
 
     this.root.querySelectorAll('[data-facet-search]').forEach((input) => {
       input.addEventListener('input', () => this.filterGroup(input));
-      // поиск внутри группы не должен отправлять форму
+      // search inside a group must not submit the form
       input.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') event.preventDefault();
       });
@@ -72,9 +72,9 @@ class CatalogPage {
   }
 
   /**
-   * Кнопка «Подбор» сворачивает панель фильтров целиком.
-   * Выбор запоминается в браузере: если человек работает со свёрнутой
-   * панелью, она не должна разворачиваться на каждой странице заново.
+   * The "Filters" button collapses the whole filter panel.
+   * The choice is remembered in the browser: if the person works with a
+   * collapsed panel, it must not expand again on every page.
    */
   setupCollapse() {
     const toggle = this.root.querySelector('[data-filters-toggle]');
@@ -86,7 +86,7 @@ class CatalogPage {
       toggle.title = collapsed ? KVITKA.i18n.expand : KVITKA.i18n.collapse;
     };
 
-    // localStorage бывает недоступен: приватное окно, запрет на куки
+    // localStorage may be unavailable: private window, cookies blocked
     let collapsed = false;
     try {
       collapsed = window.localStorage.getItem(FILTERS_KEY) === '1';
@@ -101,15 +101,16 @@ class CatalogPage {
       try {
         window.localStorage.setItem(FILTERS_KEY, next ? '1' : '0');
       } catch (error) {
-        /* не смогли запомнить - не страшно, панель просто не запомнит выбор */
+        /* could not remember — no harm, the panel just forgets the choice */
       }
     });
   }
 
   /**
-   * Раздел выбирается радиокнопкой, а её нельзя снять обычным кликом:
-   * браузер так устроен. Поэтому запоминаем состояние до нажатия и,
-   * если кликнули по уже выбранному разделу, снимаем выбор сами.
+   * The category is picked with a radio button, and a radio cannot be
+   * unchecked by a plain click: that is how browsers work. So the state
+   * before the click is remembered, and a click on the already selected
+   * category unchecks it ourselves.
    */
   setupRadioReset() {
     let pending = null;
@@ -124,8 +125,9 @@ class CatalogPage {
       const label = event.target.closest('.check');
       const radio = label && label.querySelector('input[type="radio"]');
       if (!radio || radio !== pending) return;
-      // клик по label порождает второе такое же событие на самом input,
-      // поэтому сразу забываем цель - иначе снимем выбор дважды
+      // a click on the label produces a second identical event on the
+      // input itself, so the target is forgotten at once — otherwise the
+      // selection would be cleared twice
       pending = null;
       radio.checked = false;
       this.fetchResults();
@@ -161,8 +163,8 @@ class CatalogPage {
   }
 
   dropFilter(param, extra) {
-    // Раздел — не поле формы, он часть адреса. Снять его галочкой нельзя,
-    // поэтому просто уходим на весь каталог, сохранив остальные фильтры.
+    // The category is not a form field, it is part of the URL. It cannot
+    // be unchecked, so we simply go to the whole catalog keeping the other filters.
     if (param === 'category') {
       const root = this.root.dataset.catalogUrl || '/';
       const query = this.buildQuery();
@@ -193,9 +195,9 @@ class CatalogPage {
         this.counter.textContent =
           `${data.count} ${KVITKA.Plural.forms(data.count, KVITKA.i18n.models)}`;
       }
-      // берём путь из формы, а не из адресной строки: если запросили
-      // раздел, в адресе должен оказаться он же, иначе показанное
-      // и написанное разъезжаются
+      // the path comes from the form, not from the address bar: if a
+      // category was requested, the URL must show that category, otherwise
+      // what is shown and what is written diverge
       const path = new URL(this.form.action, window.location.origin).pathname;
       window.history.replaceState({}, '', query ? `${path}?${query}` : path);
     } catch (error) {
@@ -211,5 +213,5 @@ class CatalogPage {
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('[data-catalog]');
   if (root) new CatalogPage(root).init();
-  // Баннер новинок скрипта не требует: он статичный, всё в разметке.
+  // The new-arrivals banner needs no script: it is static markup.
 });

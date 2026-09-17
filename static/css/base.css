@@ -1,10 +1,10 @@
 /* KVITKA — base.css
    Author: ISHOD · 2026 · all rights reserved. */
-/* Базовые токены, сетка страницы, шапка, подвал и общие элементы. */
+/* Base tokens, page grid, header, footer and shared elements. */
 
 :root {
-  /* Палитра магазина: тёплый сливочный фон, розово-малиновый акцент,
-     зелёный для «в наличии». Меняется только здесь. */
+  /* Shop palette: warm cream background, crimson accent, green for
+     "in stock". Changed only here. */
   --bg: #FAF6F2;
   --surface: #FFFFFF;
   --surface-muted: #FDF9F6;
@@ -24,23 +24,23 @@
   --font-display: "Instrument Serif", Georgia, serif;
 
   --page-width: 1360px;
-  /* Скругления. Было 2px — почти прямой угол, из-за чего сетка карточек
-     читалась как таблица с острыми краями; потом 6/12. Сейчас 10/16:
-     так же, как в соседних магазинах на этом же движке, — округлость
-     заметна сразу и держит всю страницу мягче. Три ступени: мелкая для
-     полей и кнопок, средняя для карточек и блоков, полная для бейджей.
-     Меняется только здесь: всё остальное берёт значения отсюда. */
+  /* Corner radii. Used to be 2px — almost square, which made the card grid
+     read as a sharp-edged table; then 6/12. Now 10/16: same as in the
+     sibling shops on this engine — the roundness is visible at once and
+     keeps the whole page softer. Three steps: small for fields and
+     buttons, medium for cards and blocks, full for badges.
+     Changed only here: everything else takes the values from here. */
   --radius: 10px;
   --radius-card: 16px;
   --radius-pill: 999px;
 
-  /* Тени вместо жёстких рамок. Рамку глаз видит как линию, тень —
-     как глубину: сетка перестаёт рябить контурами. */
+  /* Shadows instead of hard borders. The eye sees a border as a line and
+     a shadow as depth: the grid stops flickering with outlines. */
   --shadow: 0 1px 2px rgba(25, 21, 18, 0.04), 0 2px 8px rgba(25, 21, 18, 0.04);
   --shadow-hover: 0 2px 4px rgba(25, 21, 18, 0.05), 0 8px 24px rgba(25, 21, 18, 0.09);
 
-  /* Одна кривая на весь сайт: движение выглядит собранным,
-     когда всё замедляется одинаково. */
+  /* One easing curve for the whole site: motion looks composed when
+     everything decelerates the same way. */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -68,7 +68,7 @@ img { max-width: 100%; display: block; }
   padding: 24px 40px 56px;
 }
 
-/* --- служебная полоса --------------------------------------------- */
+/* --- top info bar ------------------------------------------------- */
 .topbar { background: var(--ink); color: #CDBFB4; font-size: 12.5px; }
 .topbar__inner {
   max-width: var(--page-width); margin: 0 auto; padding: 0 40px;
@@ -76,8 +76,8 @@ img { max-width: 100%; display: block; }
   gap: 24px; flex-wrap: wrap;
 }
 .topbar__facts { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
-/* значок + текст одним блоком: значок задаёт цвет акцентом, текст
-   остаётся приглушённым, иначе полоса начинает спорить с шапкой */
+/* icon + text as one block: the icon sets the accent colour, the text
+   stays muted, otherwise the bar starts competing with the header */
 .topbar__fact { display: inline-flex; align-items: center; gap: 7px; }
 .topbar__fact svg { color: #C08FA0; flex: none; }
 .topbar__sep { color: #4A4038; }
@@ -87,8 +87,8 @@ img { max-width: 100%; display: block; }
 }
 .topbar__phone:hover { color: #fff; }
 
-/* Переключатель языка. Это кнопки внутри формы, а не ссылки: выбор
-   уходит на сервер обычным POST, поэтому работает и без JavaScript. */
+/* Language switcher. Buttons inside a form, not links: the choice goes
+   to the server as a plain POST, so it works without JavaScript. */
 .langs { display: flex; align-items: center; gap: 6px; }
 .langs__item {
   border: 0; background: none; padding: 2px 0; margin: 0;
@@ -99,14 +99,15 @@ img { max-width: 100%; display: block; }
 .langs__item.is-active { color: #F2E9E2; font-weight: 600; cursor: default; }
 .langs__sep { color: #4A4038; }
 
-/* --- шапка --------------------------------------------------------- */
-/* --- шапка ------------------------------------------------------------ */
-/* Шапка липнет к верху окна: каталог длинный, а поиск и корзина нужны
-   на любой высоте страницы. Прокрутили — шапка сама ужимается:
-   уходят подпись под логотипом, контакты менеджера и строка разделов,
-   остаётся узкая полоса. Верхняя тёмная полоса с условиями не липкая
-   и просто уезжает вверх — она информационная, читают её один раз.
-   Класс на <body> ставит StickyHeader из core.js. */
+/* --- header -------------------------------------------------------- */
+/* --- header ----------------------------------------------------------- */
+/* The header sticks to the top of the window: the catalog is long, and
+   search and the cart are needed at any scroll position. Once scrolled,
+   the header shrinks by itself: the tagline under the logo, the manager
+   contacts and the category row go away, a narrow bar remains. The dark
+   top bar with the terms is not sticky and simply scrolls away — it is
+   informational, read once. The class on <body> is set by StickyHeader
+   in core.js. */
 .header {
   background: var(--surface); border-bottom: 1px solid var(--line);
   position: sticky; top: 0; z-index: 40;
@@ -127,7 +128,7 @@ body.is-scrolled .cart-badge { height: 40px; }
 .brand { display: flex; align-items: center; gap: 11px; color: var(--ink); }
 .brand:hover { color: var(--ink); }
 .brand__text { display: flex; flex-direction: column; gap: 1px; }
-/* знак не сжимается вместе с шапкой в тесноте и не растягивается */
+/* the mark neither shrinks with the header when cramped nor stretches */
 .brand__logo { width: 38px; height: 38px; flex: none;
                transition: width 0.18s var(--ease), height 0.18s var(--ease); }
 body.is-scrolled .brand__logo { width: 31px; height: 31px; }
@@ -168,10 +169,10 @@ body.is-scrolled .brand__logo { width: 31px; height: 31px; }
 .sections__link { color: var(--ink-soft); white-space: nowrap; }
 .sections__link.is-active { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); height: 48px; display: flex; align-items: center; }
 
-/* «Акции» — не раздел, а фильтр по скидке. Отбиваем вправо и красим
-   акцентом, чтобы пункт не читался как ещё одна категория.
-   Правило стоит ПОСЛЕ .sections__link.is-active: специфичность у них
-   одинаковая, и активное состояние акций должно перебивать общее. */
+/* "Sale" is not a category but a discount filter. Pushed to the right
+   and coloured with the accent so it does not read as one more category.
+   The rule comes AFTER .sections__link.is-active: their specificity is
+   equal, and the active state of "Sale" must override the general one. */
 .sections__sale {
   margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
   color: var(--accent); font-weight: 600; padding-left: 18px;
@@ -183,12 +184,12 @@ body.is-scrolled .brand__logo { width: 31px; height: 31px; }
 }
 .sections__sale-mark { font-family: var(--font-mono); font-size: 13px; }
 
-/* --- хлебные крошки ------------------------------------------------ */
+/* --- breadcrumbs --------------------------------------------------- */
 .breadcrumbs { display: flex; gap: 8px; font-size: 13px; color: var(--ink-muted); margin-bottom: 16px; }
 .breadcrumbs a { color: var(--ink-muted); }
 .breadcrumbs a:hover { color: var(--accent); }
 
-/* --- кнопки и поля ------------------------------------------------- */
+/* --- buttons and fields -------------------------------------------- */
 .button {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   height: 40px; padding: 0 18px; border: 1px solid transparent; border-radius: var(--radius);
@@ -213,7 +214,7 @@ body.is-scrolled .brand__logo { width: 31px; height: 31px; }
   padding: 0 12px; height: 40px; border-radius: var(--radius); color: var(--ink);
   transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
-/* фокус подсвечиваем мягким кольцом, а не системной синей рамкой */
+/* focus is shown with a soft ring, not the system blue outline */
 .input:focus, .textarea:focus, select:focus {
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(138, 58, 82, 0.12);
@@ -222,22 +223,22 @@ body.is-scrolled .brand__logo { width: 31px; height: 31px; }
 .textarea { height: auto; padding: 11px 13px; width: 100%; resize: vertical; }
 .textarea--mono { font-family: var(--font-mono); font-size: 13px; line-height: 1.7; }
 
-/* Родные стрелки у числовых полей убраны везде: попасть по ним мышью
-   трудно, зато колесо мыши над полем случайно меняет цену или количество.
-   Значение вводится с клавиатуры, а количество — кнопками − и +. */
+/* Native spinners on number fields are removed everywhere: they are hard
+   to hit with the mouse, yet the wheel over a field changes a price or
+   quantity by accident. Values are typed, quantities use the − and + buttons. */
 input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* --- поля форм ------------------------------------------------------
-   Общее для заказа, регистрации и кабинета: подпись сверху, поле,
-   ошибка под ним. Живёт здесь, а не в request.css, потому что формы
-   есть на нескольких страницах, а стиль у них один. */
+/* --- form fields ----------------------------------------------------
+   Shared by checkout, registration and the account: label on top, the
+   field, the error below. Lives here rather than in cart.css because
+   forms exist on several pages and share one style. */
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field__label { font-size: 12.5px; color: var(--ink-soft); }
 .field__label i { color: var(--accent); font-style: normal; }
-/* серая пометка у полей, которые можно пропустить: без неё покупатель
-   видит пустое поле и не понимает, ждут от него чего-то или нет */
+/* grey note on fields that may be skipped: without it the customer sees
+   an empty field and does not know whether something is expected */
 .field__optional { font-style: normal; font-size: 11.5px; color: var(--ink-muted); }
 .field__error { font-size: 12.5px; color: var(--accent); }
 .field .input, .field .textarea { width: 100%; }
@@ -249,7 +250,7 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 .agree { display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; cursor: pointer; }
 .agree input { margin-top: 2px; accent-color: var(--accent); }
 
-/* ссылка на политику под галкой согласия */
+/* the policy link under the consent checkbox */
 .agree__link {
   display: inline-block; margin: -4px 0 0 26px;
   font-size: 12.5px; color: var(--ink-muted);
@@ -257,17 +258,17 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 }
 .agree__link:hover { color: var(--accent); }
 
-/* --- общие блоки --------------------------------------------------- */
-/* Бейджи. Были плотными прямоугольниками во всю яркость цвета —
-   на пёстрых фотографиях это первое, что бросалось в глаза, хотя
-   важнее сам товар. Теперь пилюля, меньше кегль, лёгкая тень. */
+/* --- shared blocks ------------------------------------------------- */
+/* Badges. Used to be dense rectangles at full colour brightness — on
+   busy photos they were the first thing to catch the eye, although the
+   product matters more. Now a pill, smaller size, light shadow. */
 .badge {
   position: absolute; left: 10px; top: 10px; padding: 4px 10px;
   color: #fff; font-size: 11px; font-weight: 500; letter-spacing: 0.01em;
   border-radius: var(--radius-pill);
   box-shadow: 0 1px 4px rgba(25, 21, 18, 0.18);
 }
-/* скидка висит справа, чтобы не спорить со статусом в левом углу */
+/* the discount sits on the right so it does not compete with the status in the left corner */
 .badge--sale { left: auto; right: 10px; background: var(--accent);
                font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.02em; }
 
@@ -290,7 +291,7 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 
 .tag { padding: 8px 12px; border: 1px solid var(--field); background: var(--surface); font-size: 13px; border-radius: var(--radius-pill); }
 
-/* --- сердечко --------------------------------------------------------- */
+/* --- heart ------------------------------------------------------------ */
 .card__fav, .fav-button {
   border: 1px solid var(--field); background: rgba(255, 255, 255, 0.92);
   color: var(--ink-muted); cursor: pointer; padding: 0;
@@ -300,8 +301,8 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
               transform 0.18s var(--ease);
 }
 .card__fav:active, .fav-button:active { transform: scale(0.92); }
-/* на карточке лежит поверх фотографии, в правом нижнем её углу:
-   левый верхний занят статусом, правый верхний — скидкой */
+/* on the card it sits over the photo, in its bottom-right corner: the
+   top-left is taken by the status, the top-right by the discount */
 .card__fav { position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px;
              border-radius: var(--radius-pill); backdrop-filter: blur(4px); }
 .card { position: relative; }
@@ -311,21 +312,21 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 .card__fav.is-active svg, .fav-button.is-active svg { fill: currentColor; }
 .card__fav[disabled], .fav-button[disabled] { opacity: 0.5; cursor: default; }
 
-/* --- ссылка на кабинет в шапке ---------------------------------------- */
+/* --- account link in the header --------------------------------------- */
 .account-link { display: flex; align-items: center; gap: 8px; color: var(--ink); }
 .account-link:hover { color: var(--accent); }
 .account-link__text { display: flex; flex-direction: column; line-height: 1.2; }
 .account-link__name { font-size: 13.5px; font-weight: 600; }
 .account-link__note { font-size: 11.5px; color: var(--ink-muted); }
 
-/* --- избранное в шапке ------------------------------------------------ */
-/* Сердечки с карточек складываются сюда. Счётчик — кружок на уголке
-   значка: число меняется без перезагрузки, поэтому отдельной строкой
-   его писать нельзя — она прыгала бы по ширине. Пустое избранное
-   счётчик не показывает вовсе (атрибут hidden ставит шаблон, снимает
-   и возвращает Favorites.count в core.js). */
-/* отступ шире обычного: кружок счётчика вылезает за значок вправо
-   и при gap:9px почти касался подписи */
+/* --- favourites in the header ----------------------------------------- */
+/* Hearts from the cards collect here. The counter is a circle on the
+   corner of the icon: the number changes without a reload, so it cannot
+   be a separate line — it would jump in width. Empty favourites show no
+   counter at all (the hidden attribute is set by the template, toggled
+   by Favorites.count in core.js). */
+/* a wider gap than usual: the counter circle sticks out past the icon
+   to the right and at gap:9px almost touched the label */
 .fav-link { display: flex; align-items: center; gap: 14px; color: var(--ink); }
 .fav-link:hover { color: var(--accent); }
 .fav-link__icon { position: relative; display: flex; }
@@ -338,11 +339,11 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 }
 .fav-link__text { font-size: 13.5px; font-weight: 600; }
 
-/* --- подвал ---------------------------------------------------------- */
-/* Пять колонок в строке: о магазине, каталог, покупателю, партнёрам,
-   связь. Сетка, а не flex с межколоночными отступами: колонок может
-   стать на одну меньше (нет партнёрских страниц), и подвал не должен
-   от этого расползаться — auto-fit сам пересоберёт строку. */
+/* --- footer ---------------------------------------------------------- */
+/* Five columns in a row: about the shop, catalog, for customers, for
+   partners, contact. Grid rather than flex with gaps: there may be one
+   column fewer (no partner pages), and the footer must not fall apart
+   from that — auto-fit rebuilds the row by itself. */
 .footer { background: var(--ink); color: #B9AAA0; margin-top: 28px; }
 .footer__inner {
   max-width: var(--page-width); margin: 0 auto; padding: 38px 40px 30px;
@@ -358,8 +359,8 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 .footer__brand img { width: 34px; height: 34px; flex: none; }
 .footer__about p { font-size: 13.5px; line-height: 1.55; }
 
-/* три строки «почему мы» — те же, что в верхней полосе, но здесь
-   человек читает их спокойно, дойдя до конца страницы */
+/* three "why us" lines — the same as in the top bar, but here the
+   person reads them calmly, having reached the end of the page */
 .footer__perks { list-style: none; margin: 2px 0 0; padding: 0;
                  display: flex; flex-direction: column; gap: 9px; }
 .footer__perks li { display: flex; align-items: center; gap: 9px; font-size: 13px; }
@@ -377,7 +378,7 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 .footer__hours { font-size: 12.5px; }
 .footer__messengers { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 2px; }
 
-/* нижняя строка: копирайт и оговорка про цены */
+/* bottom line: copyright and the price disclaimer */
 .footer__bottom { border-top: 1px solid rgba(242, 233, 226, 0.09); }
 .footer__bottom-inner {
   max-width: var(--page-width); margin: 0 auto; padding: 16px 40px;
@@ -386,21 +387,21 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
 }
 .footer__bottom-inner span { color: #8A7C72; }
 
-/* --- адаптив ------------------------------------------------------- */
+/* --- responsive ---------------------------------------------------- */
 @media (max-width: 1180px) {
   .grid--products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* в шапке становится тесно: от избранного оставляем значок */
+  /* the header gets cramped: only the icon of favourites remains */
   .fav-link__text { display: none; }
 }
 @media (max-width: 900px) {
   .page, .header__inner, .topbar__inner, .sections__inner, .footer__inner { padding-left: 16px; padding-right: 16px; }
-  /* в тесной шапке от кабинета остаётся только значок */
+  /* in the cramped header only the account icon remains */
   .account-link__text { display: none; }
   .brand__logo { width: 32px; height: 32px; }
   .header__inner { flex-wrap: wrap; gap: 14px; }
   .search { order: 3; width: 100%; flex-basis: 100%; }
-  /* в полосе остаётся только город: остальное не влезает, а телефон
-     важнее — он уходит вправо и остаётся видимым */
+  /* only the city remains in the bar: the rest does not fit, and the
+     phone matters more — it moves right and stays visible */
   .topbar__facts .topbar__fact:not(:first-child) { display: none; }
   .langs { margin-left: auto; }
   .topbar__sep { display: none; }
@@ -415,10 +416,10 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
   .footer__bottom-inner { padding-left: 16px; padding-right: 16px; }
 }
 
-/* --- всплывающие уведомления ----------------------------------------- */
-/* Появляются в правом нижнем углу, когда товар уходит в корзину.
-   Ниже корзины и поверх всего остального; на телефоне растягиваются
-   по ширине экрана, потому что угол там занимать нечем. */
+/* --- toast notifications --------------------------------------------- */
+/* Appear in the bottom-right corner when a product goes into the cart.
+   Below the cart and above everything else; on a phone they stretch
+   across the screen width because there is no corner to occupy. */
 .toasts {
   position: fixed; right: 20px; bottom: 20px; z-index: 60;
   display: flex; flex-direction: column; gap: 10px;
@@ -435,8 +436,8 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin
   animation: toast-in 0.22s var(--ease);
 }
 .toast__text {
-  /* длинное название режем двумя строками: сообщение не должно
-     вырастать в половину экрана */
+  /* a long name is cut to two lines: the message must not grow to
+     half the screen */
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
 }

@@ -1,6 +1,6 @@
 /* KVITKA — page.css
    Author: ISHOD · 2026 · all rights reserved. */
-/* Информационная страница: текст слева, контакты справа. */
+/* Info page: text on the left, contacts on the right. */
 
 .info { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
 .info__main { background: var(--surface); border: 1px solid var(--line); padding: 34px 38px;  border-radius: var(--radius-card);}

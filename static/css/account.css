@@ -1,8 +1,8 @@
 /* KVITKA — account.css
    Author: ISHOD · 2026 · all rights reserved. */
-/* Кабинет покупателя: вход, регистрация, обзор, заказы, избранное. */
+/* Customer account: login, registration, overview, orders, favourites. */
 
-/* --- узкие страницы: вход, регистрация, пароль ---------------------- */
+/* --- narrow pages: login, registration, password --------------------- */
 .auth { max-width: 460px; margin: 0 auto; padding: 8px 0 48px; }
 .auth__card {
   background: var(--surface); border: 1px solid var(--line);
@@ -15,10 +15,10 @@
 .auth__links { font-size: 13px; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 6px; }
 .auth__sep { color: var(--ink-muted); }
 
-/* Плашка «загляните в спам» на странице отправленного письма.
-   Цвет предупреждения, а не ошибки: ничего не сломалось, человеку
-   просто нужно знать, где искать. Обычной строкой в тексте это
-   не работает — её проскакивают и уходят, не найдя письма. */
+/* The "check your spam folder" notice on the e-mail-sent page.
+   Warning colour, not error: nothing broke, the person just needs to
+   know where to look. As a plain line in the text it does not work —
+   people skip it and leave without finding the e-mail. */
 .auth__notice {
   display: flex; flex-direction: column; gap: 4px;
   padding: 12px 14px; border-radius: var(--radius);
@@ -29,7 +29,7 @@
 .auth__notice strong { color: var(--warn); font-weight: 600; }
 .auth__notice span { color: var(--ink-soft); }
 
-/* --- каркас кабинета ------------------------------------------------ */
+/* --- account layout ------------------------------------------------- */
 .cabinet { display: flex; align-items: flex-start; gap: 28px; padding-bottom: 32px; }
 .cabinet__side {
   width: 240px; flex-shrink: 0; position: sticky; top: 20px;
@@ -63,27 +63,28 @@
 .cabinet__subtitle { font-family: var(--font-mono); font-size: 12px;
                      color: var(--ink-muted); margin-top: -16px; }
 
-/* Карточки товаров в кабинете. В каталоге их три в ряд на всю ширину
-   страницы, а здесь слева ещё колонка разделов — жёсткие три колонки
-   выходили бы слишком тесными. Поэтому сколько поместится по 220px:
-   на широком экране те же три, на планшете две, на телефоне одна. */
+/* Product cards in the account. In the catalog there are three per row
+   across the whole page width, but here there is a section column on
+   the left — a rigid three columns would be too cramped. So as many as
+   fit at 220px: the same three on a wide screen, two on a tablet, one
+   on a phone. */
 .cabinet__main .grid--products {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
 }
-/* фотография в кабинете ниже каталожной: страница здесь про список,
-   а не про разглядывание товара. Меняем переменную, а не высоту —
-   иначе сердечко на фото останется висеть на старом месте */
+/* the photo in the account is shorter than in the catalog: this page is
+   about the list, not about examining a product. The variable changes,
+   not the height — otherwise the heart on the photo stays in its old place */
 .cabinet__main .card { --media-height: 200px; }
 
 .notes { display: flex; flex-direction: column; gap: 8px; }
 .note { border-left: 2px solid var(--ok); background: var(--surface); padding: 10px 14px; font-size: 13.5px; color: var(--ink-soft); }
 .hint { font-size: 13px; color: var(--ink-muted); line-height: 1.55; }
 
-/* --- плитки обзора --------------------------------------------------- */
-/* Три одинаковые плитки: подпись сверху, значение крупно, пояснение
-   снизу. Одинаковое строение важнее разнообразия — иначе третья
-   выпадает из ряда и это читается как поломка вёрстки. */
+/* --- overview tiles -------------------------------------------------- */
+/* Three identical tiles: label on top, large value, note below.
+   Identical structure matters more than variety — otherwise the third
+   one falls out of line and reads as broken layout. */
 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .tile {
   background: var(--surface); border: 1px solid var(--line); padding: 14px 16px;
@@ -93,17 +94,17 @@
 .tile:hover { border-color: #CFC3B8; color: var(--ink); }
 .tile__label { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
 .tile__value { font-family: var(--font-mono); font-size: 24px; font-weight: 500; line-height: 1.1; }
-/* почта — не число: моноширинный крупный кегль растянул бы её на всю
-   плитку, поэтому текстовое значение показываем спокойнее и обрезаем */
+/* an e-mail is not a number: a large monospace size would stretch it
+   across the whole tile, so a text value is shown calmer and clipped */
 .tile__value--text {
   font-family: var(--font-ui); font-size: 14px; font-weight: 500;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tile__note { font-size: 12px; color: var(--ink-muted); }
 
-/* Пустое состояние внутри кабинета. Обычный .empty занимает пол-экрана:
-   на витрине это уместно, а здесь под ним ещё разделы — получается
-   дыра посреди страницы. */
+/* Empty state inside the account. The usual .empty takes half the screen:
+   fine on the storefront, but here there are sections below it — a hole
+   in the middle of the page. */
 .empty--compact {
   flex-direction: row; align-items: center; justify-content: space-between;
   text-align: left; padding: 20px 22px; gap: 20px;
@@ -117,7 +118,7 @@
 .block__title { font-size: 17px; }
 .block__more { font-size: 13px; }
 
-/* --- список заказов -------------------------------------------------- */
+/* --- order list ------------------------------------------------------ */
 .orders { display: flex; flex-direction: column; gap: 8px; }
 .order {
   background: var(--surface); border: 1px solid var(--line); padding: 13px 16px;
@@ -134,7 +135,7 @@
   border: 1px solid var(--line); background: var(--surface-muted); color: var(--ink-soft);
   white-space: nowrap;
  border-radius: var(--radius-pill);}
-/* цветом отмечаем только то, что покупателю важно заметить */
+/* colour marks only what the customer needs to notice */
 .order__status--new { border-color: var(--accent); color: var(--accent); }
 .order__status--confirmed, .order__status--shipped { border-color: var(--ok); color: var(--ok); }
 .order__status--rejected { color: var(--ink-muted); }
@@ -144,7 +145,7 @@
 .order-foot { padding-top: 4px; }
 .order-comment { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6;  border-radius: var(--radius);}
 
-/* строки заказа: та же сетка, что в корзине, но без кнопок и фотографий */
+/* order lines: the same grid as in the cart, but without buttons and photos */
 .lines--plain { background: var(--surface); border: 1px solid var(--line);  border-radius: var(--radius-card);}
 .lines--plain .lines__head,
 .line--plain {
@@ -181,7 +182,7 @@
   .auth__card { padding: 20px; }
 }
 
-/* --- заказ: доставка ------------------------------------------------- */
+/* --- order: delivery ------------------------------------------------- */
 .lines__foot--muted { color: var(--ink-soft); font-size: 13px; padding-bottom: 4px; }
 .order-delivery { margin: 0; display: grid; grid-template-columns: 1fr; gap: 8px; }
 .order-delivery div { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; font-size: 13.5px; }

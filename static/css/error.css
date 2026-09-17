@@ -1,7 +1,7 @@
 /* KVITKA — error.css
    Author: ISHOD · 2026 · all rights reserved. */
-/* Страница 404. У 500 стили лежат внутри неё самой — она обязана
-   показаться даже тогда, когда файлы стилей не отдаются. */
+/* The 404 page. The 500 page keeps its styles inline — it must show
+   even when stylesheet files are not served. */
 
 .error-page {
   max-width: 620px; margin: 0 auto; padding: 40px 0 64px;

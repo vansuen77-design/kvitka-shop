@@ -1,16 +1,16 @@
 /* KVITKA — product.css
    Author: ISHOD · 2026 · all rights reserved. */
-/* Карточка товара: галерея, цена, количество, характеристики. */
+/* Product page: gallery, price, quantity, specifications. */
 
 .product { display: grid; grid-template-columns: 600px minmax(0, 1fr); gap: 40px; align-items: start; }
 .product__specs, .related { grid-column: 1 / -1; }
 
-/* --- галерея ---------------------------------------------------------- */
+/* --- gallery ---------------------------------------------------------- */
 .gallery__main { height: 560px; background: #FFFFFF; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; position: relative; padding: 16px;  border-radius: var(--radius-card);}
 .gallery__main--empty { background: var(--surface-muted); }
 .gallery__main img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-/* --- стрелки перелистывания --- */
+/* --- navigation arrows --- */
 .gallery__arrow {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 44px; height: 44px;
@@ -39,7 +39,7 @@
 .gallery__thumb img { width: 100%; height: 100%; object-fit: contain; }
 .gallery__thumb.is-active { border: 2px solid var(--ink); }
 
-/* --- правая колонка --------------------------------------------------- */
+/* --- right column ----------------------------------------------------- */
 .product__panel { display: flex; flex-direction: column; gap: 20px; }
 .product__head { display: flex; flex-direction: column; gap: 8px; }
 .product__meta { display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: var(--ink-soft); flex-wrap: wrap; }
@@ -50,7 +50,7 @@
 .product__note { font-size: 13px; color: var(--ink-soft); line-height: 1.55; border-left: 2px solid var(--ok); padding-left: 12px; }
 .status { display: inline-flex; align-items: center; gap: 7px; }
 
-/* --- цена ------------------------------------------------------------- */
+/* --- price ------------------------------------------------------------ */
 .price-block { border: 1px solid var(--line); background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;  border-radius: var(--radius-card);}
 .price-block__main { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .price-block__value { font-family: var(--font-mono); font-size: 30px; font-weight: 500; }
@@ -58,7 +58,7 @@
 .price-block__old { font-family: var(--font-mono); font-size: 16px; color: var(--ink-muted); }
 .price-block__package { font-size: 13.5px; color: var(--ink-soft); }
 
-/* --- количество и добавление в корзину --------------------------------- */
+/* --- quantity and add to cart ----------------------------------------- */
 .order-box { border: 1px solid var(--ink); background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
 .order-box__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .order-box__title { font-size: 14px; font-weight: 600; }
@@ -82,7 +82,7 @@
 }
 .stepper__input::-webkit-outer-spin-button, .stepper__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* --- характеристики --------------------------------------------------- */
+/* --- specifications --------------------------------------------------- */
 .product__specs { background: var(--surface); border: 1px solid var(--line); margin-top: 8px;  border-radius: var(--radius-card);}
 .specs__head { border-bottom: 1px solid var(--line); padding: 0 8px; display: flex; }
 .specs__tab { padding: 15px 16px; font-size: 14.5px; font-weight: 600; }
@@ -92,8 +92,8 @@
 .specs--wide .specs__row { justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 13.5px; }
 .specs--wide .specs__row dt { width: auto; }
 .specs--wide .specs__row dd { text-align: right; }
-/* нет описания и розницы — таблица занимает всю ширину, а не жмётся
-   в половину с пустотой справа */
+/* no description — the table takes the full width instead of
+   squeezing into a half with emptiness on the right */
 .specs__body--single .specs--wide { padding-right: 24px; }
 .specs__aside { width: 380px; flex-shrink: 0; border-left: 1px solid var(--line-soft); padding: 22px 24px; background: var(--surface-muted); display: flex; flex-direction: column; gap: 18px; }
 .specs__block { display: flex; flex-direction: column; gap: 10px; }
@@ -115,9 +115,9 @@
   .order-box__row .button { width: 100%; }
 }
 
-/* --- просмотр фото на весь экран ------------------------------------- */
-/* Пока лайтбокс открыт, страница под ним не должна прокручиваться:
-   иначе колесо уезжает в каталог вместо приближения фотографии. */
+/* --- full-screen photo viewer ---------------------------------------- */
+/* While the lightbox is open the page beneath must not scroll:
+   otherwise the wheel scrolls the catalog instead of zooming the photo. */
 html.is-lightbox { overflow: hidden; }
 
 .gallery__main img { cursor: zoom-in; }
@@ -170,7 +170,7 @@ html.is-lightbox { overflow: hidden; }
   max-width: 100%; max-height: 100%; object-fit: contain;
   transition: transform 0.18s ease; will-change: transform;
 }
-/* при панораме плавность только мешает — картинка тянется за курсором */
+/* when panning, easing only gets in the way — the image lags behind the cursor */
 .lightbox__stage.is-zoomed img { transition: none; }
 
 .lightbox__arrow {
@@ -224,7 +224,7 @@ html.is-lightbox { overflow: hidden; }
   .lightbox__stage img { transition: none; }
 }
 
-/* --- скидка ------------------------------------------------------------ */
+/* --- discount --------------------------------------------------------- */
 .price-block__sale {
   align-self: center; padding: 3px 8px;
   background: var(--accent); color: #fff;
@@ -232,9 +232,10 @@ html.is-lightbox { overflow: hidden; }
 }
 .price-block__save { font-size: 13.5px; color: var(--accent); }
 
-/* --- переключатель размера ------------------------------------------- */
-/* Варианты — обычные ссылки на страницы соседних товаров семейства.
-   Текущий размер выделен и не кликается; распроданный — приглушён. */
+/* --- size switcher ---------------------------------------------------- */
+/* Variants are plain links to the pages of sibling products in the
+   family. The current size is highlighted and not clickable; a sold-out
+   one is muted. */
 .variants { display: flex; flex-direction: column; gap: 8px; }
 .variants__title { font-size: 12.5px; color: var(--ink-soft); }
 .variants__list { display: flex; flex-wrap: wrap; gap: 8px; }

@@ -1,14 +1,14 @@
 /* KVITKA — core.js
    Author: ISHOD · 2026 · all rights reserved. */
 /**
- * Общий слой для всех страниц: запросы к бэкенду, форматирование денег
- * и счётчик корзины в шапке.
+ * Shared layer for every page: backend requests, money formatting and
+ * the cart counter in the header.
  */
 
 /**
- * Подписи на языке страницы. Django переводит только шаблоны, поэтому
- * строки для скриптов кладутся в <script type="application/json"> в base.html,
- * а здесь просто читаются. Если блока нет — работаем на русском.
+ * Labels in the page language. Django translates templates only, so
+ * strings for scripts are placed into <script type="application/json">
+ * in base.html and simply read here. If the block is missing — Russian.
  */
 const I18N = (() => {
   const fallback = {
@@ -113,17 +113,17 @@ class CartBadge {
 }
 
 /**
- * Липкая шапка.
+ * Sticky header.
  *
- * Каталог длинный, а корзина и поиск нужны на любой высоте страницы —
- * иначе за ними приходится мотать наверх. Поэтому шапка прилипает
- * к верху окна, а когда страница прокручена, сама ужимается: уходят
- * подпись под логотипом, контакты менеджера и строка разделов.
- * Остаётся узкая полоса — логотип, поиск, кабинет, заявка.
+ * The catalog is long, and the cart and search are needed at any scroll
+ * position — otherwise you scroll back up for them. So the header sticks
+ * to the top of the window and, once the page is scrolled, shrinks by
+ * itself: the tagline under the logo, the manager contacts and the
+ * category row go away. A narrow bar remains — logo, search, account, cart.
  *
- * Вся работа скрипта — один класс на <body>: что именно прячется,
- * решает CSS. Слушатель пассивный и срабатывает только на смене
- * состояния, а не на каждом пикселе прокрутки.
+ * All the script does is toggle one class on <body>: what exactly hides
+ * is decided by CSS. The listener is passive and fires only on a state
+ * change, not on every scrolled pixel.
  */
 class StickyHeader {
   constructor(threshold = 120) {
@@ -144,15 +144,15 @@ class StickyHeader {
 }
 
 /**
- * Всплывающие уведомления о добавлении в корзину.
+ * Toast notifications for adding to the cart.
  *
- * Корзина собирается прямо в каталоге, не открывая её: человек жмёт
- * корзинку на карточке и остаётся на месте. Без ответа непонятно,
- * попал товар в корзину или нет — счётчик в шапке меняется слишком
- * тихо, особенно на прокрученной странице.
+ * The cart is filled right in the catalog without opening it: the person
+ * presses the cart icon on a tile and stays put. Without feedback it is
+ * unclear whether the product got into the cart — the header counter
+ * changes too quietly, especially on a scrolled page.
  *
- * Больше трёх сообщений на экране не держим: четвёртое вытесняет
- * самое старое, иначе при наборе десяти позиций они закрывают товары.
+ * No more than three messages on screen: the fourth pushes out the oldest,
+ * otherwise picking ten items would cover the products.
  */
 class Toasts {
   constructor(cartUrl, favoritesUrl) {
@@ -167,14 +167,14 @@ class Toasts {
     if (!this.box) {
       this.box = document.createElement('div');
       this.box.className = 'toasts';
-      // aria-live: читалка произносит появившийся текст, не уводя фокус
+      // aria-live: a screen reader announces the new text without moving focus
       this.box.setAttribute('aria-live', 'polite');
       document.body.appendChild(this.box);
     }
     return this.box;
   }
 
-  /** show('текст', {href, text}) — ссылка необязательна. */
+  /** show('text', {href, text}) — the link is optional. */
   show(text, link = null) {
     const box = this.container();
     const toast = document.createElement('div');
@@ -201,12 +201,12 @@ class Toasts {
       setTimeout(() => toast.remove(), 250);
     };
     const timer = setTimeout(hide, this.life);
-    // навели мышь — не убираем: человек читает или целится в ссылку
+    // mouse over — do not hide: the person is reading or aiming at the link
     toast.addEventListener('mouseenter', () => clearTimeout(timer));
     toast.addEventListener('mouseleave', () => setTimeout(hide, 1200));
   }
 
-  /** Общая формулировка: «Название» — что с ним стало. */
+  /** Common wording: "Name" — what happened to it. */
   about(name, what, link) {
     this.show(name ? `«${name}» — ${what}` : what, link);
   }
@@ -221,18 +221,18 @@ class Toasts {
                { href: this.favoritesUrl, text: I18N.goToFavorites });
   }
 
-  /** Сердечко сняли. Ссылка тут не нужна: человек ничего не набирал. */
+  /** Heart removed. No link needed: the person did not collect anything. */
   unfavorited(name) {
     this.about(name, I18N.fromFavorites, null);
   }
 }
 
 class ProductCards {
-  /** Счётчик и кнопка «в корзину» прямо в плитке каталога.
+  /** Stepper and "add to cart" button right in the catalog tile.
    *
-   * В плитке лежит обычная форма (orders:form-add): без скрипта она
-   * отправляется с перезагрузкой, здесь мы её перехватываем и шлём
-   * fetch, чтобы человек остался на месте.
+   * The tile holds a plain form (orders:form-add): without the script it
+   * submits with a reload, here we intercept it and send fetch so the
+   * person stays put.
    */
 
   constructor(addUrl) {
@@ -265,8 +265,8 @@ class ProductCards {
   }
 
   async add(card, form) {
-    // поля — через form.elements, а не по атрибутам: так поле нельзя
-    // спутать с одноимённым свойством формы (грабля 17)
+    // fields via form.elements, not by attribute: this way a field cannot
+    // be confused with a same-named form property
     const input = form.elements['quantity'];
     const button = form.querySelector('[data-add-to-cart]');
     const quantity = normalizeQuantity(input ? input.value : 0, card.dataset);
@@ -292,12 +292,12 @@ class ProductCards {
 }
 
 /**
- * Приведение количества к тому, что можно заказать.
+ * Normalising the quantity to what can be ordered.
  *
- * Повторяет Product.normalize_quantity с сервера: целое, не меньше
- * нуля, не больше остатка. Дублирование намеренное: сервер всё равно
- * проверит, а счётчик должен показывать правду сразу, не дожидаясь
- * ответа.
+ * Mirrors Product.normalize_quantity on the server: an integer, not below
+ * zero, not above stock. The duplication is deliberate: the server checks
+ * anyway, but the stepper must show the truth immediately without waiting
+ * for a response.
  */
 function normalizeQuantity(value, options = {}) {
   const max = parseInt(options.max, 10) || 0;
@@ -307,8 +307,8 @@ function normalizeQuantity(value, options = {}) {
   return Math.min(quantity, max);
 }
 
-/** То же самое, но пустое значение подтягивается к минимуму:
- *  в счётчике товара ноль показывать незачем. */
+/** The same, but an empty value is pulled up to the minimum:
+ *  there is no point showing zero in a product stepper. */
 function quantityForStepper(value, options) {
   return normalizeQuantity(value, options) || normalizeQuantity(1, options);
 }
@@ -322,12 +322,12 @@ function debounce(fn, delay = 300) {
 }
 
 /**
- * Избранное. Сердечко на карточке товара и на его странице.
+ * Favourites. The heart on the product tile and on the product page.
  *
- * Гостю кабинета нет — сервер ответит отказом, и мы просто уводим
- * человека на вход, запомнив, куда он хотел вернуться. Внешний вид
- * кнопки меняем сразу, до ответа: так нажатие ощущается мгновенным,
- * а если сервер откажет — возвращаем как было.
+ * A guest has no account — the server refuses, and we simply send the
+ * person to the login page, remembering where they wanted to return. The
+ * button look changes at once, before the response: the click feels
+ * instant, and if the server refuses — it is reverted.
  */
 class Favorites {
   constructor(url, loginUrl) {
@@ -353,8 +353,8 @@ class Favorites {
       const data = await KVITKA.api.post(this.url, { product: button.dataset.favorite });
       this.paint(button, data.active);
       this.count(data.total);
-      // название лежит на карточке товара или на его странице —
-      // у обеих есть data-name, поэтому ищем ближайшего носителя
+      // the name sits on the product tile or on its page — both have
+      // data-name, so the closest carrier is looked up
       const name = (button.closest('[data-name]') || {}).dataset;
       KVITKA.toasts[data.active ? 'favorited' : 'unfavorited'](
         (name && name.name) || '',
@@ -372,7 +372,7 @@ class Favorites {
   paint(button, active) {
     button.classList.toggle('is-active', Boolean(active));
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
-    // на странице товара и в каталоге может быть одна и та же карточка
+    // the product page and the catalog may show the same product
     document.querySelectorAll(`[data-favorite="${button.dataset.favorite}"]`)
       .forEach((twin) => {
         twin.classList.toggle('is-active', Boolean(active));

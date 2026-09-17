@@ -1,16 +1,16 @@
 /* KVITKA — cart.js
    Author: ISHOD · 2026 · all rights reserved. */
 /**
- * Страница корзины: количество, удаление позиций, очистка и поля
- * доставки в форме заказа.
+ * Cart page: quantities, removing lines, clearing and the delivery
+ * fields of the order form.
  *
- * Страница никогда не перезагружается: сервер вместе с итогами возвращает
- * готовую разметку таблицы, и мы подменяем её на месте. Перезагрузка здесь
- * была источником путаницы — она успевала оборвать следующий запрос,
- * и позиция добавлялась «через раз».
+ * The page never reloads: together with the totals the server returns
+ * the ready table markup, and we swap it in place. A reload used to be a
+ * source of confusion here — it cut off the next request, and a line was
+ * added "every other time".
  *
- * Без JavaScript всё то же делают обычные формы в строках таблицы
- * (orders:form-update) — здесь мы только их перехватываем.
+ * Without JavaScript the plain forms in the table rows do the same
+ * (orders:form-update) — here we only intercept them.
  */
 
 class CartPage {
@@ -40,7 +40,7 @@ class CartPage {
       }
     });
 
-    // форма строки: «Убрать» — крестик с name=remove, иначе — обновить
+    // the line form: "Remove" is the cross with name=remove, otherwise update
     this.root.addEventListener('submit', (event) => {
       const line = event.target.closest('[data-line]');
       if (!line) return;
@@ -61,9 +61,9 @@ class CartPage {
   }
 
   /**
-   * Поля доставки. При самовывозе адрес не нужен — прячем его,
-   * а в итогах пишем «самовывоз». Порог бесплатной доставки и тариф
-   * считает сервер (CartTotals), здесь только перерисовываем подписи.
+   * Delivery fields. For pickup the address is not needed — hidden, and
+   * the totals say "pickup". The free-delivery threshold and rate are
+   * computed by the server (CartTotals), here only the labels are redrawn.
    */
   setupDelivery() {
     if (!this.orderForm) return;
@@ -93,7 +93,7 @@ class CartPage {
         delivery.textContent = this.cart.free_delivery_reached
           ? delivery.dataset.free : this.cart.courier_cost_label;
       }
-      // корзина ещё не менялась — оставляем то, что написал сервер
+      // the cart has not changed yet — keep what the server rendered
     }
     const progress = this.root.querySelector('[data-progress]');
     if (progress) progress.hidden = pickup;
@@ -149,7 +149,7 @@ class CartPage {
     }
   }
 
-  /** Подменяет таблицу позиций и итоги тем, что вернул сервер. */
+  /** Replaces the lines table and totals with what the server returned. */
   applyResult(data) {
     if (!data) return;
     if (this.table && typeof data.html === 'string') {

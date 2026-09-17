@@ -1,6 +1,6 @@
-/* Оформление админки КВІТКА.
-   Раскладка как в референсе: тёмный сайдбар, плитки статистики,
-   белые карточки со скруглениями. Палитра и шрифты — наши, с сайта. */
+/* KVITKA admin styling.
+   Layout as in the reference: dark sidebar, stat tiles, white rounded
+   cards. Palette and fonts are ours, from the site. */
 
 :root,
 html,
@@ -26,7 +26,7 @@ html[data-theme="dark"] {
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --font-display: "Instrument Serif", Georgia, serif;
 
-  /* переменные самой админки Django */
+  /* Django admin's own variables */
   --primary: #8A3A52;
   --secondary: #191512;
   --accent-color: #8A3A52;
@@ -67,7 +67,7 @@ body {
 a:link, a:visited { color: var(--accent); }
 a:hover, a:focus { color: var(--accent-dark); }
 
-/* ---------- шапка и сайдбар ---------- */
+/* ---------- header and sidebar ---------- */
 #header {
   background: var(--ink);
   color: #fff;
@@ -130,9 +130,9 @@ a:hover, a:focus { color: var(--accent-dark); }
   border-right: 0;
 }
 .sticky { background: var(--ink); }
-/* Боковое меню — это таблица: caption = раздел, th = модель, td = «Добавить».
-   Заглавные буквы и разрядка нужны только разделу; раньше то же правило
-   ловило и th, из-за чего названия моделей ломались посреди слова. */
+/* The side menu is a table: caption = app, th = model, td = "Add".
+   Uppercase and letter-spacing are for the app only; the same rule used
+   to catch th too, breaking model names mid-word. */
 #nav-sidebar .module {
   background: transparent; box-shadow: none; border: 0;
   margin: 0 0 18px; padding: 0; border-radius: 0;
@@ -167,7 +167,7 @@ a:hover, a:focus { color: var(--accent-dark); }
 }
 #nav-sidebar th, #nav-sidebar td { padding: 0; vertical-align: middle; }
 #nav-sidebar th {
-  /* название модели: обычный регистр, без разрядки, переносим по словам */
+  /* model name: normal case, no letter-spacing, wrapped by words */
   width: 100%;
   font-size: 14px;
   font-weight: 500;
@@ -195,7 +195,7 @@ a:hover, a:focus { color: var(--accent-dark); }
 #nav-sidebar .current-model th a:link,
 #nav-sidebar .current-model th a:visited { background: var(--accent); color: #fff; }
 
-/* «Добавить» — приписка справа, а не вторая кнопка во всю ширину */
+/* "Add" is a note on the right, not a second full-width button */
 #nav-sidebar td a:link, #nav-sidebar td a:visited {
   display: inline-block;
   padding: 4px 10px;
@@ -230,7 +230,7 @@ a:hover, a:focus { color: var(--accent-dark); }
 #nav-filter::placeholder { color: #7E7167; }
 #nav-filter:focus { outline: 1px solid var(--accent); }
 
-/* ---------- контент ---------- */
+/* ---------- content ---------- */
 #content { padding: 24px 30px 60px; }
 div.breadcrumbs {
   background: transparent;
@@ -272,7 +272,7 @@ fieldset.module { padding-bottom: 6px; }
 .aligned label { color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
 .help, .form-row p.help, div.help { color: var(--ink-muted); font-size: 12px; }
 
-/* ---------- таблицы ---------- */
+/* ---------- tables ---------- */
 #changelist { background: transparent; }
 #changelist .results {
   background: var(--surface);
@@ -365,7 +365,7 @@ fieldset.module { padding-bottom: 6px; }
   padding: 7px 11px;
 }
 
-/* ---------- кнопки ---------- */
+/* ---------- buttons ---------- */
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
   background: var(--accent);
   color: #fff;
@@ -422,7 +422,7 @@ fieldset.module { padding-bottom: 6px; }
   border-radius: 11px;
 }
 
-/* ---------- поля ---------- */
+/* ---------- fields ---------- */
 input[type=text], input[type=password], input[type=email], input[type=url],
 input[type=number], input[type=tel], textarea, select, .vTextField {
   border: 1px solid var(--field);
@@ -433,23 +433,23 @@ input[type=number], input[type=tel], textarea, select, .vTextField {
   line-height: 1.25;
   background: var(--surface);
   color: var(--ink);
-  /* Django задаёт полям height: 30px. Вместе с нашими отступами и
-     box-sizing: border-box на текст оставалось 10 пикселей — строка
-     обрезалась в полоску. Высоту считаем по содержимому. */
+  /* Django sets fields to height: 30px. With our padding and
+     box-sizing: border-box only 10 pixels were left for the text — the
+     line was clipped to a strip. Height follows the content. */
   height: auto;
   min-height: 38px;
   box-sizing: border-box;
 }
 select { padding-right: 30px; }
-/* числовые поля Django задаёт узкими (5em) — с нашими отступами
-   в них не помещается «1044» */
+/* Django makes number fields narrow (5em) — with our padding
+   "1044" does not fit */
 input[type=number], .vIntegerField, .vBigIntegerField, .vSmallIntegerField {
   width: auto; min-width: 96px;
 }
 .vDecimalField, .vFloatField { width: auto; min-width: 110px; }
 #result_list input[type=number], #result_list select { max-width: 100%; }
 
-/* в форме товара текстовые поля той же ширины, что и списки рядом */
+/* in the product form text fields are as wide as the selects next to them */
 .aligned .form-row input[type=text], .aligned .form-row input[type=email],
 .aligned .form-row input[type=url], .aligned .form-row .vTextField,
 .aligned .form-row textarea {
@@ -462,7 +462,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); outline
 .form-row:last-child { border-bottom: 0; }
 .aligned label + p, .aligned label + div.readonly { padding-top: 8px; }
 
-/* ---------- вложенные блоки ---------- */
+/* ---------- inlines ---------- */
 .inline-group {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -491,7 +491,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); outline
 .inline-group table td { border-bottom: 1px solid var(--line-soft); padding: 10px; }
 .add-row a { font-weight: 600; }
 
-/* ---------- сообщения ---------- */
+/* ---------- messages ---------- */
 ul.messagelist { padding: 0; margin: 0 0 16px; }
 ul.messagelist li {
   background: var(--surface);
@@ -517,7 +517,7 @@ ul.messagelist li.error { border-left-color: #A03A3A; }
 }
 .errorlist { color: #A03A3A; font-size: 12.5px; }
 
-/* ---------- дашборд ---------- */
+/* ---------- dashboard ---------- */
 .dash-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -610,7 +610,7 @@ ul.messagelist li.error { border-left-color: #A03A3A; }
 
 .dash-empty { padding: 26px 20px; text-align: center; color: var(--ink-muted); font-size: 13.5px; }
 
-/* последние заказы на дашборде */
+/* latest orders on the dashboard */
 .dash-request { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 10px; border-radius: 10px; }
 .dash-request:hover { background: var(--surface-muted); }
 .dash-request__number { font-family: var(--font-mono); font-size: 13px; color: var(--ink-muted); }
@@ -618,7 +618,7 @@ ul.messagelist li.error { border-left-color: #A03A3A; }
 .dash-request__meta { font-size: 12px; color: var(--ink-muted); }
 .dash-request__sum { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; text-align: right; }
 
-/* ---------- вход ---------- */
+/* ---------- login ---------- */
 body.login { background: var(--bg); }
 body.login #container {
   background: var(--surface);
@@ -647,7 +647,7 @@ body.login .submit-row { border: 0; box-shadow: none; background: transparent; p
 body.login .submit-row input { width: 100%; padding: 13px; font-size: 14.5px; }
 body.login .header-store-link { display: none; }
 
-/* ---------- мелочи ---------- */
+/* ---------- details ---------- */
 .hidden { display: none; }
 #footer { display: none; }
 .deletelink-box a { border-radius: 11px; }
@@ -663,7 +663,7 @@ th.field-thumb img, td.field-thumb img { border-radius: 8px; }
   .dash-stats { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* --- предупреждение перед удалением характеристики ---------------------- */
+/* --- warning before deleting a reference value -------------------------- */
 .kvitka-warning {
   margin: 0 0 20px;
   padding: 16px 18px;
@@ -677,10 +677,10 @@ th.field-thumb img, td.field-thumb img { border-radius: 8px; }
 .kvitka-warning p { margin: 0 0 6px; font-size: 13.5px; line-height: 1.55; }
 .kvitka-warning__list { font-family: ui-monospace, monospace; font-size: 12.5px; color: #6B625B; }
 
-/* ---------- поле с выбором из справочника ------------------------------ */
-/* Рядом с полем стоят кнопки «изменить / добавить / удалить / посмотреть».
-   Без стилей Django они разлетаются: иконки во всю строку, а сам список
-   сжимается до нечитаемой ширины. */
+/* ---------- reference-value select field -------------------------------- */
+/* Next to the field are the "change / add / delete / view" buttons.
+   Without Django's styles they scatter: icons across the whole line,
+   and the select itself shrinks to an unreadable width. */
 .related-widget-wrapper {
   display: flex;
   align-items: center;
@@ -712,12 +712,12 @@ th.field-thumb img, td.field-thumb img { border-radius: 8px; }
   display: block;
 }
 
-/* select не должен схлопываться и в обычных строках формы */
+/* a select must not collapse in ordinary form rows either */
 .form-row select, .aligned select { max-width: 100%; }
 select { min-width: 200px; }
 select[multiple] { min-width: 260px; }
 
-/* двухпанельный выбор характеристик (filter_horizontal) */
+/* two-panel attribute selector (filter_horizontal) */
 .selector { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
 .selector .selector-available, .selector .selector-chosen { flex: 1 1 260px; min-width: 0; }
 .selector select { width: 100%; min-width: 0; height: 200px; padding: 6px; }
@@ -731,8 +731,8 @@ select[multiple] { min-width: 260px; }
 .selector .selector-filter { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .selector .selector-filter input { flex: 1 1 auto; min-width: 0; }
 
-/* ---------- колонка «Удалить?» во вложенных блоках ---------------------- */
-/* Чтобы было видно, что фотографию можно убрать: отметить галку и сохранить. */
+/* ---------- the "Delete?" column in inlines ----------------------------- */
+/* So it is clear a photo can be removed: tick the box and save. */
 .inline-group .delete, .inline-group td.delete {
   text-align: center;
   white-space: nowrap;
@@ -749,11 +749,11 @@ select[multiple] { min-width: 260px; }
   border-top: 1px solid var(--line-soft);
 }
 
-/* ---------- светлая схема и галочки ------------------------------------ */
-/* Windows в тёмной теме переключает всю админку в тёмную схему: галочки
-   рисуются чёрными на светлом фоне, и не видно, отмечено или нет —
-   поэтому кажется, что удалить фотографию нельзя. Селекторы с
-   [data-theme] нужны, чтобы перебить dark_mode.css самой Django. */
+/* ---------- light scheme and checkboxes --------------------------------- */
+/* Windows in dark mode switches the whole admin to the dark scheme:
+   checkboxes are drawn black on a light background and it is unclear
+   whether they are ticked — so it seems a photo cannot be deleted.
+   The [data-theme] selectors override Django's own dark_mode.css. */
 :root, html, body,
 html[data-theme="auto"], html[data-theme="dark"], html[data-theme="light"] {
   color-scheme: light;

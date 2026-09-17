@@ -1,8 +1,8 @@
 /* KVITKA — product.js
    Author: ISHOD · 2026 · all rights reserved. */
 /**
- * Страница товара: количество, подсчёт суммы и добавление в корзину.
- * Переключатель размера — обычные ссылки, скрипта не требует.
+ * Product page: quantity, total calculation and adding to the cart.
+ * The size switcher is plain links, no script needed.
  */
 
 class QuantityBox {
@@ -38,7 +38,7 @@ class QuantityBox {
 }
 
 class Gallery {
-  /** Галерея: миниатюры, стрелки и клавиши влево-вправо. */
+  /** Gallery: thumbnails, arrows and the left/right keys. */
 
   constructor(root) {
     this.main = root.querySelector('[data-gallery-main]');
@@ -58,13 +58,13 @@ class Gallery {
     if (this.prev) this.prev.addEventListener('click', () => this.move(-1));
     if (this.next) this.next.addEventListener('click', () => this.move(1));
 
-    // одна фотография — стрелки не нужны
+    // one photo — no arrows needed
     if (this.thumbs.length < 2) {
       [this.prev, this.next].forEach((node) => node && node.remove());
     }
 
     document.addEventListener('keydown', (event) => {
-      // пока открыт просмотр на весь экран, стрелки принадлежат ему
+      // while the full-screen viewer is open, the arrow keys belong to it
       if (document.documentElement.classList.contains('is-lightbox')) return;
       if (event.key === 'ArrowLeft') this.move(-1);
       if (event.key === 'ArrowRight') this.move(1);
@@ -75,7 +75,7 @@ class Gallery {
 
   move(direction) {
     if (this.thumbs.length < 2) return;
-    // по кругу: с последней вперёд попадаем на первую
+    // wraps around: forward from the last lands on the first
     const count = this.thumbs.length;
     this.show((this.index + direction + count) % count);
   }
@@ -94,13 +94,12 @@ class Gallery {
 
 class Lightbox {
   /**
-   * Просмотр фотографий на весь экран с увеличением.
+   * Full-screen photo viewer with zoom.
    *
-   * Приближение сделано через transform: scale и transform-origin,
-   * который едет за курсором. Точку отсчёта берём из размеров
-   * НЕувеличенной картинки: как только применён scale,
-   * getBoundingClientRect возвращает уже растянутую рамку, и считать
-   * проценты по ней — значит гоняться за собственным хвостом.
+   * Zoom is done via transform: scale and a transform-origin that follows
+   * the cursor. The reference point comes from the UNscaled image size:
+   * once scale is applied, getBoundingClientRect returns the stretched
+   * box, and computing percentages from it means chasing your own tail.
    */
 
   static MAX_SCALE = 4;
@@ -138,7 +137,7 @@ class Lightbox {
     this.thumbs.forEach((thumb, index) =>
       thumb.addEventListener('click', (e) => { e.stopPropagation(); this.show(index); }));
 
-    // клик мимо фотографии закрывает, по фотографии — приближает
+    // a click outside the photo closes, on the photo — zooms
     this.stage.addEventListener('click', (event) => {
       if (event.target === this.image) this.toggleZoom(event);
       else this.close();
@@ -207,7 +206,7 @@ class Lightbox {
       this.counter.textContent = this.sources.length > 1
         ? `${index + 1} / ${this.sources.length}` : '';
     }
-    // держим маленькую галерею на странице в том же кадре
+    // keep the small gallery on the page on the same frame
     if (this.gallery) this.gallery.show(index);
   }
 
@@ -220,7 +219,7 @@ class Lightbox {
     const scale = Math.min(Lightbox.MAX_SCALE, Math.max(1, value));
     if (scale <= 1.001) { this.zoomOut(); return; }
     if (!this.zoomed) {
-      // рамку запоминаем до первого scale, пока она честная
+      // remember the box before the first scale, while it is still honest
       this.baseRect = this.image.getBoundingClientRect();
       this.zoomed = true;
       this.stage.classList.add('is-zoomed');
@@ -277,8 +276,8 @@ class ProductPage {
         this.render();
       }
     });
-    // обычная форма уходит на сервер с перезагрузкой; с JavaScript —
-    // перехватываем и остаёмся на странице
+    // the plain form submits to the server with a reload; with JavaScript
+    // we intercept it and stay on the page
     this.form.addEventListener('submit', (event) => {
       event.preventDefault();
       this.addToCart();
