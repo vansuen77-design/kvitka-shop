@@ -1,15 +1,15 @@
-"""Первичное наполнение каталога:
+"""Initial catalog seeding:
 
-    python manage.py seed_catalog          # добавить недостающее
-    python manage.py seed_catalog --reset  # пересоздать товары
+    python manage.py seed_catalog          # add what is missing
+    python manage.py seed_catalog --reset  # recreate the products
 
-Создаёт статусы, разделы, справочники подбора и демонстрационные
-букеты с картинками-заглушками (catalog/placeholders.py). Названия
-и значения справочников — сразу на двух языках: русское для админки,
-украинское для витрины (Product.title всегда украинский).
+Creates statuses, categories, filter reference values and demo bouquets
+with placeholder images (catalog/placeholders.py). Names and reference
+values come in both languages: Russian for the admin, Ukrainian for the
+storefront (Product.title is always Ukrainian).
 
-Владелец заменяет демо-товары своими в админке; команда безопасна для
-повторного запуска — то, что уже есть, не трогает.
+The owner replaces the demo products with real ones in the admin; the
+command is safe to run again — existing records are not touched.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ from catalog.models import (
     Category, Color, Flower, Kind, Occasion, Product, ProductImage, Size, Status,
 )
 
-# (русское имя, украинское имя, цвет плашки, можно заказать, пояснение)
+# (Russian name, Ukrainian name, badge colour, orderable, note)
 STATUSES = [
     ("В наличии", "В наявності", "#4F7A4B", True, "соберём за час"),
     ("Новинка", "Новинка", "#B23A5E", True, ""),
@@ -34,11 +34,11 @@ STATUSES = [
     ("Снят с продажи", "Знято з продажу", "#8C8079", False, "сезон закончился"),
 ]
 
-# Адрес статуса «Новинка» задаётся явно: по нему ищут сортировка
-# и баннер (Sorting.NEW_STATUS_SLUG). Остальные — по названию.
+# The slug of the "New" status is set explicitly: sorting and the banner
+# look it up (Sorting.NEW_STATUS_SLUG). The rest are found by name.
 STATUS_SLUGS = {"Новинка": "novinka"}
 
-# (русское имя, украинское имя, адрес, подразделы)
+# (Russian name, Ukrainian name, slug, subcategories)
 CATEGORIES = [
     ("Букеты", "Букети", "bukety", [
         ("Розы", "Троянди", "rozy"),
@@ -53,8 +53,8 @@ CATEGORIES = [
     ("Растения в горшках", "Рослини в горщиках", "rasteniya", []),
 ]
 
-# Справочники подбора: (русское, украинское, адрес). Адреса заданы явно,
-# чтобы ссылки вида ?flower=roza не зависели от транслитерации.
+# Filter reference values: (Russian, Ukrainian, slug). Slugs are explicit
+# so that links like ?flower=roza do not depend on transliteration.
 ATTRIBUTES = {
     Kind: [
         ("Букет", "Букет", "buket"),
@@ -99,10 +99,10 @@ ATTRIBUTES = {
     ],
 }
 
-# Товары. Семейство family связывает варианты одного букета — у них
-# общий переключатель размера на странице товара.
+# Products. The family links variants of one bouquet — they share a size
+# switcher on the product page.
 PRODUCTS = [
-    # --- розы: три размера одного букета ----------------------------------
+    # --- roses: three sizes of one bouquet --------------------------------
     {
         "article": "R-11", "name": "Букет из 11 красных роз", "name_uk": "Букет з 11 червоних троянд",
         "category": "rozy", "kind": "buket", "flowers": ["roza"], "occasions": ["lyubov", "den-rozhdeniya"],
@@ -147,7 +147,7 @@ PRODUCTS = [
         "description": "Пудрово-розовый сорт с крупным бутоном и ветки эвкалипта для объёма и запаха.",
         "description_uk": "Пудрово-рожевий сорт із великим бутоном і гілки евкаліпта для об'єму та запаху.",
     },
-    # --- тюльпаны ---------------------------------------------------------
+    # --- tulips -----------------------------------------------------------
     {
         "article": "T-25", "name": "25 тюльпанов микс", "name_uk": "25 тюльпанів мікс",
         "category": "tyulpany", "kind": "buket", "flowers": ["tyulpan"], "occasions": ["8-marta", "bez-povoda"],
@@ -181,7 +181,7 @@ PRODUCTS = [
         "description": "Белые тюльпаны в белой упаковке — на свадьбу, крестины или просто так.",
         "description_uk": "Білі тюльпани в білій упаковці — на весілля, хрестини або просто так.",
     },
-    # --- пионы ------------------------------------------------------------
+    # --- peonies ----------------------------------------------------------
     {
         "article": "P-7", "name": "7 розовых пионов", "name_uk": "7 рожевих півоній",
         "category": "piony", "kind": "buket", "flowers": ["pion"], "occasions": ["den-rozhdeniya", "lyubov"],
@@ -193,7 +193,7 @@ PRODUCTS = [
         "description": "Пионы — цветок на месяц в году. Раскрываются в вазе за пару дней и пахнут на всю комнату.",
         "description_uk": "Півонії — квітка на місяць у році. Розкриваються у вазі за пару днів і пахнуть на всю кімнату.",
     },
-    # --- сборные ----------------------------------------------------------
+    # --- mixed bouquets ---------------------------------------------------
     {
         "article": "M-1", "name": "Букет «Утро в саду»", "name_uk": "Букет «Ранок у саду»",
         "category": "sbornye-bukety", "kind": "buket", "flowers": ["roza", "eustoma", "evkalipt", "gortenziya"],
@@ -229,7 +229,7 @@ PRODUCTS = [
         "description": "Чётное число цветов, без яркой упаковки. Доставим к назначенному времени.",
         "description_uk": "Парна кількість квітів, без яскравої упаковки. Доставимо на призначений час.",
     },
-    # --- композиции -------------------------------------------------------
+    # --- arrangements -----------------------------------------------------
     {
         "article": "K-1", "name": "Розы в шляпной коробке", "name_uk": "Троянди в капелюшній коробці",
         "category": "v-korobke", "kind": "korobka", "flowers": ["roza", "evkalipt"], "occasions": ["lyubov", "den-rozhdeniya", "yubiley"],
@@ -253,7 +253,7 @@ PRODUCTS = [
         "description": "Собираем под заказ за день. Ставится на стол и стоит без ухода до недели.",
         "description_uk": "Збираємо під замовлення за день. Ставиться на стіл і стоїть без догляду до тижня.",
     },
-    # --- растения ---------------------------------------------------------
+    # --- plants -----------------------------------------------------------
     {
         "article": "G-1", "name": "Орхидея фаленопсис, 2 ветки", "name_uk": "Орхідея фаленопсис, 2 гілки",
         "category": "rasteniya", "kind": "gorshok", "flowers": ["orhideya"], "occasions": ["den-rozhdeniya", "bez-povoda"],
@@ -280,19 +280,19 @@ PRODUCTS = [
 
 
 class Command(BaseCommand):
-    help = "Наполняет каталог статусами, разделами, справочниками и демо-букетами с картинками."
+    help = "Seeds the catalog with statuses, categories, reference values and demo bouquets with images."
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--reset", action="store_true",
-            help="Удалить существующие товары перед наполнением",
+            help="Delete existing products before seeding",
         )
 
     @transaction.atomic
     def handle(self, *args, **options):
         if options["reset"]:
             deleted, _ = Product.objects.all().delete()
-            self.stdout.write(f"Удалено записей: {deleted}")
+            self.stdout.write(f"Records deleted: {deleted}")
 
         self.statuses = self.ensure_statuses()
         self.categories = self.ensure_categories()
@@ -301,17 +301,17 @@ class Command(BaseCommand):
         created = 0
         for index, payload in enumerate(PRODUCTS, start=1):
             if Product.objects.filter(article=payload["article"]).exists():
-                self.stdout.write(f"  {payload['article']} — уже есть, пропускаю")
+                self.stdout.write(f"  {payload['article']} — already exists, skipping")
                 continue
             self.create_product(payload, position=index * 10)
             created += 1
 
         self.stdout.write(self.style.SUCCESS(
-            f"Готово: добавлено {created} товаров, "
-            f"{Status.objects.count()} статусов."
+            f"Done: {created} products added, "
+            f"{Status.objects.count()} statuses."
         ))
 
-    # --- справочники -----------------------------------------------------
+    # --- reference data --------------------------------------------------
     def ensure_statuses(self) -> dict:
         result = {}
         for position, (name, name_uk, color, orderable, note) in enumerate(STATUSES, start=1):
@@ -345,7 +345,7 @@ class Command(BaseCommand):
         return result
 
     def ensure_attributes(self) -> dict:
-        """Создаёт значения справочников подбора и возвращает их по адресу."""
+        """Creates filter reference values and returns them by slug."""
         result: dict[type, dict] = {}
         for model, rows in ATTRIBUTES.items():
             bucket = {}
@@ -358,7 +358,7 @@ class Command(BaseCommand):
             result[model] = bucket
         return result
 
-    # --- товар -----------------------------------------------------------
+    # --- product ---------------------------------------------------------
     def create_product(self, payload: dict, position: int = 100) -> Product:
         product = Product.objects.create(
             article=payload["article"],
@@ -374,7 +374,7 @@ class Command(BaseCommand):
             height_cm=payload.get("height", 0),
             summary=payload["summary"],
             summary_uk=payload["summary_uk"],
-            # порядок в каталоге «сначала популярные» — как в этом списке
+            # "popular first" catalog order — same as in this list
             position=position,
             composition=payload["composition"],
             composition_uk=payload["composition_uk"],
@@ -388,11 +388,11 @@ class Command(BaseCommand):
         product.occasions.set([self.attributes[Occasion][s] for s in payload["occasions"]])
 
         self.attach_placeholder(product, payload["color"])
-        self.stdout.write(f"  {product.article} — добавлен")
+        self.stdout.write(f"  {product.article} — added")
         return product
 
     def attach_placeholder(self, product: Product, color: str) -> None:
-        """Картинка-заглушка вместо фото; владелец заменит в админке."""
+        """A placeholder image instead of a photo; the owner replaces it in the admin."""
         target = Path(settings.MEDIA_ROOT) / "products" / f"demo-{product.article.lower()}.png"
         if not target.exists():
             placeholders.write(target, seed=product.article, color=color,

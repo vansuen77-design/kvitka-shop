@@ -1,4 +1,4 @@
-"""Представления каталога — все классовые (CBV)."""
+"""Catalog views — all class-based."""
 
 from __future__ import annotations
 
@@ -17,14 +17,15 @@ from core.mixins import AjaxTemplateMixin, PageTitleMixin
 
 
 class CatalogFacetsMixin:
-    """Готовит панель подбора: группы значений с количеством товаров.
+    """Prepares the filter panel: value groups with product counts.
 
-    Считаем в пределах текущего раздела и без учёта уже выбранных галок —
-    иначе цифры схлопнулись бы в нули после первого же клика.
+    Counted within the current category and ignoring already selected
+    checkboxes — otherwise the numbers would collapse to zero after the
+    very first click.
     """
 
     def selected_values(self, param: str) -> list[str]:
-        """Значения параметра из адреса: ?flower=roza,pion и ?flower=roza&flower=pion."""
+        """Parameter values from the URL: ?flower=roza,pion and ?flower=roza&flower=pion."""
         values: list[str] = []
         for raw in self.request.GET.getlist(param):
             values.extend(item.strip() for item in raw.split(",") if item.strip())
@@ -52,11 +53,11 @@ class CatalogFacetsMixin:
             )
             titles[spec.code] = {value.slug: value.title for value in values}
             group = settings_by_code.get(spec.code)
-            # каталог разнородный (у растений нет повода, у коробок нет
-            # размера), поэтому группу, в которой нет ни одного товара
-            # и ничего не выбрано, не показываем вовсе — пустой список
-            # галок выглядит как поломка. Отдельные пустые значения
-            # прячет шаблон, оставляя только выбранные
+            # the catalog is heterogeneous (plants have no occasion, boxes
+            # have no size), so a group with no products at all and nothing
+            # selected is not shown — an empty list of checkboxes looks
+            # broken. Individual empty values are hidden by the template,
+            # keeping only the selected ones
             chosen = set(self.selected_values(spec.code))
             if not any(value.total for value in values) and not chosen:
                 continue
@@ -71,8 +72,9 @@ class CatalogFacetsMixin:
                 ],
             })
 
-        # справочники, выключенные из панели, всё равно нужны для подписей
-        # на «чипах» над сеткой — иначе выбранный фильтр покажет адрес
+        # reference models switched off in the panel are still needed for
+        # the "chip" labels above the grid — otherwise a selected filter
+        # would show its slug
         for spec in FACETS:
             titles.setdefault(spec.code, {
                 value.slug: value.title for value in spec.model.objects.all()
@@ -91,8 +93,9 @@ class CatalogFacetsMixin:
                 ],
             })
 
-        # nonempty(): раздел без товаров в меню и фильтрах не показываем —
-        # он ведёт на пустую страницу и выглядит как недоделанный магазин
+        # nonempty(): a category without products is hidden from the menu
+        # and filters — it leads to an empty page and looks like an
+        # unfinished shop
         categories = (
             Category.objects.active().nonempty().select_related("parent")
             .order_by("position", "name")
@@ -112,7 +115,7 @@ class CatalogFacetsMixin:
 
 
 class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListView):
-    """Список товаров с фильтрами. При fetch-запросе отдаёт только сетку."""
+    """Product list with filters. On a fetch request returns only the grid."""
 
     model = Product
     template_name = "catalog/product_list.html"
@@ -139,12 +142,12 @@ class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListVie
         return self.filterset.queryset
 
     def get_current_category(self):
-        """Раздел из адреса /katalog/<slug>/ или из ?category= фильтра.
+        """Category from the /katalog/<slug>/ URL or from the ?category= filter.
 
-        Несуществующий раздел в адресе — 404, а не «весь каталог»:
-        иначе любая опечатка в ссылке отдавала бы поисковикам дубль
-        главной страницы. Устаревшее ?category= из формы просто не
-        учитываем — это фильтр, а не адрес.
+        A non-existent category in the URL is a 404, not "the whole
+        catalog": otherwise any typo in a link would give search engines a
+        duplicate of the home page. A stale ?category= from the form is
+        simply ignored — it is a filter, not an address.
         """
         slug = self.kwargs.get("category_slug")
         if slug:
@@ -158,11 +161,11 @@ class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListVie
         return Category.objects.filter(slug=slug, is_active=True).first()
 
     def get_page_title(self) -> str:
-        """Заголовок страницы. Учитывает и раздел, и кнопку «Акции».
+        """Page title. Accounts for both the category and the "Sale" button.
 
-        Пришли по «Акциям» — так и пишем, иначе страница называется
-        «Весь каталог», а товаров в ней треть. Внутри раздела к слову
-        добавляем его название: «Акции · Букети».
+        Arrived via "Sale" — say so, otherwise the page is called "Whole
+        catalog" while showing a third of the products. Inside a category
+        the category name is appended: "Sale · Bouquets".
         """
         category = self.get_current_category()
         sale = bool(self.request.GET.get("discount"))
@@ -194,41 +197,41 @@ class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListVie
         })
         return context
 
-    # сколько товаров показываем в баннере новинок
+    # how many products the new-arrivals banner shows
     BANNER_COUNT = 3
-    # в общем каталоге берём по одной новинке из раздела; больше четырёх
-    # карточек в строку не помещается — они становятся с ноготь
+    # in the whole catalog one new item per category; more than four cards
+    # do not fit in a row — they become thumbnail-sized
     BANNER_ROOTS = 4
 
-    # «Новинка» — статус из справочника. Ищем и по адресу, и по названию:
-    # если статус заведут в админке заново, адрес получится другой,
-    # а название останется прежним. Так же сделано в сортировке.
+    # "New" is a status from the reference model. Looked up both by slug and
+    # by name: if the status is re-created in the admin the slug changes
+    # while the name stays. Sorting does the same.
     NEW_STATUS_SLUG = "novinka"
     NEW_STATUS_NAME = "Новинка"
 
     def banner_products(self):
-        """Новинки для баннера над каталогом.
+        """New arrivals for the banner above the catalog.
 
-        В разделе — три последних товара этого раздела. В общем каталоге
-        иначе: по одной новинке из каждого раздела верхнего уровня, чтобы
-        на главной было видно и букеты, и композиции, и растения, а не три
-        подряд загруженных букета роз.
+        Inside a category — the three latest products of that category. In
+        the whole catalog it is different: one new item from each top-level
+        category, so the home page shows bouquets, arrangements and plants
+        rather than three rose bouquets uploaded in a row.
 
-        Раздел учитываем вместе с вложенными: у «Букетов» своих товаров
-        нет вовсе, все лежат в «Розах» и «Тюльпанах», и без этого его
-        карточка была бы пустой.
+        A category is taken together with its children: "Bouquets" has no
+        products of its own, they all sit in "Roses" and "Tulips", and
+        without this its card would be empty.
 
-        Порядок внутри раздела: сначала помеченные статусом «Новинка»,
-        внутри — по дате добавления. Статус не обязателен: без него берём
-        просто то, что добавили последним.
+        Order within a category: products with the "New" status first, then
+        by date added. The status is optional: without it we simply take
+        what was added last.
 
-        Наличие фото проверяем через Exists, а не через JOIN с filter():
-        JOIN размножил бы товар по числу фотографий, и пришлось бы звать
-        distinct(), который в SQLite плохо дружит с сортировкой.
+        Photo presence is checked via Exists, not via a JOIN with filter():
+        a JOIN would multiply the product by its number of photos, and we
+        would need distinct(), which does not play well with ordering in SQLite.
         """
         has_photo = Exists(ProductImage.objects.filter(product=OuterRef("pk")))
-        # facet_base уже знает про текущий раздел — и про адрес вида
-        # /katalog/bukety/, и про ?category= из фильтров
+        # facet_base already knows the current category — both from a
+        # /katalog/bukety/ URL and from ?category= in the filters
         newest = (
             self.facet_base()
             .filter(has_photo)
@@ -248,10 +251,10 @@ class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListVie
         if self.get_current_category():
             return list(newest[:self.BANNER_COUNT])
 
-        # общий каталог: по одному товару из каждого корневого раздела.
-        # Запрос на раздел, а не один общий: выбрать «первую строку внутри
-        # группы» SQLite умеет только через оконные функции, а их придётся
-        # объяснять тому, кто полезет сюда после нас.
+        # whole catalog: one product from each root category. One query per
+        # category rather than a single one: "first row within a group" in
+        # SQLite needs window functions, which would have to be explained
+        # to whoever reads this after us.
         roots = (
             Category.objects.active().nonempty().filter(parent__isnull=True)
             .order_by("position", "name")[:self.BANNER_ROOTS]
@@ -261,7 +264,7 @@ class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListVie
             item = newest.in_category(root.slug).first()
             if item is not None:
                 picked.append(item)
-        # разделов нет или все пустые — ведём себя как в разделе
+        # no categories or all empty — behave as inside a category
         return picked or list(newest[:self.BANNER_COUNT])
 
     @staticmethod
@@ -283,7 +286,7 @@ class CatalogView(PageTitleMixin, AjaxTemplateMixin, CatalogFacetsMixin, ListVie
 
 
 class ProductDetailView(PageTitleMixin, DetailView):
-    """Карточка товара: фотографии, характеристики, переключатель размера."""
+    """Product page: photos, specifications, size switcher."""
 
     model = Product
     template_name = "catalog/product_detail.html"
@@ -304,14 +307,14 @@ class ProductDetailView(PageTitleMixin, DetailView):
                            "url": product.category.get_absolute_url()})
         crumbs.append({"title": product.title, "url": None})
 
-        # переключатель размера: товары того же семейства, включая этот.
-        # Один товар в семействе — переключать не на что, не показываем
+        # size switcher: products of the same family, including this one.
+        # A single product in the family — nothing to switch to, hidden
         variants = list(product.variants())
         if len(variants) < 2:
             variants = []
 
-        # «Из этого же раздела» — без соседей по семейству: они и так
-        # стоят в переключателе прямо над ценой
+        # "From the same category" — without family siblings: they are
+        # already in the switcher right above the price
         related = (
             Product.objects.catalog()
             .filter(category=product.category)

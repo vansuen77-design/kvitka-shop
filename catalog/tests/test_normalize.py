@@ -1,4 +1,4 @@
-"""Product.normalize_quantity — единственное место, где решается количество."""
+"""Product.normalize_quantity — the single place where quantity is decided."""
 
 from django.test import TestCase
 

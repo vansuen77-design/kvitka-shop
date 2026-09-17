@@ -1,12 +1,12 @@
-"""Картинки-заглушки для демонстрационного каталога.
+"""Placeholder images for the demo catalog.
 
-Настоящих фотографий у демо-магазина нет, а витрина без картинок
-выглядит сломанной. Поэтому seed_catalog рисует каждому товару свою
-карточку средствами Pillow: мягкий фон в цвет букета и стилизованные
-«цветки» — кружки с лепестками. Файлы кладутся в media/products/ и
-владелец заменяет их настоящими фото в админке.
+The demo shop has no real photos, and a storefront without images looks
+broken. So seed_catalog draws a picture for every product with Pillow: a
+soft background in the bouquet's colour and stylised "flowers" — circles
+with petals. Files go to media/products/ and the owner replaces them with
+real photos in the admin.
 
-Никаких внешних шрифтов и файлов: только Pillow из зависимостей.
+No external fonts or files: only Pillow from the dependencies.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw
 
 SIZE = (900, 1100)
 
-# цвет справочника → (фон, лепестки, серединка)
+# colour slug → (background, petals, centre)
 PALETTES = {
     "red": ("#FBEDEF", "#C8324B", "#7A1B2C"),
     "pink": ("#FCEEF3", "#E58AAE", "#B23A5E"),
@@ -40,7 +40,7 @@ def _hex(color: str) -> tuple[int, int, int]:
 
 def _flower(draw: ImageDraw.ImageDraw, cx: float, cy: float, radius: float,
             petals: str, core: str, count: int = 6) -> None:
-    """Один цветок: лепестки по кругу и серединка."""
+    """One flower: petals in a circle and a centre."""
     for i in range(count):
         angle = 2 * math.pi * i / count
         px = cx + math.cos(angle) * radius * 0.55
@@ -52,21 +52,21 @@ def _flower(draw: ImageDraw.ImageDraw, cx: float, cy: float, radius: float,
 
 
 def render(seed: str, color: str = "pink", stems: int = 9) -> bytes:
-    """PNG-картинка букета. Одинаковый seed — одинаковая картинка."""
+    """PNG picture of a bouquet. Same seed — same picture."""
     background, petals, core = PALETTES.get(color, DEFAULT)
     rnd = random.Random(seed)
     image = Image.new("RGB", SIZE, _hex(background))
     draw = ImageDraw.Draw(image)
 
     width, height = SIZE
-    # стебли: пучок линий, сходящихся к низу
+    # stems: a bunch of lines converging at the bottom
     base_x, base_y = width / 2, height * 0.93
     for _ in range(max(stems, 5)):
         top_x = rnd.uniform(width * 0.25, width * 0.75)
         top_y = rnd.uniform(height * 0.28, height * 0.55)
         draw.line((base_x, base_y, top_x, top_y), fill=_hex("#5E8A57"), width=6)
 
-    # цветки: крупнее к центру, мельче по краям
+    # flowers: larger towards the centre, smaller at the edges
     count = min(max(stems, 5), 15)
     for _ in range(count):
         cx = rnd.uniform(width * 0.2, width * 0.8)
@@ -77,7 +77,7 @@ def render(seed: str, color: str = "pink", stems: int = 9) -> bytes:
             petals = rnd.choice(["#E58AAE", "#F2C94C", "#C8324B", "#FFFFFF", "#9B7BC7"])
         _flower(draw, cx, cy, radius, petals, core, count=rnd.choice((5, 6, 8)))
 
-    # обёртка: светлый конус внизу
+    # wrapping: a light cone at the bottom
     draw.polygon(
         [(width * 0.3, height * 0.6), (width * 0.7, height * 0.6),
          (width * 0.58, height * 0.95), (width * 0.42, height * 0.95)],

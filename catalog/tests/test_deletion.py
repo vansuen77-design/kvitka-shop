@@ -1,4 +1,4 @@
-"""Удаление справочника снимает товары с публикации, а не стирает их."""
+"""Deleting a reference value unpublishes products instead of erasing them."""
 
 from django.test import TestCase
 

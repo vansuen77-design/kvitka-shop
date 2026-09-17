@@ -1,19 +1,19 @@
-"""Ставит и снимает скидку сразу на весь каталог.
+"""Applies or removes a discount on the whole catalog at once.
 
-Как это устроено в проекте. У товара две цены: price — по которой
-продаём, old_price — перечёркнутая рядом. Скидка на сайте не хранится
-отдельным числом: она видна ровно тогда, когда old_price больше price,
-а процент считается из них двоих.
+How it works in this project. A product has two prices: price — what we
+sell at, old_price — struck out next to it. The discount is not stored as
+a separate number: it is visible exactly when old_price is greater than
+price, and the percentage is computed from the two.
 
-Поэтому «поставить −5%» означает: нынешнюю цену записать как старую,
-а продажную опустить на 5 процентов.
+So "apply −5%" means: write the current price as the old one and lower
+the selling price by 5 percent.
 
-    manage.py set_discount --percent 5      поставить −5 % на всё
-    manage.py set_discount --revert         снять: вернуть старые цены
-    manage.py set_discount --percent 5 --dry-run    только показать
+    manage.py set_discount --percent 5      apply −5 % to everything
+    manage.py set_discount --revert         remove: restore old prices
+    manage.py set_discount --percent 5 --dry-run    only show
 
-Снятие возвращает цены обратно ровно потому, что старая цена не
-выдумана, а была настоящей ценой до скидки.
+Removal restores the prices precisely because the old price is not made
+up — it was the real price before the discount.
 """
 
 from __future__ import annotations
@@ -27,22 +27,22 @@ from catalog.models import Product
 
 
 class Command(BaseCommand):
-    help = "Ставит скидку на весь каталог или снимает её"
+    help = "Applies a discount to the whole catalog or removes it"
 
     def add_arguments(self, parser):
         parser.add_argument("--percent", type=int, default=0,
-                            help="размер скидки в процентах, например 5")
+                            help="discount size in percent, e.g. 5")
         parser.add_argument("--revert", action="store_true",
-                            help="снять скидку: вернуть старые цены")
+                            help="remove the discount: restore old prices")
         parser.add_argument("--dry-run", action="store_true",
-                            help="показать, что получится, и ничего не менять")
+                            help="show what would happen and change nothing")
 
     def handle(self, *args, **options):
         percent, revert = options["percent"], options["revert"]
         if revert and percent:
-            raise CommandError("Выберите что-то одно: --percent или --revert.")
+            raise CommandError("Pick one: --percent or --revert.")
         if not revert and not 1 <= percent <= 90:
-            raise CommandError("Укажите --percent от 1 до 90 или --revert.")
+            raise CommandError("Give --percent from 1 to 90 or --revert.")
 
         dry = options["dry_run"]
         changed = 0
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 if changed <= 10:
                     self.stdout.write(
                         f"  {product.article}: {product.price} → {new[0]}"
-                        + (f" (было {new[1]})" if new[1] else " (скидка снята)")
+                        + (f" (was {new[1]})" if new[1] else " (discount removed)")
                     )
                 if not dry:
                     product.price, product.old_price = new
@@ -65,25 +65,25 @@ class Command(BaseCommand):
                 transaction.set_rollback(True)
 
         if changed > 10:
-            self.stdout.write(f"  … и ещё {changed - 10}")
-        word = "показано" if dry else "изменено"
-        self.stdout.write(self.style.SUCCESS(f"Товаров {word}: {changed}."))
+            self.stdout.write(f"  … and {changed - 10} more")
+        word = "shown" if dry else "changed"
+        self.stdout.write(self.style.SUCCESS(f"Products {word}: {changed}."))
 
     @staticmethod
     def discount_price(product, percent: int):
-        """Нынешняя цена становится старой, продажная падает на percent."""
+        """The current price becomes the old one, the selling price drops by percent."""
         base = product.price or Decimal("0")
         if base <= 0:
-            return None                      # цены нет — скидывать не с чего
+            return None                      # no price — nothing to discount
         new = (base * (100 - percent) / 100).quantize(
             Decimal("1"), rounding=ROUND_HALF_UP)
         if new <= 0 or new == base:
-            return None                      # копеечный товар: скидка съела бы всё
+            return None                      # penny product: the discount would eat it all
         return new, base
 
     @staticmethod
     def revert_price(product):
-        """Возвращает цену, которая была до скидки."""
+        """Restores the price that was there before the discount."""
         if not product.old_price or product.old_price <= product.price:
-            return None                      # скидки на этом товаре не было
+            return None                      # this product had no discount
         return product.old_price, None

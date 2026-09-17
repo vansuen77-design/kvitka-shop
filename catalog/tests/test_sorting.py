@@ -1,4 +1,4 @@
-"""Сортировки каталога: «со скидкой» и «новые» считаются на стороне базы."""
+"""Catalog sorting: "discount" and "new" are computed on the database side."""
 
 from django.test import TestCase
 
@@ -23,7 +23,7 @@ class SaleSortingTests(TestCase):
                          [self.cheap_big_sale, self.pricey_small_sale])
 
     def test_sale_annotation_is_not_null(self):
-        """Деление Decimal в SQLite отдаёт NULL — ловим регресс (грабля 2)."""
+        """Decimal division in SQLite yields NULL — catch the regression."""
         sorting = Sorting("sale")
         rows = sorting.prepare(Product.objects.published()).values_list("discount", flat=True)
         self.assertTrue(all(value is not None for value in rows))
@@ -45,7 +45,7 @@ class NewSortingTests(TestCase):
         sorting = Sorting("new")
         rows = list(sorting.prepare(Product.objects.published()).order_by(*sorting.order_by))
         self.assertEqual(rows[0], new)
-        # внутри — по дате добавления, последний добавленный раньше
+        # within — by date added, the last added comes first
         self.assertEqual(rows[1], plain)
         self.assertEqual(rows[2], old)
 

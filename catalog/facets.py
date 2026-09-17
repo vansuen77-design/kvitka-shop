@@ -1,14 +1,14 @@
-"""Реестр справочников подбора.
+"""Registry of filter reference models.
 
-Одно место, из которого работает всё сразу:
+One place that drives everything at once:
 
-* панель подбора в каталоге (какие группы, в каком порядке, с поиском ли);
-* фильтрация товаров по адресной строке;
-* подписи в плитке каталога (in_tile);
-* таблица «Характеристики» на странице товара;
-* колонки прайса и список справочников в админке.
+* the filter panel in the catalog (which groups, in what order, with search or not);
+* filtering products by the query string;
+* labels in the catalog tile (in_tile);
+* the "Specifications" table on the product page;
+* price-list columns and the list of reference models in the admin.
 
-Добавили сюда строку — новая характеристика появилась везде.
+Add a line here — a new attribute appears everywhere.
 """
 
 from __future__ import annotations
@@ -22,21 +22,21 @@ from catalog.models import Color, FacetGroup, Flower, Kind, Occasion, Size
 
 @dataclass(frozen=True)
 class FacetSpec:
-    """Описание одного справочника."""
+    """Description of one reference model."""
 
-    code: str            # ключ в адресной строке: ?flower=roza
-    field: str           # поле товара
-    model: type          # модель справочника
-    label: str           # подпись — русский ключ перевода
-    multiple: bool = False   # можно выбрать несколько значений у товара
-    searchable: bool = False  # поле поиска внутри группы фильтра
-    in_filter: bool = True    # показывать в подборе по умолчанию
-    in_tile: bool = False     # показывать значение в плитке каталога
+    code: str            # query-string key: ?flower=roza
+    field: str           # product field
+    model: type          # reference model
+    label: str           # label — Russian translation key
+    multiple: bool = False   # a product may have several values
+    searchable: bool = False  # search box inside the filter group
+    in_filter: bool = True    # shown in the filter panel by default
+    in_tile: bool = False     # value shown in the catalog tile
     position: int = 100
 
     @property
     def lookup(self) -> str:
-        """Как отфильтровать товары по адресам значений."""
+        """How to filter products by value slugs."""
         return f"{self.field}__slug__in"
 
 
@@ -56,7 +56,7 @@ BY_MODEL: dict[type, FacetSpec] = {spec.model: spec for spec in FACETS}
 
 
 def visible_specs() -> list[FacetSpec]:
-    """Справочники, включённые в панель подбора — в порядке из админки."""
+    """Reference models enabled in the filter panel — in the admin order."""
     groups = {group.code: group for group in FacetGroup.objects.active()}
     chosen = [(groups[spec.code], spec) for spec in FACETS if spec.code in groups]
     chosen.sort(key=lambda pair: (pair[0].position, pair[0].name))
@@ -64,10 +64,10 @@ def visible_specs() -> list[FacetSpec]:
 
 
 def tile_specs() -> list[FacetSpec]:
-    """Справочники, значения которых подписываются в плитке (до трёх)."""
+    """Reference models whose values are shown in the tile (up to three)."""
     return [spec for spec in FACETS if spec.in_tile][:3]
 
 
 def group_titles() -> dict[str, "FacetGroup"]:
-    """Настройки групп из админки: подпись, поиск, порядок."""
+    """Group settings from the admin: label, search, order."""
     return {group.code: group for group in FacetGroup.objects.all()}

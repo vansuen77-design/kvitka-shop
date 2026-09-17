@@ -1,8 +1,8 @@
-"""Фильтры каталога.
+"""Catalog filters.
 
-Каждый фильтр — отдельный класс: знает, как достать значение из GET,
-как применить его к выборке и как показать себя «чипом» над сеткой.
-Добавить новый фильтр = добавить класс в список ProductFilterSet.filters.
+Every filter is a separate class: it knows how to read its value from GET,
+how to apply it to the queryset and how to show itself as a "chip" above
+the grid. Adding a filter = adding a class to ProductFilterSet.filters.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from django.utils.translation import gettext as _, gettext_noop
 
 
 class Filter(ABC):
-    """Базовый фильтр."""
+    """Base filter."""
 
     def __init__(self, param: str, label: str) -> None:
         self.param = param
@@ -26,18 +26,18 @@ class Filter(ABC):
 
     @abstractmethod
     def parse(self, params):
-        """Достаёт значение из QueryDict. None — фильтр не задан."""
+        """Reads the value from the QueryDict. None — filter not set."""
 
     @abstractmethod
     def apply(self, queryset, value):
-        """Применяет значение к выборке."""
+        """Applies the value to the queryset."""
 
     def chips(self, value) -> list[dict]:
         return [{"param": self.param, "label": f"{self.label}: {value}"}]
 
 
 class MultiChoiceFilter(Filter):
-    """Несколько значений: ?flower=roza&flower=pion или ?flower=roza,pion"""
+    """Several values: ?flower=roza&flower=pion or ?flower=roza,pion"""
 
     def __init__(self, param, label, queryset_method, titles=None):
         super().__init__(param, label)
@@ -63,7 +63,7 @@ class MultiChoiceFilter(Filter):
 
 
 class AttributeFilter(MultiChoiceFilter):
-    """Фильтр по справочнику подбора — один класс на все характеристики."""
+    """Filter by a reference model — one class for all attributes."""
 
     def __init__(self, spec, label=None, titles=None):
         super().__init__(spec.code, label or _(spec.label), "", titles)
@@ -140,7 +140,7 @@ class PriceRangeFilter(Filter):
 
 
 class FlagFilter(Filter):
-    """Логический переключатель: ?in_stock=1"""
+    """Boolean toggle: ?in_stock=1"""
 
     def __init__(self, param, label, queryset_method):
         super().__init__(param, label)
@@ -157,11 +157,11 @@ class FlagFilter(Filter):
 
 
 class Sorting:
-    """Сортировка списка."""
+    """List sorting."""
 
-    # подписи здесь по-русски: это одновременно и ключи перевода,
-    # переводятся при выводе в label/as_choices. gettext_noop только
-    # помечает строку для makelocales, сам перевод — при выводе.
+    # labels are Russian here: they double as translation keys and are
+    # translated on output in label/as_choices. gettext_noop only marks the
+    # string for makelocales, the translation itself happens on output.
     OPTIONS = {
         "popular": (gettext_noop("сначала популярные"), ("position", "-created_at")),
         "cheap": (gettext_noop("сначала дешевле"), ("price",)),
@@ -171,9 +171,9 @@ class Sorting:
     }
     DEFAULT = "popular"
 
-    # «Новинка» — это статус из справочника, а не отдельная галка.
-    # Ищем и по адресу, и по названию: если статус когда-нибудь заведут
-    # заново руками, адрес получится другой, а название останется.
+    # "New" is a status from the reference model, not a separate flag.
+    # Looked up both by slug and by name: if the status is ever re-created
+    # by hand the slug changes while the name stays.
     NEW_STATUS_SLUG = "novinka"
     NEW_STATUS_NAME = "Новинка"
 
@@ -186,24 +186,24 @@ class Sorting:
 
     @property
     def order_by(self) -> tuple[str, ...]:
-        """Поля для order_by. Дата добавления идёт последней всегда:
-        при равенстве основного признака порядок должен быть
-        предсказуемым, иначе SQLite выдаёт строки как ей удобно."""
+        """Fields for order_by. Date added always goes last: when the main
+        key ties, the order must be predictable, otherwise SQLite returns
+        rows in whatever order it likes."""
         fields = self.OPTIONS[self.key][1]
         if "-created_at" not in fields:
             fields += ("-created_at",)
         return fields
 
     def prepare(self, queryset):
-        """Досыпает в выборку то, чего нет в самой модели.
+        """Annotates the queryset with what the model itself lacks.
 
-        «Сначала новые» по одной дате создания бесполезны: весь каталог
-        заливается пачкой и отличается миллисекундами. Поэтому наверх
-        поднимаем то, что магазин сам пометил статусом «Новинка»,
-        а уже внутри — по дате добавления.
+        "Newest first" by creation date alone is useless: the whole catalog
+        is uploaded in one batch and differs by milliseconds. So products
+        the shop itself marked with the "New" status go to the top, and
+        within them — by date added.
 
-        «Сначала со скидкой» считает процент: в модели он свойство
-        Python, а сортировать надо на стороне базы.
+        "Discount first" computes the percentage: in the model it is a
+        Python property, but sorting has to happen on the database side.
         """
         if self.key == "new":
             return queryset.annotate(is_new=Case(
@@ -217,17 +217,17 @@ class Sorting:
             ))
 
         if self.key == "sale":
-            # Считаем долю скидки, а не разницу в гривнах: иначе наверх
-            # уедут дорогие товары, у которых «минус 80 ₴» это те же
-            # пять процентов, что у дешёвых «минус 3 ₴».
+            # The discount share is computed, not the difference in hryvnias:
+            # otherwise expensive products would float to the top, where
+            # "minus 80 ₴" is the same five percent as "minus 3 ₴" on cheap ones.
             #
-            # Товары без старой цены получают ноль и честно оказываются
-            # в конце — скрывать их нельзя, это обычная сортировка,
-            # а не фильтр «только со скидкой».
-            # Считаем во float, а не в Decimal. Деление двух Decimal
-            # SQLite отдаёт так, что Django возвращает NULL, и сортировка
-            # молча вырождается в сортировку по цене — проверено на живой
-            # выборке. Явное приведение к float это убирает.
+            # Products without an old price get zero and honestly end up at
+            # the bottom — they must not be hidden, this is ordinary sorting,
+            # not a "discount only" filter.
+            # Computed in float, not Decimal. Dividing two Decimals in SQLite
+            # comes back so that Django returns NULL, and the sort silently
+            # degrades to sorting by price — verified on live data. An
+            # explicit cast to float fixes it.
             money = lambda field: Cast(F(field), FloatField())
             ratio = ExpressionWrapper(
                 (money("old_price") - money("price")) / money("old_price"),
@@ -252,7 +252,7 @@ class Sorting:
 
 
 class ProductFilterSet:
-    """Собирает выборку каталога из параметров запроса."""
+    """Builds the catalog queryset from request parameters."""
 
     def __init__(self, params, queryset, category_titles=None,
                  status_titles=None, titles=None):
@@ -263,8 +263,8 @@ class ProductFilterSet:
         category_filter = CategoryFilter("category", _("Раздел"))
         category_filter.titles = category_titles or {}
 
-        # фильтры по справочникам собираются из реестра: добавили строку
-        # в catalog/facets.py — фильтр появился сам
+        # reference-model filters are built from the registry: add a line
+        # to catalog/facets.py and the filter appears by itself
         from catalog.facets import FACETS, group_titles
 
         groups = group_titles()
@@ -283,9 +283,9 @@ class ProductFilterSet:
         self.filters += [
             MultiChoiceFilter("stock", _("Наличие"), "availability",
                               {"in": _("В наличии"), "out": _("Нет в наличии")}),
-            # ?discount=1 — сюда ведёт кнопка «Акции» в шапке. Отдельной
-            # галки в панели подбора нет специально: фильтр снимается
-            # чипом над сеткой, как и все остальные.
+            # ?discount=1 — the "Sale" button in the header leads here. There
+            # is deliberately no separate checkbox in the filter panel: the
+            # filter is removed via the chip above the grid like all others.
             FlagFilter("discount", _("Только со скидкой"), "with_discount"),
             PriceRangeFilter(),
         ]

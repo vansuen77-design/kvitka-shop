@@ -1,8 +1,8 @@
-"""Выгрузка прайса: XLSX для людей и XML для площадок.
+"""Price list export: XLSX for people and XML for marketplaces.
 
-XLSX собирается вручную из ZIP с XML внутри — так работает формат Office.
-Сделано специально без сторонних библиотек: ставить ничего не нужно,
-файл открывается в Excel, LibreOffice и Google Таблицах.
+The XLSX is assembled by hand as a ZIP with XML inside — that is how the
+Office format works. Deliberately without third-party libraries: nothing
+to install, the file opens in Excel, LibreOffice and Google Sheets.
 """
 
 import zipfile
@@ -18,9 +18,9 @@ from django.views import View
 from catalog.facets import FACETS
 from catalog.models import Product
 
-# Колонки прайса: сначала общее, потом все характеристики из справочников,
-# потом состав, остаток и цена. Добавили справочник в catalog/facets.py —
-# в прайсе появилась новая колонка.
+# Price list columns: general fields first, then every reference attribute,
+# then composition, stock and price. Add a reference model to
+# catalog/facets.py — a new column appears in the price list.
 BASE_COLUMNS = [("Артикул", 14), ("Название", 46), ("Раздел", 20)]
 TAIL_COLUMNS = [
     ("Цветков", 10), ("Состав", 40),
@@ -43,7 +43,7 @@ def _column_name(index: int) -> str:
 
 
 class XlsxWriter:
-    """Минимальный писатель .xlsx: один лист, строки списками значений."""
+    """Minimal .xlsx writer: one sheet, rows as lists of values."""
 
     def __init__(self, sheet_title: str = "Прайс") -> None:
         self.sheet_title = sheet_title
@@ -56,7 +56,7 @@ class XlsxWriter:
     def add_row(self, values: list) -> None:
         self.rows.append(values)
 
-    # --- сборка ------------------------------------------------------
+    # --- assembly ----------------------------------------------------
     def _cell(self, ref: str, value, bold: bool) -> str:
         style = ' s="1"' if bold else ""
         if isinstance(value, (int, float)) and not isinstance(value, bool):
@@ -137,12 +137,12 @@ class XlsxWriter:
 
 
 def _price_rows():
-    """Товары для выгрузки — те же, что видит покупатель."""
+    """Products for export — the same ones the customer sees."""
     return Product.objects.catalog().order_by("category__position", "article")
 
 
 class PriceXlsxView(View):
-    """Прайс одним файлом .xlsx."""
+    """Price list as a single .xlsx file."""
 
     def get(self, request, *args, **kwargs):
         columns = price_columns()
@@ -171,7 +171,7 @@ class PriceXlsxView(View):
 
 
 class PriceXmlView(View):
-    """Фид в формате YML — его понимают Пром, Розетка и Google Merchant."""
+    """YML feed — understood by Prom, Rozetka and Google Merchant."""
 
     def get(self, request, *args, **kwargs):
         shop = settings.SHOP
@@ -220,7 +220,7 @@ class PriceXmlView(View):
                 parts.append(f'<param name="Цветков в букете">{product.stems}</param>')
             if product.composition:
                 parts.append(f'<param name="Состав">{escape(product.composition)}</param>')
-            # характеристики берём из справочников — по ним же работает подбор
+            # attributes come from the reference models — the same ones the filters use
             for spec in FACETS:
                 value = product.attribute_value(spec)
                 if value:

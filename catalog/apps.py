@@ -7,5 +7,5 @@ class CatalogConfig(AppConfig):
     verbose_name = "Каталог"
 
     def ready(self):
-        # подключаем снятие товаров с публикации при удалении справочника
+        # wire up unpublishing of products when a reference value is deleted
         from catalog import signals  # noqa: F401

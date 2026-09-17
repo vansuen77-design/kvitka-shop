@@ -1,4 +1,4 @@
-"""Фильтры каталога: справочники из адреса, поиск, цена, скидка."""
+"""Catalog filters: reference values from the URL, search, price, discount."""
 
 from django.http import QueryDict
 from django.test import TestCase
@@ -38,7 +38,7 @@ class AttributeFilterTests(TestCase):
         self.assertEqual(set(filtered("flower=pion")), {self.only_pion, self.both})
 
     def test_every_facet_is_filterable_by_url(self):
-        """Каждый справочник из реестра работает через ?code=slug."""
+        """Every reference model from the registry works via ?code=slug."""
         singles = {Kind: "kind", Color: "color", Size: "size"}
         values = {}
         for spec in FACETS:
@@ -99,7 +99,7 @@ class OtherFilterTests(TestCase):
 
 class SearchTests(TestCase):
     def test_cyrillic_search_ignores_case(self):
-        """LIKE в SQLite чувствителен к регистру кириллицы (грабля 19)."""
+        """LIKE in SQLite is case-sensitive for Cyrillic."""
         product = make_product(name="Пионы розовые", name_uk="Півонії рожеві")
         self.assertEqual(filtered("q=пионы"), [product])
         self.assertEqual(filtered("q=Півонії"), [product])

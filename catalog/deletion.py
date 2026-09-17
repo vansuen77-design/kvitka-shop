@@ -1,12 +1,12 @@
-"""Что происходит с товарами, когда удаляют характеристику.
+"""What happens to products when an attribute value is deleted.
 
-Правило простое: справочник удалить можно всегда, но товары, которые на
-него ссылались, снимаются с публикации. Они пропадают из каталога, из
-поиска и из выгрузок, но остаются в базе с фотографиями и ценами —
-вернуть их можно галкой «Показывать на сайте» в списке товаров.
+The rule is simple: a reference value can always be deleted, but the
+products that referenced it are unpublished. They vanish from the catalog,
+search and exports, but stay in the database with photos and prices —
+they can be brought back with the "Show on site" checkbox in the product list.
 
-Так сделано осознанно: удаление бренда не должно необратимо стирать
-ассортимент из-за одного неверного клика.
+This is deliberate: deleting a reference value must not irreversibly wipe
+out part of the range because of one wrong click.
 """
 
 from __future__ import annotations
@@ -25,13 +25,13 @@ def plural(count: int, forms=PLURALS) -> str:
 
 
 def affected_products(obj):
-    """Товары, привязанные к этому значению справочника."""
+    """Products linked to this reference value."""
     related = getattr(obj, "products", None)
     if related is None:
         return Product.objects.none()
     queryset = related.all()
     if isinstance(obj, Category):
-        # у раздела считаем и товары его подразделов
+        # for a category, products of its subcategories count too
         queryset = Product.objects.filter(
             category__in=[obj.pk] + list(obj.children.values_list("pk", flat=True))
         )
@@ -39,7 +39,7 @@ def affected_products(obj):
 
 
 def describe(obj) -> dict | None:
-    """Текст предупреждения для страницы подтверждения удаления."""
+    """Warning text for the delete confirmation page."""
     queryset = affected_products(obj)
     total = queryset.count()
     if not total:
@@ -56,7 +56,7 @@ def describe(obj) -> dict | None:
 
 
 def unpublish_products(obj) -> int:
-    """Снимает товары с публикации. Возвращает, сколько сняли."""
+    """Unpublishes the products. Returns how many were unpublished."""
     queryset = affected_products(obj).filter(is_active=True)
     articles = list(queryset.values_list("pk", flat=True))
     if not articles:
@@ -66,7 +66,7 @@ def unpublish_products(obj) -> int:
 
 
 def is_reference(obj) -> bool:
-    """Справочник ли это — то есть надо ли снимать товары с публикации."""
+    """Is this a reference value — i.e. should products be unpublished."""
     from catalog.facets import BY_MODEL
 
     return type(obj) in BY_MODEL or isinstance(obj, (Category, Status))

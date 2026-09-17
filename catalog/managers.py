@@ -1,40 +1,41 @@
-"""Менеджеры и QuerySet каталога — вся логика выборок собрана здесь,
-чтобы представления оставались тонкими."""
+"""Catalog managers and QuerySets — all query logic lives here so that
+views stay thin."""
 
 from django.db import models
 from django.db.models import Exists, F, OuterRef, Q
 
 from core.models import ActivatableQuerySet
 
-# Связи, которые каталог подтягивает одним запросом. FK — в select_related,
-# множественные справочники и фото — в prefetch. Новый справочник из
-# catalog/facets.py надо дописать сюда, иначе плитка пойдёт в базу за
-# каждым товаром отдельно.
+# Relations the catalog loads in one go. FKs go to select_related,
+# multi-valued reference models and photos to prefetch. A new reference
+# model from catalog/facets.py must be added here, otherwise the tile hits
+# the database for every product separately.
 RELATED = ("category", "status", "kind", "color", "size")
 PREFETCH = ("images", "flowers", "occasions")
 
 
 class CategoryQuerySet(ActivatableQuerySet):
-    """Выборки разделов каталога."""
+    """Catalog category lookups."""
 
     def nonempty(self) -> "CategoryQuerySet":
-        """Только разделы, в которых есть что показать.
+        """Only categories that have something to show.
 
-        Пустой раздел в меню — обещание, которого витрина не выполняет:
-        человек заходит и видит голую страницу. Раньше такие разделы
-        приходилось прятать галочкой в админке и не забывать вернуть её,
-        когда товар приедет. Теперь раздел исчезает и возвращается сам.
+        An empty category in the menu is a promise the storefront does not
+        keep: the visitor opens it and sees a bare page. Such categories
+        used to be hidden with a checkbox in the admin, not forgetting to
+        turn it back on when stock arrived. Now the category disappears
+        and comes back by itself.
 
-        Считаем товары и в самом разделе, и в его подразделах: у
-        «Женского белья» своих товаров нет, они лежат в «Трусах женских»,
-        и без второй проверки родитель пропал бы вместе с ними.
+        Products are counted both in the category itself and in its
+        children: "Bouquets" has no products of its own, they sit in
+        "Roses", and without the second check the parent would vanish too.
 
-        Exists вместо join с distinct: join размножает строки по числу
-        товаров, а distinct в SQLite не дружит с сортировкой по полю,
-        которого нет в выборке.
+        Exists instead of a join with distinct: a join multiplies rows by
+        the number of products, and distinct in SQLite does not play well
+        with ordering by a field that is not in the selection.
 
-        Импорт внутри метода намеренно: models.py подтягивает этот файл,
-        и обратная ссылка наверху превратилась бы в кольцо импортов.
+        The import inside the method is deliberate: models.py imports this
+        file, and a back reference at the top would create an import cycle.
         """
         from catalog.models import Product
 
@@ -44,8 +45,8 @@ class CategoryQuerySet(ActivatableQuerySet):
 
 
 class ProductQuerySet(ActivatableQuerySet):
-    """Выборки товаров. Каждый метод возвращает новый QuerySet,
-    поэтому их можно соединять в цепочку."""
+    """Product lookups. Every method returns a new QuerySet, so they can
+    be chained."""
 
     def published(self) -> "ProductQuerySet":
         return self.active()
@@ -53,7 +54,7 @@ class ProductQuerySet(ActivatableQuerySet):
     def with_relations(self) -> "ProductQuerySet":
         return self.select_related(*RELATED).prefetch_related(*PREFETCH)
 
-    # --- фильтры ---------------------------------------------------------
+    # --- filters ---------------------------------------------------------
     def in_category(self, slug: str) -> "ProductQuerySet":
         return self.filter(Q(category__slug=slug) | Q(category__parent__slug=slug))
 
@@ -61,13 +62,13 @@ class ProductQuerySet(ActivatableQuerySet):
         return self.filter(stock_quantity__gt=0)
 
     def with_discount(self) -> "ProductQuerySet":
-        """Только товары со скидкой — для кнопки «Акции» в шапке.
+        """Only discounted products — for the "Sale" button in the header.
 
-        Признак тот же, что показывает зачёркнутую цену на карточке
-        (свойство Product.has_discount): старая цена заполнена и выше
-        текущей. Считать здесь по-своему нельзя — «Акции» и плашка
-        «−5 %» разъехались бы, и покупатель увидел бы в акциях товар
-        без скидки.
+        Same criterion that shows the struck-out price on the tile
+        (Product.has_discount): the old price is set and higher than the
+        current one. It must not be computed differently here — "Sale" and
+        the "−5 %" badge would diverge, and a customer would find a product
+        without a discount among the sale items.
         """
         return self.filter(old_price__isnull=False, old_price__gt=F("price"))
 
@@ -75,17 +76,17 @@ class ProductQuerySet(ActivatableQuerySet):
         return self.filter(status__slug__in=list(slugs))
 
     def with_attribute(self, lookup: str, slugs, multiple: bool = False):
-        """Фильтр по любому справочнику подбора.
+        """Filter by any reference model.
 
-        Отдельного метода на каждую характеристику нет специально: все
-        они фильтруются одинаково — по адресу значения.
-        Какие вообще бывают, описано в catalog/facets.py.
+        Deliberately no separate method per attribute: they all filter the
+        same way — by value slug. Which ones exist is described in
+        catalog/facets.py.
         """
         queryset = self.filter(**{lookup: list(slugs)})
         return queryset.distinct() if multiple else queryset
 
     def availability(self, values) -> "ProductQuerySet":
-        """«В наличии» / «Нет в наличии» — считаем по остатку."""
+        """"In stock" / "Out of stock" — determined by the stock quantity."""
         values = set(values)
         if values == {"in"}:
             return self.filter(stock_quantity__gt=0)
@@ -105,10 +106,10 @@ class ProductQuerySet(ActivatableQuerySet):
         term = (term or "").strip()
         if not term:
             return self
-        # LIKE в SQLite не различает регистр только у латиницы (грабля 19):
-        # «роза» и «Роза» — разные строки. Поэтому ищем и как ввели, и
-        # с заглавной, и целиком строчными — по русскому и украинскому
-        # названию, артикулу, составу и цветку.
+        # LIKE in SQLite is case-insensitive for ASCII only: "роза" and
+        # "Роза" are different strings. So we search as typed, capitalised
+        # and all lower-case — across the Russian and Ukrainian name,
+        # article, composition and flower.
         variants = {term, term.lower(), term.capitalize()}
         query = Q()
         for word in variants:
@@ -125,7 +126,7 @@ class ProductQuerySet(ActivatableQuerySet):
 
 
 class ProductManager(models.Manager.from_queryset(ProductQuerySet)):
-    """Менеджер по умолчанию: сразу отдаёт готовый к выводу набор."""
+    """Default manager: returns a set ready for display."""
 
     def catalog(self) -> ProductQuerySet:
         return self.get_queryset().published().with_relations()

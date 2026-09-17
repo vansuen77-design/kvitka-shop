@@ -1,16 +1,15 @@
-"""Заводит строки раздела «Панель подбора» — по одной на справочник.
+"""Creates the "Filter panel" rows — one per reference model.
 
-Сами значения живут в справочниках, а эта команда решает, какие группы
-показывать покупателю по умолчанию. Запускается из ЗАПУСТИТЬ-КОПИЮ.bat и
-безопасна для повторного запуска: настройки, которые вы поменяли руками,
-не трогает.
+The values themselves live in the reference models; this command decides
+which groups are shown to the customer by default. Run by start.bat and
+safe to run again: settings changed by hand are not touched.
 
-Украинская подпись берётся из переводов (locale/uk), а не из словаря
-в коде: одна и та же строка «Цветы» переводится один раз в .po и
-работает и здесь, и в карточке товара. Поэтому порядок такой:
-makelocales → перевод → compilelocales → seed_facets (грабля 22).
-Если перевода ещё нет, подпись остаётся пустой и команда об этом
-предупреждает — следующий запуск её дозаполнит.
+The Ukrainian label comes from the translations (locale/uk), not from a
+dictionary in code: the same string "Цветы" is translated once in .po and
+works both here and on the product page. Hence the order:
+makelocales → translate → compilelocales → seed_facets.
+If there is no translation yet, the label stays empty and the command
+warns about it — the next run fills it in.
 """
 
 from django.core.management.base import BaseCommand
@@ -21,17 +20,17 @@ from catalog.models import FacetGroup
 
 
 def ukrainian(label: str) -> str:
-    """Перевод подписи из .po; пусто, если перевода нет.
+    """Label translation from .po; empty if there is none.
 
-    Смотрим прямо в каталог, а не через gettext: «Тип» по-украински
-    тоже «Тип», и по совпадению строк не отличить перевод от его
-    отсутствия.
+    Read straight from the catalog, not via gettext: "Тип" is also "Тип"
+    in Ukrainian, and by string equality a translation cannot be told
+    apart from its absence.
     """
     return trans_real.translation("uk")._catalog.get(label, "")
 
 
 class Command(BaseCommand):
-    help = "Создаёт группы панели подбора по реестру справочников"
+    help = "Creates filter panel groups from the reference model registry"
 
     def handle(self, *args, **options):
         created = kept = 0
@@ -52,20 +51,20 @@ class Command(BaseCommand):
             )
             if is_new:
                 created += 1
-                mark = "в подборе" if spec.in_filter else "только в карточке товара"
+                mark = "in the filter panel" if spec.in_filter else "product page only"
                 self.stdout.write(f"  {spec.label} — {mark}")
             else:
                 kept += 1
-                # подпись появилась в переводах позже — дозаполняем,
-                # но то, что владелец вписал руками, не трогаем
+                # the label appeared in the translations later — fill it in,
+                # but do not touch what the owner typed by hand
                 if not group.name_uk and name_uk:
                     group.name_uk = name_uk
                     group.save(update_fields=["name_uk", "updated_at"])
         self.stdout.write(self.style.SUCCESS(
-            f"Панель подбора: создано {created}, уже было {kept}."
+            f"Filter panel: created {created}, already existed {kept}."
         ))
         if missing:
             self.stdout.write(self.style.WARNING(
-                "Нет украинского перевода подписей: " + ", ".join(missing)
-                + ". Сначала makelocales → перевод → compilelocales."
+                "No Ukrainian translation for labels: " + ", ".join(missing)
+                + ". Run makelocales → translate → compilelocales first."
             ))

@@ -1,4 +1,4 @@
-"""Страницы каталога: список, раздел, карточка, JSON, баннер, панель подбора."""
+"""Catalog pages: list, category, product page, JSON, banner, filter panel."""
 
 import json
 
@@ -32,7 +32,7 @@ class CatalogPageTests(TestCase):
         self.assertContains(response, self.product.title)
 
     def test_json_answer_has_no_store_and_vary(self):
-        """Один адрес отдаёт HTML и JSON: у JSON no-store, у обоих Vary (инвариант 13)."""
+        """One URL serves HTML and JSON: JSON gets no-store, both get Vary."""
         html = self.client.get("/")
         self.assertIn("X-Requested-With", html.get("Vary", ""))
 
@@ -48,7 +48,7 @@ class CatalogPageTests(TestCase):
         response = self.client.get(self.product.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.product.title)
-        # крошки: каталог → раздел → товар
+        # breadcrumbs: catalog → category → product
         self.assertContains(response, self.child.title)
 
     def test_inactive_product_is_404(self):
@@ -89,10 +89,10 @@ class FacetPanelTests(TestCase):
 
         response = self.client.get("/")
         self.assertContains(response, 'name="flower"')
-        # поводов ни у одного товара нет — группы нет вовсе
+        # no product has an occasion — the group is absent entirely
         self.assertNotContains(response, 'name="occasion"')
 
-        # выбранное значение остаётся, даже если товаров с ним нет
+        # a selected value stays even if no product has it
         response = self.client.get("/?occasion=svadba")
         self.assertContains(response, 'value="svadba"')
 

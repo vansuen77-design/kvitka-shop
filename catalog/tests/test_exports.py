@@ -1,4 +1,4 @@
-"""Прайс XLSX и фид XML собираются без сторонних библиотек."""
+"""The XLSX price list and the XML feed are built without third-party libraries."""
 
 import zipfile
 from io import BytesIO
@@ -27,7 +27,7 @@ class ExportTests(TestCase):
         self.assertIn("X-1", sheet)
         self.assertIn("Троянда", sheet)
         self.assertNotIn("скрытый", sheet)
-        # по колонке на каждый справочник из реестра
+        # one column per reference model from the registry
         for spec in FACETS:
             self.assertIn(spec.label, sheet)
 

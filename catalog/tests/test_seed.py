@@ -1,4 +1,4 @@
-"""Команды наполнения: чистая база → рабочий каталог, повтор безопасен."""
+"""Seed commands: empty database → working catalog, re-running is safe."""
 
 from io import StringIO
 import tempfile
@@ -26,12 +26,12 @@ class SeedTests(TestCase):
             call_command("seed_catalog", stdout=StringIO())
             products = Product.objects.count()
             self.assertGreater(products, 0)
-            # каждый демо-товар получил картинку и украинское название
+            # every demo product got an image and a Ukrainian name
             for product in Product.objects.all():
                 self.assertTrue(product.has_photo, product.article)
                 self.assertTrue(product.name_uk, product.article)
                 self.assertTrue((Path(self.media.name) / product.cover.image.name).exists())
-            # статус «Новинка» — по адресу, который ищет сортировка
+            # the "New" status — by the slug that sorting looks for
             self.assertTrue(Status.objects.filter(slug=Sorting.NEW_STATUS_SLUG).exists())
             self.assertEqual(FacetGroup.objects.count(), len(FACETS))
             self.assertTrue(Category.objects.filter(parent__isnull=False).exists())
@@ -46,6 +46,6 @@ class SeedTests(TestCase):
             call_command("seed_catalog", stdout=StringIO())
             response = self.client.get("/")
             self.assertEqual(response.status_code, 200)
-            # у семейств есть переключатель
+            # families have a switcher
             family = Product.objects.exclude(family="").first()
             self.assertContains(self.client.get(family.get_absolute_url()), 'class="variants"')

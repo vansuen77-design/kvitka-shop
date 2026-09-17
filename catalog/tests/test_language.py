@@ -1,4 +1,4 @@
-"""Двуязычность: название товара всегда украинское, остальное — по языку страницы."""
+"""Bilingual UI: the product name is always Ukrainian, the rest follows the page language."""
 
 from io import StringIO
 from django.test import TestCase, override_settings
@@ -40,7 +40,7 @@ class TitleTests(TestCase):
 
 class FacetLabelTests(TestCase):
     def test_facet_labels_translated_from_po(self):
-        """Подписи групп подбора берутся из .po, а не из словаря в коде."""
+        """Filter group labels come from .po, not from a dictionary in code."""
         with translation.override("uk"):
             for spec in FACETS:
                 with self.subTest(label=spec.label):

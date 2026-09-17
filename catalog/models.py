@@ -1,18 +1,18 @@
-"""Модели каталога.
+"""Catalog models.
 
-Иерархия наследования:
+Inheritance hierarchy:
     models.Model
       └── TimeStampedModel (core)
             └── NamedModel (core)
-                  ├── Category, Status, справочники подбора
+                  ├── Category, Status, filter reference models
                   └── Product
 
-Товар продаётся поштучно: букет — одна штука, цена одна на товар,
-остаток — одно число. Варианты одного букета (11 / 25 / 51 роза) — это
-отдельные товары, связанные полем family: у каждого свой артикул,
-цена и остаток, а на странице между ними стоит переключатель размера.
+Products are sold by the piece: a bouquet is one item, one price per
+product, stock is a single number. Variants of one bouquet (11 / 25 / 51
+roses) are separate products linked by the family field: each has its own
+article, price and stock, and the product page shows a size switcher.
 
-Автор кода: ISHOD, 2026. Все права на исходный код принадлежат автору.
+Code by ISHOD, 2026. All rights to the source code belong to the author.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ from core.utils import transliterate
 
 
 class Category(NamedModel):
-    """Раздел каталога. Поддерживает один уровень вложенности."""
+    """Catalog category. Supports one level of nesting."""
 
     parent = models.ForeignKey(
         "self",
@@ -62,9 +62,9 @@ class Category(NamedModel):
 
 
 class Status(NamedModel):
-    """Статус товара: «В наличии», «Под заказ», «Новинка», «Снят с продажи».
+    """Product status: "In stock", "On order", "New", "Discontinued".
 
-    Список редактируется в админке — можно завести свои.
+    The list is edited in the admin — custom ones can be added.
     """
 
     color = models.CharField(
@@ -86,10 +86,10 @@ class Status(NamedModel):
 
 
 class AttributeModel(NamedModel):
-    """Общая база для справочников, по которым фильтруется каталог.
+    """Common base for the reference models the catalog is filtered by.
 
-    Все они устроены одинаково: название, порядок, показывать или нет.
-    Владелец заводит значения в админке, фильтр в каталоге появляется сам.
+    They are all alike: name, order, shown or not. The owner adds values
+    in the admin, the filter in the catalog appears by itself.
     """
 
     class Meta(NamedModel.Meta):
@@ -97,7 +97,7 @@ class AttributeModel(NamedModel):
 
 
 class Kind(AttributeModel):
-    """Тип товара: Букет, Композиция в коробке, Корзина, Растение в горшке."""
+    """Product type: bouquet, box arrangement, basket, potted plant."""
 
     class Meta(AttributeModel.Meta):
         verbose_name = "тип товара"
@@ -105,9 +105,9 @@ class Kind(AttributeModel):
 
 
 class Flower(AttributeModel):
-    """Цветок: Роза, Тюльпан, Пион, Хризантема.
+    """Flower: rose, tulip, peony, chrysanthemum.
 
-    Множественный справочник: в сборном букете цветов несколько.
+    Multi-valued: a mixed bouquet has several flowers.
     """
 
     class Meta(AttributeModel.Meta):
@@ -116,7 +116,7 @@ class Flower(AttributeModel):
 
 
 class Occasion(AttributeModel):
-    """Повод: День рождения, Свадьба, 8 Марта. У букета их может быть несколько."""
+    """Occasion: birthday, wedding, 8 March. A bouquet may have several."""
 
     class Meta(AttributeModel.Meta):
         verbose_name = "повод"
@@ -124,7 +124,7 @@ class Occasion(AttributeModel):
 
 
 class Color(AttributeModel):
-    """Основной цвет букета: Красный, Розовый, Белый, Микс."""
+    """Main colour of the bouquet: red, pink, white, mix."""
 
     class Meta(AttributeModel.Meta):
         verbose_name = "цвет"
@@ -132,10 +132,10 @@ class Color(AttributeModel):
 
 
 class Size(AttributeModel):
-    """Размер букета: Малый (S), Средний (M), Большой (L).
+    """Bouquet size: small (S), medium (M), large (L).
 
-    Порядок значений — по полю position, не по алфавиту: «Большой»
-    в подборе не должен стоять раньше «Малого» (грабля 24).
+    Values are ordered by position, not alphabetically: "Large" must not
+    come before "Small" in the filter panel.
     """
 
     class Meta(AttributeModel.Meta):
@@ -145,11 +145,11 @@ class Size(AttributeModel):
 
 
 class FacetGroup(TimeStampedModel):
-    """Группа в панели подбора каталога.
+    """A group in the catalog filter panel.
 
-    Сами значения живут в справочниках выше, а эта таблица решает, какие
-    группы показывать покупателю, под какой подписью и в каком порядке.
-    Строки заводит команда seed_facets — по одной на справочник.
+    The values themselves live in the reference models above; this table
+    decides which groups to show the customer, under what label and in
+    what order. Rows are created by the seed_facets command — one per model.
     """
 
     code = models.CharField(
@@ -185,14 +185,14 @@ class FacetGroup(TimeStampedModel):
 
     @property
     def title(self) -> str:
-        """Подпись группы на языке посетителя — как у справочников."""
+        """Group label in the visitor's language — same as for reference models."""
         if get_language() == "uk" and self.name_uk:
             return self.name_uk
         return self.name
 
 
 class Product(NamedModel):
-    """Товарная позиция: букет, композиция или растение."""
+    """A product: bouquet, arrangement or plant."""
 
     article = models.CharField("артикул", max_length=32, unique=True)
     category = models.ForeignKey(
@@ -219,7 +219,7 @@ class Product(NamedModel):
                   "покажется русское описание.",
     )
 
-    # --- подбор: по этим полям работают фильтры в каталоге ---------------
+    # --- filtering: the catalog filters work on these fields --------------
     kind = models.ForeignKey(
         Kind, verbose_name="тип товара", on_delete=models.SET_NULL,
         related_name="products", null=True, blank=True,
@@ -241,10 +241,10 @@ class Product(NamedModel):
         related_name="products", null=True, blank=True,
     )
 
-    # --- варианты одного букета -------------------------------------------
-    # «Розы красные» бывают на 11, 25 и 51 штуку. Это три товара со своим
-    # артикулом, ценой и остатком, а одинаковая family связывает их в один
-    # переключатель размера на странице товара.
+    # --- variants of one bouquet ------------------------------------------
+    # "Red roses" come as 11, 25 and 51 stems. These are three products with
+    # their own article, price and stock, and the shared family links them
+    # into one size switcher on the product page.
     family = models.CharField(
         "семейство вариантов", max_length=64, blank=True, db_index=True,
         help_text="Одинаковое слово у букетов, которые отличаются только "
@@ -252,9 +252,9 @@ class Product(NamedModel):
                   "Например «rozy-krasnye». Пусто — вариантов нет.",
     )
 
-    # --- состав и размеры: текст и числа, не справочники -------------------
-    # Состав — свободный текст намеренно: «25 роз Freedom 60 см, эвкалипт»
-    # никто не станет фильтровать, а вот читать его будут.
+    # --- composition and dimensions: text and numbers, not reference models
+    # Composition is free text on purpose: nobody filters by "25 Freedom
+    # roses 60 cm, eucalyptus", but people do read it.
     composition = models.TextField(
         "состав", blank=True,
         help_text="Что внутри: «25 роз, эвкалипт, крафт-упаковка».",
@@ -268,7 +268,7 @@ class Product(NamedModel):
         "высота, см", default=0, help_text="0 — не показывать.",
     )
 
-    # --- остаток и цена ---------------------------------------------------
+    # --- stock and price --------------------------------------------------
     stock_quantity = models.PositiveIntegerField(
         "остаток, штук", default=0, db_index=True,
         help_text="Сколько букетов можно собрать сегодня.",
@@ -298,35 +298,34 @@ class Product(NamedModel):
     def get_absolute_url(self) -> str:
         return reverse("catalog:product", args=[self.slug])
 
-    # --- цена -----------------------------------------------------------
+    # --- price ----------------------------------------------------------
     def amount_for(self, quantity: int) -> Decimal:
         return (self.price * max(int(quantity or 0), 0)).quantize(Decimal("0.01"))
 
     @property
     def has_discount(self) -> bool:
-        """Старая цена заполнена и она выше текущей.
+        """The old price is set and is higher than the current one.
 
-        Проверяем именно «выше»: если владелец по ошибке впишет цену
-        ниже нынешней, показывать «скидку» вверх мы не станем.
+        "Higher" specifically: if the owner mistakenly enters a price lower
+        than the current one, we will not show a "discount" upwards.
         """
         return bool(self.old_price and self.old_price > self.price)
 
     @property
     def discount_percent(self) -> int:
-        """Скидка в процентах, целыми. Ноль — показывать нечего.
+        """Discount in whole percent. Zero — nothing to show.
 
-        Ноль возвращается и когда разница есть, но меньше половины
-        процента: плашка «−0%» выглядит как ошибка, лучше обойтись
-        зачёркнутой ценой.
+        Zero is also returned when there is a difference but under half a
+        percent: a "−0%" badge looks like a bug, the struck-out price is enough.
         """
         if not self.has_discount:
             return 0
         return int(round((self.old_price - self.price) / self.old_price * 100))
 
-    # --- количество -------------------------------------------------------
+    # --- quantity ---------------------------------------------------------
     @property
     def max_quantity(self) -> int:
-        """Сколько штук реально можно взять — весь остаток."""
+        """How many can actually be taken — the whole stock."""
         return self.stock_quantity
 
     @property
@@ -334,13 +333,13 @@ class Product(NamedModel):
         return 1
 
     def normalize_quantity(self, quantity) -> int:
-        """Приводит любое введённое число к тому, что можно заказать.
+        """Turns any entered number into one that can be ordered.
 
-        Единственное место, где это решается: карточка, корзина, форма
-        без JavaScript — все зовут этот метод, чтобы правила не разъезжались.
+        The single place where this is decided: product tile, cart, no-JS
+        form — all call this method so the rules never diverge.
 
-        Ноль означает «убрать позицию» и остаётся нулём — иначе очистить
-        строку было бы нечем. Больше остатка — обрезаем до остатка.
+        Zero means "remove the line" and stays zero — otherwise there would
+        be no way to clear a line. Above stock — clamped to stock.
         """
         try:
             quantity = int(quantity)
@@ -378,12 +377,12 @@ class Product(NamedModel):
     def status_color(self) -> str:
         return self.status.color if self.status_id else "#6B625B"
 
-    # --- варианты -------------------------------------------------------
+    # --- variants -------------------------------------------------------
     def variants(self):
-        """Товары того же семейства, включая этот, — для переключателя.
+        """Products of the same family, including this one — for the switcher.
 
-        Порядок по размеру из справочника, внутри — по числу цветков:
-        так 11 роз всегда стоят раньше 51, как бы их ни завели.
+        Ordered by size from the reference model, then by stem count: so 11
+        roses always come before 51, however they were entered.
         """
         if not self.family:
             return Product.objects.none()
@@ -396,14 +395,14 @@ class Product(NamedModel):
 
     @property
     def variant_label(self) -> str:
-        """Подпись кнопки в переключателе: «25 шт» или название размера."""
+        """Switcher button label: "25 pcs" or the size name."""
         if self.stems:
             return f"{self.stems} {_('шт')}"
         if self.size_id:
             return self.size.title
         return self.article
 
-    # --- фото -----------------------------------------------------------
+    # --- photos ---------------------------------------------------------
     @property
     def cover(self):
         images = list(self.images.all())
@@ -415,7 +414,7 @@ class Product(NamedModel):
         return bool(cover and cover.image)
 
     def attribute_value(self, spec) -> str:
-        """Значение одного справочника у этого товара — строкой."""
+        """Value of one reference model for this product — as a string."""
         value = getattr(self, spec.field, None)
         if value is None:
             return ""
@@ -424,10 +423,10 @@ class Product(NamedModel):
         return value.title
 
     def tile_values(self) -> list[str]:
-        """Короткие подписи под названием в плитке каталога.
+        """Short labels under the name in the catalog tile.
 
-        Берутся из справочников с пометкой in_tile — цветок, повод,
-        размер. Пустые пропускаются.
+        Taken from reference models marked in_tile — flower, occasion,
+        size. Empty ones are skipped.
         """
         from catalog.facets import tile_specs
 
@@ -437,8 +436,8 @@ class Product(NamedModel):
             if value is None:
                 continue
             if spec.multiple:
-                # у сборного букета цветов может быть пять — в плитке
-                # хватит двух, остальное видно на странице товара
+                # a mixed bouquet may have five flowers — two are enough
+                # in the tile, the rest is on the product page
                 names = [item.title for item in value.all()][:2]
                 values.append(", ".join(names))
             else:
@@ -447,20 +446,21 @@ class Product(NamedModel):
 
     @property
     def title(self) -> str:
-        """Название товара — всегда украинское.
+        """Product name — always Ukrainian.
 
-        У справочников название следует за языком страницы, у товаров —
-        нет: магазин украинский, и букет должен называться одинаково
-        везде — в каталоге, в заказе, в открытке курьера, в разговоре
-        с покупателем. Русское название остаётся в базе для админки.
+        Reference names follow the page language, product names do not:
+        the shop is Ukrainian, and a bouquet must be called the same
+        everywhere — in the catalog, in the order, on the courier's note,
+        in a conversation with the customer. The Russian name stays in the
+        database for the admin.
 
-        Перевода нет — показываем русское: пустая карточка хуже.
+        No translation — show the Russian one: an empty tile is worse.
         """
         return self.name_uk or self.name
 
     @property
     def description_text(self) -> str:
-        """Описание на языке посетителя — как title у справочников."""
+        """Description in the visitor's language — like title on reference models."""
         if get_language() == "uk" and self.description_uk:
             return self.description_uk
         return self.description
@@ -478,11 +478,11 @@ class Product(NamedModel):
         return self.composition
 
     def specification_rows(self) -> list[tuple[str, str]]:
-        """Таблица «Характеристики».
+        """The "Specifications" table.
 
-        Первая часть строится из справочников подбора — ровно из тех же,
-        что стоят в панели слева. Вторая — числа, справочниками они
-        быть не могут.
+        The first part is built from the filter reference models — exactly
+        the same ones that are in the panel on the left. The second part is
+        numbers, which cannot be reference models.
         """
         from catalog.facets import FACETS
 
@@ -497,7 +497,7 @@ class Product(NamedModel):
 
 
 class ProductImage(TimeStampedModel):
-    """Фотография товара. Первая по порядку становится обложкой."""
+    """Product photo. The first by order becomes the cover."""
 
     product = models.ForeignKey(
         Product, verbose_name="товар", on_delete=models.CASCADE,

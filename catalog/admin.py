@@ -1,7 +1,7 @@
-"""Админка каталога.
+"""Catalog admin.
 
-Здесь владелец ведёт ассортимент: цены, остатки, описания, фотографии,
-статусы, разделы и справочники подбора.
+Here the owner maintains the range: prices, stock, descriptions, photos,
+statuses, categories and filter reference models.
 """
 
 from django.contrib import admin
@@ -23,9 +23,9 @@ from catalog.models import (
 )
 
 
-# --- вложенные блоки ------------------------------------------------------
+# --- inlines --------------------------------------------------------------
 class ProductImageInline(admin.TabularInline):
-    """Фотографии прямо внутри карточки товара."""
+    """Photos right inside the product form."""
 
     model = ProductImage
     extra = 1
@@ -47,7 +47,7 @@ class ProductImageInline(admin.TabularInline):
 
 
 class SubcategoryInline(admin.TabularInline):
-    """Подразделы внутри раздела."""
+    """Subcategories inside a category."""
 
     model = Category
     extra = 1
@@ -57,10 +57,10 @@ class SubcategoryInline(admin.TabularInline):
 
 
 class UnpublishWarningMixin:
-    """Предупреждает, что удаление значения уберёт товары из каталога.
+    """Warns that deleting a value will remove products from the catalog.
 
-    Само снятие с публикации делает сигнал в catalog/signals.py — здесь
-    только текст, который менеджер видит перед тем, как нажать «Да».
+    The unpublishing itself is done by the signal in catalog/signals.py —
+    here is only the text the manager sees before pressing "Yes".
     """
 
     def delete_view(self, request, object_id, extra_context=None):
@@ -94,7 +94,7 @@ class UnpublishWarningMixin:
             )
 
 
-# --- товары ---------------------------------------------------------------
+# --- products -------------------------------------------------------------
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
@@ -103,8 +103,8 @@ class ProductAdmin(admin.ModelAdmin):
     )
     list_display_links = ("article", "name")
     list_editable = ("price", "status", "stock_quantity", "is_active")
-    # справочники подбора перечислены здесь руками: сами они в фильтрах
-    # не появятся. Добавили строку в catalog/facets.py — допишите и сюда
+    # reference models are listed here by hand: they do not appear in the
+    # admin filters by themselves. Added a line to catalog/facets.py — add it here too
     list_filter = ("status", "category", "kind", "flowers", "occasions",
                    "color", "size", "is_active")
     search_fields = ("article", "name", "name_uk", "family", "composition",
@@ -177,7 +177,7 @@ class ProductAdmin(admin.ModelAdmin):
         self.message_user(request, f"Скрыты: {updated}")
 
 
-# --- справочники ----------------------------------------------------------
+# --- reference models -----------------------------------------------------
 @admin.register(Category)
 class CategoryAdmin(UnpublishWarningMixin, admin.ModelAdmin):
     list_display = ("name", "name_uk", "parent", "products_count",
@@ -215,11 +215,11 @@ class StatusAdmin(UnpublishWarningMixin, admin.ModelAdmin):
 
 
 class AttributeAdmin(UnpublishWarningMixin, admin.ModelAdmin):
-    """Общая админка справочников подбора: значение, порядок, видимость.
+    """Shared admin for filter reference models: value, order, visibility.
 
-    Каждое значение — пункт в левой панели каталога. Счётчик показывает,
-    сколько товаров на него ссылается. Значение без товаров покупателю
-    не показывается — панель прячет пустые пункты, пока товар не появится.
+    Every value is an item in the catalog's left panel. The counter shows
+    how many products reference it. A value without products is not shown
+    to the customer — the panel hides empty items until a product appears.
     """
 
     list_display = ("name", "name_uk", "products_count", "position", "is_active")
@@ -262,7 +262,7 @@ class SizeAdmin(AttributeAdmin):
 
 @admin.register(FacetGroup)
 class FacetGroupAdmin(admin.ModelAdmin):
-    """Панель подбора: какие группы показывать покупателю и в каком порядке."""
+    """Filter panel: which groups to show the customer and in what order."""
 
     list_display = ("name", "code", "values_count", "position",
                     "has_search", "is_active")
@@ -273,7 +273,7 @@ class FacetGroupAdmin(admin.ModelAdmin):
     fields = ("code", "name", "position", "has_search", "is_active")
 
     def has_add_permission(self, request) -> bool:
-        # строки заводит команда seed_facets — по одной на справочник
+        # rows are created by the seed_facets command — one per reference model
         return False
 
     def has_delete_permission(self, request, obj=None) -> bool:

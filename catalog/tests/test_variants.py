@@ -1,4 +1,4 @@
-"""Варианты одного букета: семейство family и переключатель размера."""
+"""Variants of one bouquet: the family and the size switcher."""
 
 from django.test import TestCase
 
@@ -10,7 +10,7 @@ class VariantsTests(TestCase):
         self.s = make_value(Size, "Малый", slug="s", position=10, name_uk="Малий")
         self.m = make_value(Size, "Средний", slug="m", position=20, name_uk="Середній")
         self.l = make_value(Size, "Большой", slug="l", position=30, name_uk="Великий")
-        # заводим нарочно не по порядку — переключатель должен отсортировать сам
+        # created deliberately out of order — the switcher must sort them itself
         self.big = make_product(name="51", family="rozy", size=self.l, stems=51, price="3000")
         self.small = make_product(name="11", family="rozy", size=self.s, stems=11, price="800")
         self.mid = make_product(name="25", family="rozy", size=self.m, stems=25, price="1800")
@@ -37,7 +37,7 @@ class VariantsTests(TestCase):
         self.assertContains(response, 'class="variants"')
         self.assertContains(response, self.small.get_absolute_url())
         self.assertContains(response, self.big.get_absolute_url())
-        # текущий вариант — не ссылка
+        # the current variant is not a link
         self.assertContains(response, 'aria-current="page"')
 
     def test_single_member_family_has_no_switcher(self):
