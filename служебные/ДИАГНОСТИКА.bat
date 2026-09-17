@@ -4,7 +4,7 @@ title KVITKA - диагностика переноса
 rem Батник лежит в подпапке, а проект уровнем выше — поэтому «..».
 rem Без этой строки Python и manage.py искались бы здесь и не нашлись.
 cd /d "%~dp0.."
-set "SERVER=kvitka@185.101.38.39"
+set "SERVER=kvitka@АДРЕС-СЕРВЕРА"
 
 echo [1] Собираю архив...
 if exist "%TEMP%\t.tgz" del "%TEMP%\t.tgz"

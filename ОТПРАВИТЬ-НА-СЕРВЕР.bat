@@ -4,7 +4,8 @@ title KVITKA - отправить на сервер
 cd /d "%~dp0"
 setlocal
 
-set "SERVER=kvitka@185.101.38.39"
+rem Впишите адрес своего сервера (см. deploy\УСТАНОВКА.md)
+set "SERVER=kvitka@АДРЕС-СЕРВЕРА"
 set "REMOTE=/home/kvitka/kvitka"
 
 echo.

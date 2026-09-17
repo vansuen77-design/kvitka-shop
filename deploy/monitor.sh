@@ -38,7 +38,7 @@ CHAT=$(value_of TELEGRAM_CHAT_ID)
 SITE=$(value_of SITE_URL)
 if [ -z "$SITE" ]; then
     HOST=$(value_of ALLOWED_HOSTS | cut -d, -f1)
-    SITE="https://${HOST:-testprogram.com.ua}"
+    SITE="https://${HOST:-kvitka.example}"
 fi
 
 notify() {

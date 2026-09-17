@@ -4,7 +4,8 @@ title KVITKA - скачать резервные копии
 cd /d "%~dp0"
 setlocal
 
-set "SERVER=kvitka@185.101.38.39"
+rem Впишите адрес своего сервера (см. deploy\УСТАНОВКА.md)
+set "SERVER=kvitka@АДРЕС-СЕРВЕРА"
 rem Кладём рядом с самим проектом, а не в %USERPROFILE%\Desktop:
 rem когда рабочий стол перенесён в OneDrive, это разные папки,
 rem и вторая на экране не видна.

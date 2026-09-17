@@ -1,7 +1,7 @@
 # Туннель Cloudflare. Копировать в /etc/systemd/system/kvitka-tunnel.service
 #
 # Файл с ключами туннеля кладётся в /home/kvitka/.cloudflared/
-# Тот самый, что сейчас лежит у вас в C:\Users\vansu\.cloudflared\
+# Тот самый, что сейчас лежит у вас в %USERPROFILE%\.cloudflared\
 #
 #   sudo systemctl enable --now kvitka-tunnel
 #   journalctl -u kvitka-tunnel -f
