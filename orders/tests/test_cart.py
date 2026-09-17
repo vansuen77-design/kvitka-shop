@@ -1,4 +1,4 @@
-"""Корзина в сессии: добавление, замена, удаление, итоги, порог доставки."""
+"""Session cart: adding, replacing, removing, totals, delivery threshold."""
 
 from decimal import Decimal
 
@@ -29,7 +29,7 @@ class CartTests(TestCase):
     def test_add_accumulates_and_respects_stock(self):
         self.assertEqual(self.cart.add(self.product, 2), 2)
         self.assertEqual(self.cart.add(self.product, 2), 4)
-        # было 4, просим ещё 5 — остаток 5, итог обрезан
+        # had 4, asking for 5 more — stock is 5, the total is clamped
         self.assertEqual(self.cart.add(self.product, 5), 5)
         self.assertEqual(self.cart.totals.quantity, 5)
 
@@ -91,7 +91,7 @@ class FreeDeliveryTests(TestCase):
         self.request = make_request()
 
     def test_threshold_from_settings(self):
-        """Порог читается из settings.SHOP — тесты не знают числа (грабля 23)."""
+        """The threshold is read from settings.SHOP — tests do not know the number."""
         with override_settings(SHOP=shop_with(FREE_DELIVERY_FROM=1000, DELIVERY_COST=120)):
             cart = Cart(self.request)
             cheap = make_product(price="400", stock=10)

@@ -1,24 +1,24 @@
-"""Бот-справочная: заказы и покупатели прямо в Telegram.
+"""Info bot: orders and customers right in Telegram.
 
-Зачем. Админка закрыта наружу и открывается только через SSH-туннель —
-это правильно для управления, но неудобно, когда надо просто глянуть
-с телефона, сколько пришло заказов. Бот закрывает именно эту нужду:
-только чтение, ничего не меняет.
+Why. The admin is closed from the outside and opens only through an SSH
+tunnel — right for management, but inconvenient when you just want to
+glance from the phone how many orders came in. The bot covers exactly
+that need: read only, changes nothing.
 
-Кому отвечает. Строго одному человеку — тому, чей id лежит в .env
-(TELEGRAM_CHAT_ID). Любое сообщение с другого id молча игнорируется
-и пишется в журнал: если кто-то нашёл бота и пишет ему, это видно.
+Who it answers. Strictly one person — the one whose id is in .env
+(TELEGRAM_CHAT_ID). Any message from another id is silently ignored and
+logged: if someone found the bot and writes to it, it is visible.
 
-Как устроено. Длинные опросы (long polling): запрашиваем обновления
-с таймаутом, Telegram держит соединение и отвечает, как только придёт
-сообщение. Никакого webhook — значит, не нужен внешний адрес и порт.
+How it works. Long polling: updates are requested with a timeout,
+Telegram holds the connection and answers as soon as a message arrives.
+No webhook — so no external address or port is needed.
 
-Номер последнего обработанного сообщения хранится в файле рядом с базой.
-Без него после перезапуска бот заново отвечал бы на старые команды.
+The id of the last processed update is stored in a file next to the
+database. Without it the bot would answer old commands again after a restart.
 
-Запуск:  manage.py telegram_bot
-На сервере работает сервисом kvitka-bot (см. deploy/kvitka-bot.service).
-Автор кода: ISHOD, 2026.
+Run:  manage.py telegram_bot
+On the server it runs as the kvitka-bot service (see deploy/kvitka-bot.service).
+Code by ISHOD, 2026.
 """
 
 from __future__ import annotations
@@ -44,10 +44,10 @@ from orders.models import Order
 logger = logging.getLogger("kvitka")
 
 API = "https://api.telegram.org/bot{token}/{method}"
-POLL_TIMEOUT = 25          # столько Telegram держит соединение
+POLL_TIMEOUT = 25          # how long Telegram holds the connection
 HTTP_TIMEOUT = POLL_TIMEOUT + 10
-LIMIT = 3900               # потолок Telegram 4096, оставляем запас
-PAGE = 10                  # сколько записей показываем за раз
+LIMIT = 3900               # Telegram's ceiling is 4096, keep a margin
+PAGE = 10                  # how many records are shown at once
 
 HELP = f"""<b>{settings.SHOP["NAME"]} — справочная</b>
 
@@ -71,15 +71,15 @@ def money(value) -> str:
 
 
 class Command(BaseCommand):
-    help = "Telegram-бот: показывает заказы и покупателей владельцу"
+    help = "Telegram bot: shows orders and customers to the owner"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--once", action="store_true",
-            help="Разобрать накопившееся и выйти. Для проверки.",
+            help="Process pending updates and exit. For testing.",
         )
 
-    # --- связь с Telegram -------------------------------------------------
+    # --- talking to Telegram ----------------------------------------------
     def api(self, method: str, **params):
         url = API.format(token=self.token, method=method)
         data = urllib.parse.urlencode(params).encode("utf-8")
@@ -93,55 +93,55 @@ class Command(BaseCommand):
             self.api("sendMessage", chat_id=self.chat_id, text=text,
                      parse_mode="HTML", disable_web_page_preview="true")
         except Exception:
-            logger.exception("Бот: не смог отправить ответ")
+            logger.exception("Bot: could not send the reply")
 
-    # --- запуск -----------------------------------------------------------
+    # --- startup ----------------------------------------------------------
     def handle(self, *args, **options):
         conf = getattr(settings, "TELEGRAM", {})
         self.token = conf.get("TOKEN") or ""
         self.chat_id = str(conf.get("CHAT_ID") or "")
         if not self.token or not self.chat_id:
             raise CommandError(
-                "В .env нет TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID — "
-                "боту не с чем работать."
+                "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set in .env — "
+                "nothing for the bot to work with."
             )
 
         self.offset_file = Path(settings.BASE_DIR) / "var" / "bot-offset"
         self.offset_file.parent.mkdir(parents=True, exist_ok=True)
         offset = self.read_offset()
 
-        self.stdout.write("Бот запущен. Отвечает только владельцу.")
+        self.stdout.write("Bot started. Answers the owner only.")
         while True:
             try:
                 answer = self.api("getUpdates", offset=offset,
                                   timeout=POLL_TIMEOUT)
             except urllib.error.HTTPError as error:
-                # Telegram отвечает кодом — по нему сразу видно причину,
-                # и «сеть недоступна» тут было бы враньём
+                # Telegram answers with a code — the cause is clear from it,
+                # and "network unavailable" would be a lie here
                 if error.code == 401:
                     raise CommandError(
-                        "Telegram не принял токен (401). Проверьте "
-                        "TELEGRAM_BOT_TOKEN в .env на сервере."
+                        "Telegram rejected the token (401). Check "
+                        "TELEGRAM_BOT_TOKEN in .env on the server."
                     )
                 if error.code == 409:
-                    # тот же бот опрашивается откуда-то ещё: обычно его
-                    # забыли выключить на своём компьютере
+                    # the same bot is polled from somewhere else: usually it
+                    # was left running on the owner's computer
                     logger.warning(
-                        "Бот: тот же бот уже запущен где-то ещё (409). "
-                        "Оставьте один экземпляр."
+                        "Bot: the same bot is already running elsewhere (409). "
+                        "Keep a single instance."
                     )
                     time.sleep(15)
                     continue
-                logger.warning("Бот: Telegram ответил %s", error.code)
+                logger.warning("Bot: Telegram answered %s", error.code)
                 time.sleep(10)
                 continue
             except (urllib.error.URLError, TimeoutError, OSError) as error:
-                # сеть моргнула — подождём и попробуем снова, это норма
-                logger.warning("Бот: сеть недоступна (%s)", error)
+                # the network blinked — wait and retry, that is normal
+                logger.warning("Bot: network unavailable (%s)", error)
                 time.sleep(5)
                 continue
             except Exception:
-                logger.exception("Бот: неожиданная ошибка при опросе")
+                logger.exception("Bot: unexpected error while polling")
                 time.sleep(10)
                 continue
 
@@ -150,11 +150,11 @@ class Command(BaseCommand):
                 try:
                     self.handle_update(update)
                 except Exception:
-                    logger.exception("Бот: ошибка при обработке сообщения")
+                    logger.exception("Bot: error while handling a message")
             self.write_offset(offset)
 
             if options["once"]:
-                self.stdout.write("Разовый прогон закончен.")
+                self.stdout.write("Single run finished.")
                 return
 
     def read_offset(self) -> int:
@@ -167,9 +167,9 @@ class Command(BaseCommand):
         try:
             self.offset_file.write_text(str(offset), encoding="utf-8")
         except OSError:
-            logger.warning("Бот: не смог запомнить номер сообщения")
+            logger.warning("Bot: could not save the update offset")
 
-    # --- разбор сообщения -------------------------------------------------
+    # --- parsing a message ------------------------------------------------
     def handle_update(self, update: dict) -> None:
         message = update.get("message") or update.get("edited_message") or {}
         text = (message.get("text") or "").strip()
@@ -177,8 +177,8 @@ class Command(BaseCommand):
         if not text:
             return
         if sender != self.chat_id:
-            # чужой: не отвечаем вообще, чтобы бот не подтверждал, что живой
-            logger.warning("Бот: сообщение с чужого id %s — пропущено", sender)
+            # a stranger: no reply at all, so the bot does not confirm it is alive
+            logger.warning("Bot: message from foreign id %s — skipped", sender)
             return
 
         command, _, argument = text.partition(" ")
@@ -199,7 +199,7 @@ class Command(BaseCommand):
             return
         self.send(handler(argument.strip()))
 
-    # --- сами команды -----------------------------------------------------
+    # --- the commands themselves ------------------------------------------
     def cmd_help(self, argument: str) -> str:
         return HELP
 
@@ -265,7 +265,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def delivery_lines(order) -> str:
-        """Куда, когда и кому везти — одним блоком."""
+        """Where, when and to whom to deliver — as one block."""
         rows = []
         if order.is_pickup:
             rows.append("Самовывоз")
@@ -350,8 +350,8 @@ class Command(BaseCommand):
     def cmd_stock(self, argument: str) -> str:
         from catalog.models import Product
 
-        # «заканчивается» — меньше пяти букетов: столько же считает
-        # плитка каталога (Product.stock_state)
+        # "running low" — fewer than five bouquets: the catalog tile uses
+        # the same threshold (Product.stock_state)
         low = list(Product.objects.published().filter(stock_quantity__lt=5)
                    .order_by("stock_quantity")[:40])
         if not low:

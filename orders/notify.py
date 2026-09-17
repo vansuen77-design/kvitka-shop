@@ -1,16 +1,17 @@
-"""Уведомления о новом заказе: флористу в Telegram, покупателю на почту.
+"""New-order notifications: to the florist in Telegram, to the customer by e-mail.
 
-Почему так, а не иначе:
+Why this way:
 
-* Отправка идёт в фоновом потоке. Покупатель не должен ждать, пока мы
-  достучимся до Telegram или почтового сервера, и тем более не должен
-  видеть ошибку, если они лежат: заказ уже сохранён, уведомление — дело
-  второе.
-* Ни одна ошибка отсюда не долетает до покупателя. Всё, что пошло не
-  так, пишется в журнал сервера (journalctl -u kvitka).
-* Письмо покупателю собирается на языке, на котором он оформлял заказ
-  (Order.language): в фоновом потоке активного языка запроса уже нет.
-* Стандартная библиотека, без requests: одна зависимость меньше.
+* Sending happens in a background thread. The customer must not wait
+  while we reach Telegram or the mail server, and must not see an error
+  if they are down: the order is already saved, the notification is
+  secondary.
+* No error from here reaches the customer. Everything that went wrong is
+  written to the server log (journalctl -u kvitka).
+* The customer e-mail is built in the language they ordered in
+  (Order.language): in the background thread the request language is
+  no longer active.
+* Standard library only, no requests: one dependency fewer.
 """
 
 from __future__ import annotations
@@ -31,8 +32,8 @@ logger = logging.getLogger("kvitka")
 
 API = "https://api.telegram.org/bot{token}/sendMessage"
 TIMEOUT = 10
-MAX_LINES = 25          # больше в сообщение не влезет по-человечески
-LIMIT = 4000            # у Telegram потолок 4096 символов
+MAX_LINES = 25          # more than that does not fit a message readably
+LIMIT = 4000            # Telegram caps messages at 4096 characters
 
 
 def enabled() -> bool:
@@ -41,15 +42,15 @@ def enabled() -> bool:
 
 
 def notify_new_order(order, background: bool = True) -> None:
-    """Точка входа. Зовётся сразу после сохранения заказа.
+    """Entry point. Called right after the order is saved.
 
-    ``background=False`` нужен тестам и командам: отправить здесь и сейчас.
+    ``background=False`` is for tests and commands: send here and now.
     """
     if enabled():
         try:
             text = build_message(order)
         except Exception:
-            logger.exception("Telegram: не смог собрать текст заказа %s", order.pk)
+            logger.exception("Telegram: could not build the text for order %s", order.pk)
         else:
             _run(_send, text, background=background)
     if order.email:
@@ -64,7 +65,7 @@ def _run(target, *args, background: bool) -> None:
     thread.start()
 
 
-# --- текст ---------------------------------------------------------------
+# --- text ----------------------------------------------------------------
 def _esc(value) -> str:
     return html.escape(str(value or ""))
 
@@ -87,7 +88,7 @@ def build_message(order) -> str:
         head.append(f"✉️ {_esc(order.email)}")
     head.append("")
 
-    # --- доставка -------------------------------------------------------
+    # --- delivery -------------------------------------------------------
     if order.is_pickup:
         head.append("🏬 Самовывоз")
     else:
@@ -135,7 +136,7 @@ def build_message(order) -> str:
     return text
 
 
-# --- отправка ------------------------------------------------------------
+# --- sending -------------------------------------------------------------
 def _send(text: str) -> None:
     conf = settings.TELEGRAM
     payload = json.dumps({
@@ -154,26 +155,26 @@ def _send(text: str) -> None:
         with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
             answer = json.loads(response.read().decode("utf-8"))
         if not answer.get("ok"):
-            logger.error("Telegram отказал: %s", answer)
+            logger.error("Telegram refused: %s", answer)
     except urllib.error.HTTPError as error:
-        # тело ответа Telegram объясняет причину лучше, чем код
+        # the Telegram response body explains the cause better than the code
         detail = error.read().decode("utf-8", "replace")[:300]
         logger.error("Telegram %s: %s", error.code, detail)
     except Exception:
-        logger.exception("Telegram: не отправилось")
+        logger.exception("Telegram: sending failed")
 
 
 def send_raw(text: str) -> None:
-    """Синхронная отправка — нужна команде проверки telegram_test."""
+    """Synchronous send — needed by the telegram_test check command."""
     _send(text)
 
 
-# --- письмо покупателю ---------------------------------------------------
+# --- customer e-mail -----------------------------------------------------
 def _email_customer(order_id: int, language: str) -> None:
-    """«Заказ принят» на почту покупателя, на его языке.
+    """"Order accepted" to the customer's e-mail, in their language.
 
-    Заказ перечитываем из базы: поток живёт дольше запроса, а объект
-    из представления к этому моменту может быть уже без строк.
+    The order is re-read from the database: the thread outlives the
+    request, and the object from the view may have no lines by then.
     """
     from orders.context_processors import shop_settings
     from orders.models import Order
@@ -190,4 +191,4 @@ def _email_customer(order_id: int, language: str) -> None:
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [order.email],
                   fail_silently=False)
     except Exception:
-        logger.exception("Заказ %s: письмо покупателю не ушло", order_id)
+        logger.exception("Order %s: customer e-mail was not sent", order_id)

@@ -1,4 +1,4 @@
-"""Оформление заказа: страница корзины, формы без JavaScript, API, «спасибо»."""
+"""Checkout: the cart page, no-JS forms, API, "thank you"."""
 
 import datetime
 import json

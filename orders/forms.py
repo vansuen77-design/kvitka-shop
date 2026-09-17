@@ -1,4 +1,4 @@
-"""Форма заказа: контакты, доставка, получатель, открытка."""
+"""Order form: contacts, delivery, recipient, gift card."""
 
 from __future__ import annotations
 
@@ -13,13 +13,13 @@ from orders.models import Order
 
 
 class OrderForm(forms.ModelForm):
-    """Контакты и доставка. Оплаты нет — флорист перезванивает и подтверждает.
+    """Contacts and delivery. No payment — the florist calls back and confirms.
 
-    Подписи и подсказки полей задаются здесь, а не берутся из модели:
-    в модели они по-русски и такими нужны в админке, а покупателю форма
-    должна показываться на языке страницы. Русский текст здесь — это
-    одновременно и ключ перевода: gettext_noop помечает его для
-    makelocales, а переводит __init__ при сборке формы.
+    Labels and placeholders are set here rather than taken from the model:
+    in the model they are Russian and needed so in the admin, while the
+    customer must see the form in the page language. The Russian text here
+    doubles as the translation key: gettext_noop marks it for makelocales,
+    and __init__ translates it when the form is built.
     """
 
     agree = forms.BooleanField(required=True)
@@ -51,7 +51,7 @@ class OrderForm(forms.ModelForm):
         "comment": gettext_noop("Что учесть: код домофона, время звонка, замена цветов"),
     }
 
-    # выбрать можно от сегодня до этого числа дней вперёд
+    # selectable from today up to this many days ahead
     MAX_DAYS_AHEAD = 30
 
     def __init__(self, *args, **kwargs):
@@ -61,7 +61,7 @@ class OrderForm(forms.ModelForm):
                 field.label = _(self.LABELS[name])
             if name in self.PLACEHOLDERS:
                 field.widget.attrs["placeholder"] = _(self.PLACEHOLDERS[name])
-        # подписи вариантов лежат в модели по-русски
+        # choice labels are stored in the model in Russian
         self.fields["delivery"].choices = [
             (value, _(label)) for value, label in Order.Delivery.choices
         ]
@@ -128,10 +128,10 @@ class OrderForm(forms.ModelForm):
         return self.clean_phone_value(phone) if phone else ""
 
     def clean_delivery_date(self):
-        """Дата — не в прошлом и не дальше месяца.
+        """The date is not in the past and not further than a month.
 
-        Проверяет сервер, а не только атрибуты min/max поля: браузер
-        их может не поддерживать, а без JavaScript — тем более.
+        Checked by the server, not only by the field's min/max attributes:
+        the browser may not support them, and without JavaScript even less so.
         """
         value = self.cleaned_data.get("delivery_date")
         if value is None:
@@ -154,6 +154,6 @@ class OrderForm(forms.ModelForm):
             if not data.get("delivery_date"):
                 self.add_error("delivery_date", _("Выберите дату доставки."))
         else:
-            # самовывоз: адрес не нужен, что бы ни осталось в поле
+            # pickup: no address needed, whatever is left in the field
             data["address"] = ""
         return data

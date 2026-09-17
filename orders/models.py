@@ -1,10 +1,10 @@
-"""Заказы.
+"""Orders.
 
-Оплаты на сайте нет: покупатель собирает корзину, указывает, куда и когда
-привезти букет, а флорист перезванивает и подтверждает. Всё, что он ввёл,
-попадает сюда и видно в админке.
+There is no online payment: the customer fills the cart, says where and
+when to deliver the bouquet, and the florist calls back to confirm.
+Everything they entered lands here and is visible in the admin.
 
-Автор кода: ISHOD, 2026. Все права на исходный код принадлежат автору.
+Code by ISHOD, 2026. All rights to the source code belong to the author.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ class OrderQuerySet(models.QuerySet):
 
 
 class Order(TimeStampedModel):
-    """Заказ с доставкой. Флорист связывается с покупателем сам."""
+    """An order with delivery. The florist contacts the customer."""
 
     class Status(models.TextChoices):
         NEW = "new", "Новый"
@@ -38,8 +38,9 @@ class Order(TimeStampedModel):
         DONE = "done", "Выполнен"
         CANCELLED = "cancelled", "Отменён"
 
-    # Подписи ниже показываются покупателю, поэтому помечены для перевода:
-    # gettext_noop только даёт makelocales найти строку, а переводит форма
+    # The labels below are shown to the customer, so they are marked for
+    # translation: gettext_noop only lets makelocales find the string, the
+    # form translates it
     class Delivery(models.TextChoices):
         COURIER = "courier", gettext_noop("Курьером по городу")
         PICKUP = "pickup", gettext_noop("Самовывоз из магазина")
@@ -54,8 +55,8 @@ class Order(TimeStampedModel):
         AFTERNOON = "15-18", "15:00–18:00"
         EVENING = "18-21", "18:00–21:00"
 
-    # Заказ можно оформить и без кабинета — поэтому null. Если человек
-    # вошёл, ставим ссылку: по ней он видит свою историю заказов.
+    # An order can be placed without an account — hence null. If the person
+    # is logged in, the link is set: through it they see their order history.
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name="кабинет покупателя",
         on_delete=models.SET_NULL, related_name="orders",
@@ -65,7 +66,7 @@ class Order(TimeStampedModel):
     phone = models.CharField("телефон", max_length=40)
     email = models.EmailField("почта", blank=True)
 
-    # --- доставка ---------------------------------------------------------
+    # --- delivery ---------------------------------------------------------
     delivery = models.CharField(
         "доставка", max_length=16, choices=Delivery.choices,
         default=Delivery.COURIER,
@@ -88,8 +89,8 @@ class Order(TimeStampedModel):
         "оплата", max_length=16, choices=Payment.choices, default=Payment.CASH,
     )
     comment = models.TextField("комментарий покупателя", blank=True)
-    # Язык, на котором покупатель оформлял заказ: письмо «заказ принят»
-    # уходит в фоне, когда активного языка запроса уже нет
+    # The language the customer ordered in: the "order accepted" e-mail is
+    # sent in the background, when the request language is no longer active
     language = models.CharField("язык сайта", max_length=5, blank=True)
 
     status = models.CharField(
@@ -98,7 +99,7 @@ class Order(TimeStampedModel):
     )
     manager_note = models.TextField("заметка флориста", blank=True)
 
-    # --- суммы на момент заказа -------------------------------------------
+    # --- amounts at the time of the order ---------------------------------
     total_quantity = models.PositiveIntegerField("всего штук", default=0)
     goods_amount = models.DecimalField(
         "товары на сумму", max_digits=11, decimal_places=2, default=Decimal("0"),
@@ -139,11 +140,11 @@ class Order(TimeStampedModel):
 
     @staticmethod
     def delivery_cost_for(delivery: str, goods_amount) -> Decimal:
-        """Стоимость доставки по правилам магазина.
+        """Delivery cost by the shop's rules.
 
-        Самовывоз бесплатен. Курьер — по тарифу из настроек, а от порога
-        FREE_DELIVERY_FROM бесплатно. Пороги читаются из settings.SHOP,
-        чтобы тесты и полоса прогресса в корзине считали одно и то же.
+        Pickup is free. Courier — at the rate from settings, free above the
+        FREE_DELIVERY_FROM threshold. Thresholds are read from settings.SHOP
+        so that tests and the cart progress bar compute the same thing.
         """
         if delivery == Order.Delivery.PICKUP:
             return Decimal("0")
@@ -165,8 +166,8 @@ class Order(TimeStampedModel):
 
 
 class OrderLine(TimeStampedModel):
-    """Строка заказа. Название и цена сохраняются на момент заказа —
-    чтобы через месяц было видно, о чём договаривались."""
+    """Order line. Name and price are saved at the time of the order — so a
+    month later it is still clear what was agreed."""
 
     order = models.ForeignKey(
         Order, verbose_name="заказ", on_delete=models.CASCADE,

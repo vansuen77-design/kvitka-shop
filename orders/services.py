@@ -1,7 +1,8 @@
-"""Оформление заказа: одна функция, которую зовут и страница, и тесты.
+"""Checkout: one function called by both the page and the tests.
 
-Вынесено из представления, чтобы бизнес-логика (копирование строк,
-язык, привязка к кабинету) не зависела от того, откуда пришёл заказ.
+Moved out of the view so that the business logic (copying lines,
+language, linking to the account) does not depend on where the order
+came from.
 """
 
 from __future__ import annotations
@@ -14,19 +15,18 @@ from orders.models import Order, OrderLine
 
 @transaction.atomic
 def create_order(form, totals, user=None) -> Order:
-    """Сохранить заказ из проверенной формы и строк корзины.
+    """Save an order from a validated form and the cart lines.
 
-    Строки копируют артикул, название и цену на момент заказа
-    (инвариант 5): товар потом могут переименовать или удалить,
-    а заказ должен остаться читаемым.
+    Lines copy the article, name and price at the time of the order: the
+    product may later be renamed or deleted, and the order must stay readable.
     """
     order: Order = form.save(commit=False)
     order.status = Order.Status.NEW
-    # запомним язык покупателя — письмо «заказ принят» уходит в фоне,
-    # когда активного языка запроса уже нет
+    # remember the customer's language — the "order accepted" e-mail is
+    # sent in the background, when the request language is no longer active
     order.language = (get_language() or "")[:5]
-    # заказ оформляют и без кабинета; вошёл — привяжем, чтобы он
-    # попал в «мои заказы»
+    # orders are placed without an account too; logged in — link it so
+    # that it shows up in "my orders"
     if user is not None and user.is_authenticated:
         order.user = user
     order.save()
@@ -36,7 +36,7 @@ def create_order(form, totals, user=None) -> Order:
             order=order,
             product=line.product,
             article=line.product.article,
-            # то же название, что покупатель видел в каталоге
+            # the same name the customer saw in the catalog
             product_name=line.product.title,
             quantity=line.quantity,
             unit_price=line.unit_price,

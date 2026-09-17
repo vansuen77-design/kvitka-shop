@@ -1,10 +1,10 @@
-"""Проверка связи с Telegram — без оформления настоящего заказа.
+"""Telegram connectivity check — without placing a real order.
 
-    python manage.py telegram_test            — короткое тестовое сообщение
-    python manage.py telegram_test --last     — текст по последнему заказу
+    python manage.py telegram_test            — a short test message
+    python manage.py telegram_test --last     — the text of the latest order
 
-Команда синхронная и намеренно шумная: если что-то настроено неверно,
-вы увидите ответ Telegram прямо в окне, а не в журнале сервера.
+The command is synchronous and deliberately noisy: if something is set up
+wrong, you see Telegram's answer right in the window, not in the server log.
 """
 
 from django.conf import settings
@@ -15,26 +15,26 @@ from orders.models import Order
 
 
 class Command(BaseCommand):
-    help = "Отправляет тестовое сообщение в Telegram"
+    help = "Sends a test message to Telegram"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--last", action="store_true",
-            help="Взять последний заказ и отправить его так, как ушёл бы флористу.",
+            help="Take the latest order and send it as the florist would receive it.",
         )
 
     def handle(self, *args, **options):
         conf = getattr(settings, "TELEGRAM", {})
         token, chat = conf.get("TOKEN", ""), conf.get("CHAT_ID", "")
 
-        self.stdout.write(f"Токен:  {'задан (' + str(len(token)) + ' символов)' if token else 'ПУСТО'}")
-        self.stdout.write(f"Чат:    {chat or 'ПУСТО'}")
-        self.stdout.write(f"Адрес:  {getattr(settings, 'SITE_URL', '') or 'не задан'}")
+        self.stdout.write(f"Token:  {'set (' + str(len(token)) + ' characters)' if token else 'EMPTY'}")
+        self.stdout.write(f"Chat:   {chat or 'EMPTY'}")
+        self.stdout.write(f"URL:    {getattr(settings, 'SITE_URL', '') or 'not set'}")
 
         if not notify.enabled():
             self.stdout.write(self.style.ERROR(
-                "\nНе хватает TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID в файле .env — "
-                "уведомления сейчас выключены."
+                "\nTELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing from .env — "
+                "notifications are currently off."
             ))
             return
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
             order = Order.objects.order_by("-pk").first()
             if order is None:
                 self.stdout.write(self.style.WARNING(
-                    "Заявок ещё нет — отправляю обычное тестовое сообщение."
+                    "No orders yet — sending the plain test message."
                 ))
                 text = "✅ Проверка связи. Уведомления о заказах настроены."
             else:
@@ -50,9 +50,9 @@ class Command(BaseCommand):
         else:
             text = "✅ Проверка связи. Уведомления о заказах настроены."
 
-        self.stdout.write("\nОтправляю...")
+        self.stdout.write("\nSending...")
         notify.send_raw(text)
         self.stdout.write(self.style.SUCCESS(
-            "Отправлено. Если сообщение не пришло — смотрите строку с ошибкой выше: "
-            "чаще всего это неверный токен или бот, которому вы ещё не написали /start."
+            "Sent. If the message did not arrive — see the error line above: "
+            "most often it is a wrong token or a bot you have not yet sent /start to."
         ))

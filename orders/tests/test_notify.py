@@ -1,5 +1,5 @@
-"""Уведомления: текст для Telegram собирается, без токена — молчим,
-письмо покупателю уходит на его языке."""
+"""Notifications: the Telegram text is built, without a token we stay silent,
+the customer e-mail goes out in their language."""
 
 import datetime
 from decimal import Decimal
@@ -71,7 +71,7 @@ class CustomerEmailTests(TestCase):
         self.assertIn(order.number, letter.subject)
         self.assertIn("Троянди", letter.body)
         self.assertIn("R-11", letter.body)
-        # тема и тело — на украинском, а не на языке текущего потока
+        # subject and body are Ukrainian, not the current thread language
         self.assertIn("прийнято", letter.subject)
         self.assertNotIn("Здравствуйте", letter.body)
 

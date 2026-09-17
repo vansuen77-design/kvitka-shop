@@ -1,10 +1,10 @@
-"""Корзина — то, что покупатель набрал, но ещё не оформил.
+"""The cart — what the customer picked but has not ordered yet.
 
-Живёт в сессии. Структура хранения:
+Lives in the session. Storage structure:
 
-    {"<id товара>": количество штук}
+    {"<product id>": quantity}
 
-Товар продаётся поштучно, поэтому позиция — это просто количество.
+Products are sold by the piece, so a line is simply a quantity.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from core.utils import format_money
 
 @dataclass
 class CartLine:
-    """Одна позиция корзины."""
+    """One cart line."""
 
     product: Product
     quantity: int
@@ -55,10 +55,10 @@ class CartTotals:
     amount: Decimal = Decimal("0")
     lines: list[CartLine] = field(default_factory=list)
 
-    # --- бесплатная доставка ---------------------------------------------
-    # Порог и тариф читаются из settings.SHOP при каждом обращении, а не
-    # запоминаются при импорте: тесты меняют порог через override_settings,
-    # и полоса прогресса обязана это увидеть (грабля 23).
+    # --- free delivery ---------------------------------------------------
+    # The threshold and rate are read from settings.SHOP on every access,
+    # not remembered at import time: tests change the threshold through
+    # override_settings, and the progress bar must see it.
     @property
     def free_delivery_from(self) -> Decimal:
         return Decimal(settings.SHOP["FREE_DELIVERY_FROM"])
@@ -80,7 +80,7 @@ class CartTotals:
 
     @property
     def courier_cost(self) -> Decimal:
-        """Сколько будет стоить курьер при текущей сумме."""
+        """What the courier costs at the current amount."""
         from orders.models import Order
 
         return Order.delivery_cost_for(Order.Delivery.COURIER, self.amount)
@@ -100,7 +100,7 @@ class CartTotals:
 
 
 class Cart:
-    """Обёртка над сессией. Views и шаблоны работают только с ней."""
+    """Wrapper around the session. Views and templates work only with it."""
 
     session_key = settings.CART_SESSION_KEY
 
@@ -109,17 +109,17 @@ class Cart:
         self._data: dict = self.session.setdefault(self.session_key, {})
         self._totals: CartTotals | None = None
 
-    # --- запись ----------------------------------------------------------
+    # --- writing ---------------------------------------------------------
     def _save(self) -> None:
         self.session[self.session_key] = self._data
         self.session.modified = True
         self._totals = None
 
     def add(self, product, quantity: int) -> int:
-        """Добавляет количество к позиции и возвращает итог по ней.
+        """Adds a quantity to a line and returns the line total.
 
-        Принимаем именно товар, а не его номер: сумма «было плюс стало»
-        тоже обязана уложиться в остаток, а знает об этом только он.
+        Takes the product itself, not its id: "had plus added" must also
+        fit into stock, and only the product knows that.
         """
         current = int(self._data.get(str(product.pk), 0))
         total = product.normalize_quantity(current + int(quantity))
@@ -142,7 +142,7 @@ class Cart:
         self._data = {}
         self._save()
 
-    # --- чтение ----------------------------------------------------------
+    # --- reading ---------------------------------------------------------
     def _build(self) -> CartTotals:
         totals = CartTotals()
         if not self._data:
@@ -160,8 +160,8 @@ class Cart:
             product = products.get(int(key)) if key.isdigit() else None
             if product is None:
                 continue
-            # чиним на лету старые корзины и позиции, у которых за это
-            # время уменьшился остаток
+            # fix on the fly old carts and lines whose stock has dropped
+            # in the meantime
             quantity = product.normalize_quantity(raw_quantity)
             if quantity <= 0:
                 continue

@@ -1,4 +1,4 @@
-"""Админка заказов: флорист видит контакты, доставку, состав и ведёт статус."""
+"""Order admin: the florist sees contacts, delivery, contents and manages the status."""
 
 from django.contrib import admin
 from django.utils.html import format_html
@@ -31,10 +31,10 @@ class OrderLineInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    # В списке видно всё, что нужно, чтобы собрать и отвезти букет:
-    # кто заказал, куда и когда везти, что написать на открытке.
-    # Складываем это в несколько колонок, иначе таблицу пришлось бы
-    # прокручивать вбок, чтобы прочитать один заказ.
+    # The list shows everything needed to assemble and deliver a bouquet:
+    # who ordered, where and when to deliver, what to write on the card.
+    # Packed into a few columns, otherwise the table would have to be
+    # scrolled sideways to read a single order.
     list_display = (
         "number", "created_short", "customer", "delivery_info",
         "total_amount", "comment_short", "status_badge", "status",
@@ -118,7 +118,7 @@ class OrderAdmin(admin.ModelAdmin):
             return format_html('<span style="color:#B5ADA6">—</span>')
         text = obj.comment.strip()
         short = text if len(text) <= 70 else text[:70].rstrip() + "…"
-        # полный текст показываем подсказкой: он бывает длинным
+        # the full text is shown as a tooltip: it can be long
         return format_html(
             '<span title="{}" style="display:inline-block;max-width:260px">{}</span>',
             text, short)

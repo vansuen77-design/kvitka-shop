@@ -1,4 +1,4 @@
-"""Представления корзины и оформления заказа."""
+"""Cart and checkout views."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from orders.services import create_order
 
 
 class CartMixin:
-    """Даёт представлению готовую корзину."""
+    """Gives the view a ready cart."""
 
     @property
     def cart(self) -> Cart:
@@ -27,7 +27,7 @@ class CartMixin:
 
 
 class CartView(PageTitleMixin, CartMixin, TemplateView):
-    """Страница «Корзина»: собранные позиции и форма заказа."""
+    """The "Cart" page: collected lines and the order form."""
 
     template_name = "orders/cart.html"
     page_title = "Корзина"
@@ -49,10 +49,11 @@ class CartView(PageTitleMixin, CartMixin, TemplateView):
         return context
 
     def profile_initial(self) -> dict:
-        """Данные вошедшего покупателя — чтобы не вводить их каждый раз.
+        """Data of the logged-in customer — so they need not type it every time.
 
-        Анкеты может не быть: администратора завели командой, а не через
-        регистрацию. Тогда берём хотя бы имя и почту из учётной записи.
+        There may be no profile: the administrator was created by a command,
+        not through registration. Then at least the name and e-mail are
+        taken from the account.
         """
         user = self.request.user
         if not user.is_authenticated:
@@ -63,7 +64,7 @@ class CartView(PageTitleMixin, CartMixin, TemplateView):
         return {"name": user.first_name, "email": user.email}
 
     def post(self, request, *args, **kwargs):
-        """Оформление. Оплаты нет — сохраняем и показываем «спасибо»."""
+        """Checkout. No payment — save and show "thank you"."""
         totals = self.cart.totals
         form = OrderForm(request.POST)
 
@@ -73,18 +74,18 @@ class CartView(PageTitleMixin, CartMixin, TemplateView):
             return self.render_to_response(self.get_context_data(form=form))
 
         order = create_order(form, totals, request.user)
-        # уведомление уходит в фоне: если Telegram недоступен,
-        # покупатель об этом не узнает и заказ не потеряет
+        # the notification goes in the background: if Telegram is down the
+        # customer will not know and will not lose the order
         notify_new_order(order)
         self.cart.clear()
-        # чтобы страницу «спасибо» не мог открыть кто-то посторонний,
-        # перебирая номера — запоминаем свой заказ в сессии
+        # so that a stranger cannot open the "thank you" page by guessing
+        # numbers — remember the own order in the session
         request.session["last_order"] = order.pk
         return redirect("orders:success", pk=order.pk)
 
 
 class OrderSuccessView(PageTitleMixin, DetailView):
-    """Спасибо за заказ — номер и что будет дальше."""
+    """Thank you for the order — the number and what happens next."""
 
     model = Order
     template_name = "orders/success.html"
@@ -94,19 +95,18 @@ class OrderSuccessView(PageTitleMixin, DetailView):
         return _("Заказ принят")
 
     def get_queryset(self):
-        """Только свой заказ — тот, что запомнили в сессии при отправке."""
+        """Only the own order — the one remembered in the session on submit."""
         own = self.request.session.get("last_order")
         return Order.objects.filter(pk=own) if own else Order.objects.none()
 
 
-# --- действия над корзиной -----------------------------------------------
+# --- cart actions --------------------------------------------------------
 class CartActionView(JsonRequestMixin, CartMixin, View):
-    """Общее для всех действий над корзиной.
+    """Common base for all cart actions.
 
-    В ответ кладём не только цифры, но и готовую разметку таблицы позиций:
-    страница обновляет её на месте и никогда не перезагружается — иначе
-    перезагрузка обрывает следующий запрос, который пользователь уже успел
-    отправить.
+    The response carries not only the numbers but the ready markup of the
+    lines table: the page updates it in place and never reloads — otherwise
+    a reload would cut off the next request the user has already sent.
     """
 
     def lines_html(self) -> str:
@@ -134,7 +134,7 @@ class CartActionView(JsonRequestMixin, CartMixin, View):
 
 
 class CartAddView(CartActionView):
-    """Добавить количество по товару."""
+    """Add a quantity of a product."""
 
     def post(self, request, *args, **kwargs):
         payload = self.get_payload()
@@ -150,7 +150,7 @@ class CartAddView(CartActionView):
         if asked <= 0:
             return self.fail(_("Укажите количество"))
 
-        # остаток — одним методом товара
+        # stock — via the product's single method
         quantity = product.normalize_quantity(asked)
         if quantity <= 0:
             return self.fail(_("Этого букета не осталось"))
@@ -160,7 +160,7 @@ class CartAddView(CartActionView):
 
 
 class CartUpdateView(CartActionView):
-    """Заменить количество позиции."""
+    """Replace the quantity of a line."""
 
     def post(self, request, *args, **kwargs):
         payload = self.get_payload()
@@ -191,7 +191,7 @@ class CartClearView(CartActionView):
 
 
 class CartFormAddView(CartMixin, View):
-    """Резервный путь без JavaScript: обычная форма с перезагрузкой."""
+    """Fallback without JavaScript: a plain form with a reload."""
 
     def post(self, request, *args, **kwargs):
         product = get_object_or_404(
@@ -208,10 +208,10 @@ class CartFormAddView(CartMixin, View):
 
 
 class CartFormUpdateView(CartMixin, View):
-    """Без JavaScript: кнопки «Обновить» и «Убрать» в строке корзины.
+    """Without JavaScript: the "Update" and "Remove" buttons in a cart line.
 
-    Одна форма на строку, две кнопки: «remove» обнуляет позицию, иначе
-    берём количество из поля. Количество приводит сам товар.
+    One form per line, two buttons: "remove" zeroes the line, otherwise the
+    quantity is taken from the field. The product normalises the quantity.
     """
 
     def post(self, request, *args, **kwargs):
