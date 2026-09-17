@@ -1,4 +1,4 @@
-"""Дымовые проверки: главные адреса отвечают, чужое — 404, админка за шлюзом."""
+"""Smoke tests: main URLs answer, unknown ones are 404, the admin is behind the gate."""
 
 from django.test import TestCase, override_settings
 

@@ -1,4 +1,4 @@
-"""Шлюз админки: код из Telegram, срок, пять попыток, пауза между отправками."""
+"""Admin gate: Telegram code, expiry, five attempts, pause between sends."""
 
 import re
 from unittest import mock
@@ -52,7 +52,7 @@ class CodeTests(TestCase):
         ok, message = admin_gate.check_code(request, wrong)
         self.assertFalse(ok)
         self.assertNotIn(admin_gate.SESSION_KEY, request.session)
-        # даже верный код после аннулирования не работает
+        # even the correct code does not work after cancellation
         ok, _ = admin_gate.check_code(request, code)
         self.assertFalse(ok)
 

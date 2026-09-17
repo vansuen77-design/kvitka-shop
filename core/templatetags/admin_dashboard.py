@@ -1,4 +1,4 @@
-"""Данные для сводки на главной странице админки."""
+"""Data for the summary on the admin index page."""
 
 from decimal import Decimal
 
@@ -21,7 +21,7 @@ STATUS_PILL = {
 
 @register.simple_tag
 def kvitka_stats() -> dict:
-    """Четыре плитки над карточками разделов."""
+    """Four tiles above the app cards."""
     requests = Order.objects.aggregate(
         total=Count("id"),
         new=Count("id", filter=Q(status=Order.Status.NEW)),
@@ -50,7 +50,7 @@ def kvitka_stats() -> dict:
 
 @register.simple_tag
 def recent_orders(limit: int = 6):
-    """Последние заказы — чтобы не искать их по разделам."""
+    """Latest orders — so they need not be looked up by section."""
     return list(Order.objects.all()[:limit])
 
 

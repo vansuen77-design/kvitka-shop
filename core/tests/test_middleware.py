@@ -1,4 +1,4 @@
-"""Язык, админка по-русски, страницы ошибок, robots и карта сайта."""
+"""Language, Russian admin, error pages, robots and sitemap."""
 
 from django.conf import settings
 from django.test import TestCase, override_settings
@@ -17,7 +17,7 @@ class LanguageMiddlewareTests(TestCase):
         self.assertEqual(response["Content-Language"], "ru")
 
     def test_middleware_order_matches_template(self):
-        """Порядок middleware — инвариант 12: сессии раньше проверок админки."""
+        """Middleware order: sessions before the admin checks."""
         names = settings.MIDDLEWARE
         session = names.index("django.contrib.sessions.middleware.SessionMiddleware")
         access = names.index("core.middleware.AdminAccessMiddleware")

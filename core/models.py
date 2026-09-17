@@ -1,6 +1,6 @@
-"""Базовые абстрактные модели — общий фундамент для всех приложений.
+"""Base abstract models — the common foundation for all apps.
 
-Здесь живут только абстракции: наследники находятся в catalog и orders.
+Only abstractions live here: subclasses are in catalog and orders.
 """
 
 from django.db import models
@@ -10,14 +10,14 @@ from core.utils import transliterate
 
 
 class TimeStampedQuerySet(models.QuerySet):
-    """QuerySet с общими для всех моделей выборками."""
+    """QuerySet with lookups shared by all models."""
 
     def recent(self, limit: int = 10) -> "TimeStampedQuerySet":
         return self.order_by("-created_at")[:limit]
 
 
 class ActivatableQuerySet(TimeStampedQuerySet):
-    """QuerySet для моделей с флагом активности."""
+    """QuerySet for models with an active flag."""
 
     def active(self) -> "ActivatableQuerySet":
         return self.filter(is_active=True)
@@ -27,7 +27,7 @@ class ActivatableQuerySet(TimeStampedQuerySet):
 
 
 class TimeStampedModel(models.Model):
-    """Хранит время создания и последнего изменения записи."""
+    """Stores creation and last-modification time of a record."""
 
     created_at = models.DateTimeField("создана", auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField("изменена", auto_now=True)
@@ -40,7 +40,7 @@ class TimeStampedModel(models.Model):
 
 
 class NamedModel(TimeStampedModel):
-    """Справочник: название, ЧПУ-адрес, признак активности, порядок вывода."""
+    """Reference entry: name, slug, active flag, display order."""
 
     name = models.CharField("название", max_length=160)
     name_uk = models.CharField(
@@ -63,18 +63,18 @@ class NamedModel(TimeStampedModel):
 
     @property
     def title(self) -> str:
-        """Название на языке посетителя.
+        """Name in the visitor's language.
 
-        В шаблонах и представлениях выводим именно его, а не name:
-        на украинской версии сайта берём name_uk, а если перевода нет —
-        честно показываем русское название, но страницу не ломаем.
+        Templates and views output this, not name: on the Ukrainian version
+        name_uk is used, and if there is no translation the Russian name is
+        shown honestly without breaking the page.
         """
         if get_language() == "uk" and self.name_uk:
             return self.name_uk
         return self.name
 
     def build_slug(self) -> str:
-        """Как построить адрес. Наследники могут переопределить."""
+        """How to build the slug. Subclasses may override."""
         return transliterate(self.name) or "item"
 
     def save(self, *args, **kwargs):

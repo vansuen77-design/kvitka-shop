@@ -1,4 +1,4 @@
-"""Защиты adopt_content: разная структура и пустой каталог — отказ."""
+"""adopt_content guards: different structure and empty catalog — refusal."""
 
 import shutil
 import sqlite3
@@ -32,16 +32,16 @@ class AdoptContentGuardsTests(SimpleTestCase):
     def test_refuses_on_different_migrations(self):
         make_db(self.live, [("catalog", "0001_initial"), ("catalog", "0002_more")], ["A"])
         make_db(self.incoming, [("catalog", "0001_initial")], ["A"])
-        with self.assertRaisesMessage(CommandError, "разной структуре"):
+        with self.assertRaisesMessage(CommandError, "different structure"):
             self.adopt()
 
     def test_refuses_empty_catalog(self):
         make_db(self.live, [("catalog", "0001_initial")], ["A"])
         make_db(self.incoming, [("catalog", "0001_initial")], [])
-        with self.assertRaisesMessage(CommandError, "ноль товаров"):
+        with self.assertRaisesMessage(CommandError, "zero products"):
             self.adopt()
 
     def test_refuses_missing_incoming(self):
         make_db(self.live, [("catalog", "0001_initial")], ["A"])
-        with self.assertRaisesMessage(CommandError, "Не нашёл присланную базу"):
+        with self.assertRaisesMessage(CommandError, "Incoming database not found"):
             self.adopt()

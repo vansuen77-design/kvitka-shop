@@ -1,9 +1,9 @@
-"""Правка стандартных разделов админки.
+"""Tweaks to Django's built-in admin sections.
 
-Учётная запись администратора в проекте должна быть ровно одна: пока
-суперпользователь существует, кнопка «Добавить» в разделе «Пользователи»
-не показывается, а последнего администратора нельзя удалить или снять
-с него права — иначе в админку никто не войдёт.
+The project must have exactly one administrator account: while a superuser
+exists, the "Add" button in "Users" is hidden, and the last administrator
+can be neither deleted nor stripped of rights — otherwise nobody could log
+into the admin any more.
 """
 
 from django.contrib import admin
@@ -21,7 +21,7 @@ def superuser_count(exclude_pk=None) -> int:
 
 
 class SingleAdminUserAdmin(DjangoUserAdmin):
-    """Пользователь может быть только один — тот, что уже создан."""
+    """There can be only one user — the one already created."""
 
     def has_add_permission(self, request) -> bool:
         return superuser_count() == 0
@@ -33,7 +33,7 @@ class SingleAdminUserAdmin(DjangoUserAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         fields = list(super().get_readonly_fields(request, obj))
-        # последнему администратору нельзя снять права — заблокируем сам чекбокс
+        # the last administrator cannot lose rights — lock the checkbox itself
         if obj is not None and obj.is_superuser and superuser_count(obj.pk) == 0:
             fields += ["is_superuser", "is_staff", "is_active"]
         return fields

@@ -1,9 +1,9 @@
-"""Карта сайта для поисковых систем.
+"""Sitemap for search engines.
 
-Домен берётся из запроса, а не из django.contrib.sites: у нас одна
-установка на один адрес, и отдельная таблица с доменом — это ещё одно
-место, которое забудут поправить при переезде. Так карта сайта
-переезжает вместе с сайтом и врать не может.
+The domain comes from the request, not from django.contrib.sites: one
+installation serves one address, and a separate table with the domain is
+one more place people forget to fix when moving. This way the sitemap moves
+together with the site and cannot lie.
 """
 
 from django.conf import settings
@@ -15,15 +15,15 @@ from pages.models import InfoPage
 
 
 class HttpsSitemap(Sitemap):
-    """Общая основа: заставляет писать в карте https.
+    """Common base: forces https in the sitemap.
 
-    Сама по себе карта берёт схему из запроса, а к Django приходит
-    обычный http с адреса 127.0.0.1 — снаружи стоит Cloudflare, и о том,
-    что посетитель пришёл по https, Django не знает. Без этой строки в
-    карту уходили бы адреса вида http://, и поисковик считал бы их
-    отдельной небезопасной версией сайта.
+    By itself the sitemap takes the scheme from the request, and Django
+    receives plain http from 127.0.0.1 — Cloudflare sits in front, and
+    Django does not know the visitor came over https. Without this the
+    sitemap would list http:// addresses, and the search engine would treat
+    them as a separate insecure version of the site.
 
-    На копии у себя (DEBUG) оставляем как есть: там https нет.
+    On the local copy (DEBUG) it is left as is: there is no https there.
     """
 
     @property
@@ -32,8 +32,8 @@ class HttpsSitemap(Sitemap):
 
 
 class StaticSitemap(HttpsSitemap):
-    """Страницы без своей записи в базе. Сейчас это только главная —
-    она же весь каталог."""
+    """Pages without their own database record. Currently only the home
+    page — which is the whole catalog."""
 
     changefreq = "daily"
     priority = 1.0
@@ -46,15 +46,15 @@ class StaticSitemap(HttpsSitemap):
 
 
 class CategorySitemap(HttpsSitemap):
-    """Разделы каталога. Меняются чаще товаров: приход и уход позиций
-    виден именно на них."""
+    """Catalog categories. They change more often than products: items
+    arriving and leaving show up on them."""
 
     changefreq = "daily"
     priority = 0.8
 
     def items(self):
-        # nonempty(): пустой раздел отдавать поисковику незачем — он
-        # приведёт человека на страницу без товаров
+        # nonempty(): no point giving an empty category to the crawler —
+        # it would bring a visitor to a page without products
         return Category.objects.active().nonempty().order_by("position", "name")
 
     def lastmod(self, obj: Category):
@@ -62,11 +62,11 @@ class CategorySitemap(HttpsSitemap):
 
 
 class ProductSitemap(HttpsSitemap):
-    """Карточки товаров — основная масса адресов.
+    """Product pages — the bulk of the addresses.
 
-    limit разбивает выдачу на файлы, если товаров станет много: в одну
-    карту по стандарту помещается 50 000 адресов, но файл такого размера
-    поисковики читают неохотно.
+    limit splits the output into files when there are many products: the
+    standard allows 50 000 addresses per sitemap, but search engines are
+    reluctant to read files that big.
     """
 
     changefreq = "weekly"
@@ -81,8 +81,8 @@ class ProductSitemap(HttpsSitemap):
 
 
 class InfoPageSitemap(HttpsSitemap):
-    """Доставка, оплата, о магазине. Меняются редко, но в поиске нужны:
-    по ним покупатель решает, можно ли вам доверять."""
+    """Delivery, payment, about the shop. Rarely change, but needed in
+    search: by them a customer decides whether to trust you."""
 
     changefreq = "monthly"
     priority = 0.3

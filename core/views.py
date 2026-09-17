@@ -1,4 +1,4 @@
-"""Служебные страницы, не принадлежащие ни одному разделу."""
+"""Service pages that belong to no app."""
 
 from django.http import HttpRequest, HttpResponse
 from django.urls import reverse
@@ -7,17 +7,17 @@ from core.context_processors import site_address
 
 
 def robots_txt(request: HttpRequest) -> HttpResponse:
-    """Правила обхода для поисковых роботов.
+    """Crawling rules for search engine robots.
 
-    Отдаём из Django, а не файлом в static, ради одной строки — адреса
-    карты сайта. Он должен быть полным, с доменом, и переезжать вместе
-    с сайтом.
+    Served from Django rather than a static file for the sake of one line —
+    the sitemap address. It must be absolute, with the domain, and move
+    together with the site.
 
-    Закрываем только служебное: админку и шлюз перед ней, кабинет
-    покупателя, корзину и выгрузки прайса. Страницы каталога с галками
-    фильтров намеренно оставлены открытыми — дубли берёт на себя
-    canonical в шапке страницы, а запрет через robots.txt мешал бы
-    поисковику дойти до самих товаров.
+    Only service areas are closed: the admin and its gate, the customer
+    account, the cart and price exports. Catalog pages with filter
+    checkboxes are deliberately left open — duplicates are handled by the
+    canonical link in the head, and a robots.txt ban would stop the crawler
+    from reaching the products themselves.
     """
     sitemap_url = f"{site_address(request)}{reverse('sitemap')}"
     lines = [

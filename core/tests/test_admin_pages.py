@@ -1,4 +1,4 @@
-"""Свои шаблоны админки (сводка, подтверждение удаления) не должны падать."""
+"""Custom admin templates (dashboard, delete confirmation) must not crash."""
 
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings

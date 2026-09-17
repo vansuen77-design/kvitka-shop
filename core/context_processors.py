@@ -1,4 +1,4 @@
-"""Данные, нужные каждому шаблону: верхнее меню разделов и адрес страницы."""
+"""Data every template needs: the top category menu and the page address."""
 
 from django.conf import settings
 
@@ -6,12 +6,12 @@ from catalog.models import Category
 
 
 def navigation(request) -> dict:
-    """Разделы верхнего уровня для меню в шапке и подвале.
+    """Top-level categories for the header and footer menus.
 
-    nonempty(): раздел без единого товара не показываем. Пустая полка в
-    меню обещает то, чего нет, и человек уходит с ощущением, что магазин
-    недоделан. Появится товар — раздел вернётся сам, руками включать
-    ничего не нужно.
+    nonempty(): a category without a single product is hidden. An empty
+    shelf in the menu promises something that is not there, and the visitor
+    leaves feeling the shop is unfinished. Once a product appears the
+    category comes back by itself, nothing to switch on by hand.
     """
     return {
         "root_categories": (
@@ -21,36 +21,34 @@ def navigation(request) -> dict:
 
 
 def site_address(request) -> str:
-    """Начало всех внешних ссылок: схема и домен.
+    """Prefix of every external link: scheme and domain.
 
-    Берём из SITE_URL, а не из самого запроса. Причина не в педантизме:
-    к Django приходит обычный http с адреса 127.0.0.1 — снаружи стоит
-    Cloudflare, и заголовок о том, что посетитель пришёл по https, до
-    нас не доезжает. Спросив запрос, мы получили бы http:// в карте
-    сайта и в canonical, а поисковик счёл бы это отдельной, небезопасной
-    версией сайта.
+    Taken from SITE_URL, not from the request. Not out of pedantry: Django
+    receives plain http from 127.0.0.1 — Cloudflare sits in front, and the
+    header saying the visitor came over https never reaches us. Asking the
+    request would put http:// into the sitemap and canonical links, and the
+    search engine would treat that as a separate, insecure version of the site.
 
-    Ещё это склеивает www и адрес без www: SITE_URL один, и обе версии
-    укажут на него как на основную.
+    It also merges www and non-www: SITE_URL is one, and both versions point
+    to it as the main one.
 
-    На копии у себя SITE_URL пуст — там возвращаем адрес из запроса,
-    иначе локальные ссылки вели бы на боевой сайт.
+    On the local copy SITE_URL is empty — the request address is returned
+    then, otherwise local links would lead to the live site.
     """
     return settings.SITE_URL or f"{request.scheme}://{request.get_host()}"
 
 
 def canonical(request) -> dict:
-    """Настоящий адрес страницы — тот, который должен попасть в поиск.
+    """The real page address — the one that should end up in search.
 
-    Один и тот же список товаров открывается по десяткам адресов: ?sort=,
-    ?q=, галки фильтров, порядок которых в строке произвольный. Для
-    поисковика это разные страницы с одинаковым содержимым, и он сам
-    решает, какую показывать, — обычно не ту, что нужна нам. Поэтому
-    в шапке говорим прямо: вот основной адрес.
+    The same product list opens under dozens of URLs: ?sort=, ?q=, filter
+    checkboxes in arbitrary order. To a search engine these are different
+    pages with identical content, and it picks which one to show — usually
+    not the one we want. So the head says plainly: this is the main address.
 
-    Номер страницы оставляем. Вторая страница списка — это действительно
-    другие товары, и склеивать её с первой значит спрятать половину
-    каталога от поиска.
+    The page number is kept. The second page of a list really is different
+    products, and merging it with the first would hide half of the catalog
+    from search.
     """
     base = site_address(request)
     page = request.GET.get("page", "")

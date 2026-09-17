@@ -1,28 +1,28 @@
-"""Вход в админку по одноразовому коду из Telegram.
+"""Admin login with a one-time code from Telegram.
 
-Задача. Админка снова открыта из интернета — так ей удобно пользоваться
-с любого компьютера. Но пароль в этом случае остаётся единственной
-преградой, а его подбирают роботы круглосуточно.
+The problem. The admin panel is open from the internet — convenient to use
+from any computer. But then the password is the only barrier, and bots
+guess passwords around the clock.
 
-Решение. Перед формой входа Django стоит наш шлюз: пока в сессии нет
-отметки о пройденном коде, вместо админки показывается страница
-«Пришлите код». Код уходит в Telegram владельцу — тому единственному
-человеку, чей id записан в .env. Не имея доступа к этому Telegram,
-войти нельзя, даже зная логин и пароль.
+The solution. Our gate stands in front of Django's login form: until the
+session carries a "code passed" mark, a "Send me the code" page is shown
+instead of the admin. The code goes to the owner's Telegram — the one
+person whose id is in .env. Without access to that Telegram nobody gets in,
+even knowing the username and password.
 
-Что важно в реализации:
+Implementation notes:
 
-* Код хранится хешем, не текстом. Сессия лежит в базе, и утёкшая база
-  не должна отдавать действующие коды.
-* Живёт пять минут и сгорает после первой же удачной проверки.
-* Пять неверных попыток — код аннулируется целиком, нужен новый.
-  Иначе шестизначное число подбирается перебором за вечер.
-* Просить новый код можно не чаще раза в 45 секунд: иначе шлюз
-  превращается в кнопку «завалить владельца сообщениями».
-* Запросы с самого сервера (127.0.0.1) шлюз не трогает. Это запасной
-  вход через SSH-туннель на случай, если Telegram недоступен.
+* The code is stored as a hash, not plain text. Sessions live in the
+  database, and a leaked database must not reveal valid codes.
+* It lives five minutes and burns after the first successful check.
+* Five wrong attempts — the code is cancelled entirely, a new one is
+  needed. Otherwise a six-digit number is brute-forced in an evening.
+* A new code may be requested no more than once every 45 seconds:
+  otherwise the gate becomes a "spam the owner" button.
+* Requests from the server itself (127.0.0.1) bypass the gate. That is
+  the fallback entrance through an SSH tunnel when Telegram is down.
 
-Автор кода: ISHOD, 2026.
+Code by ISHOD, 2026.
 """
 
 from __future__ import annotations
@@ -41,11 +41,11 @@ from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger("kvitka")
 
-SESSION_KEY = "admin_gate"          # что здесь: хеш кода, срок, попытки
-PASSED_KEY = "admin_gate_passed"    # до какого времени пускаем без кода
-NEXT_KEY = "admin_gate_next"        # куда вернуть после проверки
+SESSION_KEY = "admin_gate"          # holds: code hash, expiry, attempts
+PASSED_KEY = "admin_gate_passed"    # until when we let in without a code
+NEXT_KEY = "admin_gate_next"        # where to return after the check
 
-# адрес страницы шлюза — нужен, чтобы не звать reverse на каждый запрос
+# gate page path — so that reverse() is not called on every request
 GATE_PATH = "/vhod-v-upravlenie/"
 
 CODE_LENGTH = 6
@@ -57,7 +57,7 @@ def conf(name: str, default):
 
 
 def _hash(code: str) -> str:
-    """Код в сессии держим только в виде хеша — с солью из SECRET_KEY."""
+    """The code is kept in the session only as a hash, salted with SECRET_KEY."""
     return sha256(f"{settings.SECRET_KEY}:{code}".encode("utf-8")).hexdigest()
 
 
@@ -83,9 +83,9 @@ def mark_passed(request) -> None:
     request.session.pop(SESSION_KEY, None)
 
 
-# --- код ------------------------------------------------------------------
+# --- code -----------------------------------------------------------------
 def issue_code(request) -> tuple[bool, str]:
-    """Создаёт код и отправляет его владельцу. Возвращает (успех, что сказать)."""
+    """Creates a code and sends it to the owner. Returns (success, message)."""
     from orders.notify import send_raw
 
     now = timezone.now().timestamp()
@@ -105,15 +105,15 @@ def issue_code(request) -> tuple[bool, str]:
     request.session.modified = True
 
     minutes = conf("ADMIN_GATE_CODE_SECONDS", 300) // 60
-    # сам код в журнал не пишем никогда — журнал читают больше людей,
-    # чем кажется
+    # the code itself is never logged — more people read logs than
+    # you would think
     send_raw(
         f"🔐 <b>Вход в админку {settings.SHOP['NAME']}</b>\n\n"
         f"Код: <code>{code}</code>\n\n"
         f"Действует {minutes} мин. Если это не вы — просто не вводите его "
         "и смените пароль администратора."
     )
-    logger.info("Шлюз админки: код отправлен")
+    logger.info("Admin gate: code sent")
     return True, "Код отправлен в Telegram."
 
 
@@ -131,17 +131,17 @@ def check_code(request, entered: str) -> tuple[bool, str]:
     if not entered:
         return False, "Введите код из шести цифр."
 
-    # сравниваем в постоянное время: иначе по задержке ответа можно
-    # понемногу угадывать код
+    # constant-time comparison: otherwise the response delay leaks
+    # the code bit by bit
     if hmac.compare_digest(state.get("hash", ""), _hash(entered)):
         mark_passed(request)
-        logger.info("Шлюз админки: код принят")
+        logger.info("Admin gate: code accepted")
         return True, ""
 
     attempts = int(state.get("attempts", 0)) + 1
     if attempts >= MAX_ATTEMPTS:
         request.session.pop(SESSION_KEY, None)
-        logger.warning("Шлюз админки: код аннулирован после %s попыток", attempts)
+        logger.warning("Admin gate: code cancelled after %s attempts", attempts)
         return False, "Слишком много попыток. Запросите новый код."
 
     state["attempts"] = attempts
@@ -150,9 +150,9 @@ def check_code(request, entered: str) -> tuple[bool, str]:
     return False, f"Код не подошёл. Осталось попыток: {MAX_ATTEMPTS - attempts}."
 
 
-# --- страница шлюза -------------------------------------------------------
+# --- gate page ------------------------------------------------------------
 def gate_view(request):
-    """Страница «пришлите код». Работает и без JavaScript."""
+    """The "send me the code" page. Works without JavaScript."""
     if not enabled() or is_passed(request):
         return HttpResponseRedirect(request.session.pop(NEXT_KEY, None)
                                     or settings.ADMIN_PATH + "/")
@@ -184,10 +184,10 @@ def gate_view(request):
 
 # --- middleware -----------------------------------------------------------
 class AdminGateMiddleware(MiddlewareMixin):
-    """Не пускает в админку, пока не введён код из Telegram.
+    """Blocks the admin until the Telegram code is entered.
 
-    Стоит ПОСЛЕ SessionMiddleware: без сессии отметку о пройденном коде
-    хранить негде.
+    Placed AFTER SessionMiddleware: without a session there is nowhere to
+    keep the "code passed" mark.
     """
 
     def process_request(self, request):
@@ -195,30 +195,30 @@ class AdminGateMiddleware(MiddlewareMixin):
             return None
 
         path = request.path
-        # Сначала дешёвая проверка пути, и только потом reverse: он
-        # незачем на каждой странице витрины.
+        # Cheap path check first, reverse() only afterwards: no need for
+        # it on every storefront page.
         if not path.startswith(settings.ADMIN_PATH) and path != GATE_PATH:
             return None
 
         try:
             gate_url = reverse("admin-gate")
         except NoReverseMatch:
-            # Адреса шлюза нет в URLConf — обычно это значит, что на
-            # сервер доехал новый код, но старый config/urls.py.
-            # Молча пропускаем в админку: там своя форма входа, и это
-            # лучше, чем уронить сайт целиком.
-            logger.error("Шлюз админки: адрес admin-gate не найден, шлюз пропущен")
+            # The gate URL is missing from the URLConf — usually means new
+            # code reached the server but config/urls.py is still old.
+            # Silently let through to the admin: it has its own login form,
+            # which is better than taking the whole site down.
+            logger.error("Admin gate: admin-gate URL not found, gate skipped")
             return None
 
         if path == gate_url:
             return None
 
-        # С самого сервера пускаем без кода: это вход через SSH-туннель,
-        # запасной путь на случай, если Telegram лежит.
+        # The server itself gets in without a code: that is the SSH tunnel
+        # entrance, the fallback for when Telegram is down.
         #
-        # На копии у себя это мешает проверить шлюз — там все запросы
-        # локальные. Поставьте ADMIN_GATE_ALLOW_LOCAL=0 в .env копии,
-        # и код будет спрашиваться даже на 127.0.0.1.
+        # On the local copy this prevents testing the gate — all requests
+        # there are local. Set ADMIN_GATE_ALLOW_LOCAL=0 in the copy's .env
+        # and the code is asked even on 127.0.0.1.
         if conf("ADMIN_GATE_ALLOW_LOCAL", True):
             address = request.META.get("HTTP_CF_CONNECTING_IP") or \
                 request.META.get("REMOTE_ADDR", "")

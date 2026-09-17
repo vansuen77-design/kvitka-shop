@@ -1,4 +1,4 @@
-"""makelocales: сбор строк из шаблонов и кода, запись и проверка .po."""
+"""makelocales: collecting strings from templates and code, writing and checking .po."""
 
 import tempfile
 from pathlib import Path
@@ -82,7 +82,7 @@ class PoTests(SimpleTestCase):
         ru = i18n_tools.read_po(self.po("ru"))
         self.assertEqual(ru, {"Найти": "Найти", "Вход": "Вход"})
 
-        # переводим одну строку руками и меняем шаблон
+        # translate one string by hand and change the template
         text = self.po("uk").read_text(encoding="utf-8").replace(
             'msgid "Найти"\nmsgstr ""', 'msgid "Найти"\nmsgstr "Знайти"')
         self.po("uk").write_text(text, encoding="utf-8")
@@ -113,7 +113,7 @@ class PoTests(SimpleTestCase):
 
 class ProjectCatalogTests(SimpleTestCase):
     def test_project_translations_are_complete(self):
-        """То же, что makelocales --check: в коде нет строк без перевода."""
+        """Same as makelocales --check: no untranslated strings in the code."""
         from django.conf import settings
 
         problems = i18n_tools.check(Path(settings.BASE_DIR), Path(settings.LOCALE_PATHS[0]))

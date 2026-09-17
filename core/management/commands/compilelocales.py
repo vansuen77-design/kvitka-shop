@@ -1,12 +1,12 @@
-"""Собирает переводы: locale/<язык>/LC_MESSAGES/django.po → django.mo
+"""Compiles translations: locale/<lang>/LC_MESSAGES/django.po → django.mo
 
-Зачем своя команда вместо штатной manage.py compilemessages: та вызывает
-внешнюю программу msgfmt из пакета GNU gettext, которого на Windows нет
-и который пришлось бы ставить отдельно. Формат .mo простой и описан в
-документации gettext, поэтому проще собрать его самим — тогда переводы
-работают на любом компьютере без лишних установок.
+Why a custom command instead of manage.py compilemessages: that one calls
+the external msgfmt program from GNU gettext, which is not on Windows and
+would have to be installed separately. The .mo format is simple and
+documented by gettext, so it is easier to build it ourselves — then
+translations work on any computer without extra installs.
 
-Запуск:  python manage.py compilelocales
+Run:  python manage.py compilelocales
 """
 
 from __future__ import annotations
@@ -17,15 +17,15 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-MAGIC = 0x950412DE  # подпись .mo в порядке байтов little-endian
+MAGIC = 0x950412DE  # .mo signature in little-endian byte order
 
 
 def parse_po(text: str) -> dict[str, str]:
-    """Разбирает .po в словарь «оригинал → перевод».
+    """Parses a .po into a "source → translation" dictionary.
 
-    Понимает то, что нам нужно: msgid, msgstr, продолжение строк и
-    комментарии. Множественные формы (msgid_plural) не поддерживаем —
-    в проекте склонения делает свой шаблонный фильтр plural.
+    Understands what we need: msgid, msgstr, continuation lines and
+    comments. Plural forms (msgid_plural) are not supported — the project
+    handles plurals with its own template filter.
     """
     entries: dict[str, str] = {}
     key: list[str] = []
@@ -36,7 +36,7 @@ def parse_po(text: str) -> dict[str, str]:
         if target is None:
             return
         msgid, msgstr = "".join(key), "".join(value)
-        # пустой msgid — служебный заголовок, пустой перевод — не переведено
+        # empty msgid is the header entry, empty translation means untranslated
         if msgid and msgstr:
             entries[msgid] = msgstr
 
@@ -58,7 +58,7 @@ def parse_po(text: str) -> dict[str, str]:
 
 
 def unquote(chunk: str) -> str:
-    """«"текст\\n"» → «текст» с настоящим переводом строки."""
+    """'"text\\n"' → 'text' with a real line break."""
     chunk = chunk.strip()
     if len(chunk) >= 2 and chunk[0] == '"' and chunk[-1] == '"':
         chunk = chunk[1:-1]
@@ -67,16 +67,16 @@ def unquote(chunk: str) -> str:
 
 
 def build_mo(entries: dict[str, str]) -> bytes:
-    """Собирает двоичный .mo — формат из документации GNU gettext."""
+    """Builds the binary .mo — the format from the GNU gettext documentation."""
     items = sorted(entries.items())
-    # заголовок каталога: без него gettext не считает файл валидным
+    # catalog header: without it gettext does not consider the file valid
     items.insert(0, ("", "Content-Type: text/plain; charset=UTF-8\n"))
 
     ids = b"".join(k.encode("utf-8") + b"\x00" for k, _ in items)
     strs = b"".join(v.encode("utf-8") + b"\x00" for _, v in items)
 
     count = len(items)
-    start_ids = 7 * 4 + count * 8 * 2      # заголовок + две таблицы смещений
+    start_ids = 7 * 4 + count * 8 * 2      # header + two offset tables
     start_strs = start_ids + len(ids)
 
     id_table, str_table = [], []
@@ -91,9 +91,9 @@ def build_mo(entries: dict[str, str]) -> bytes:
 
     header = struct.pack(
         "<7I", MAGIC, 0, count,
-        7 * 4,                    # где начинается таблица оригиналов
-        7 * 4 + count * 8,        # где начинается таблица переводов
-        0, 0,                     # хеш-таблица не нужна
+        7 * 4,                    # where the source table starts
+        7 * 4 + count * 8,        # where the translation table starts
+        0, 0,                     # no hash table
     )
     tables = struct.pack(f"<{len(id_table)}I", *id_table)
     tables += struct.pack(f"<{len(str_table)}I", *str_table)
@@ -101,7 +101,7 @@ def build_mo(entries: dict[str, str]) -> bytes:
 
 
 class Command(BaseCommand):
-    help = "Собирает .po в .mo без установки gettext"
+    help = "Compiles .po into .mo without installing gettext"
 
     def handle(self, *args, **options):
         roots = [Path(path) for path in settings.LOCALE_PATHS]
@@ -113,8 +113,8 @@ class Command(BaseCommand):
                 mo.write_bytes(build_mo(entries))
                 total += 1
                 language = po.parent.parent.name
-                self.stdout.write(f"  {language}: {len(entries)} строк → {mo.name}")
+                self.stdout.write(f"  {language}: {len(entries)} strings → {mo.name}")
         if not total:
-            self.stdout.write(self.style.WARNING("Файлов .po не найдено."))
+            self.stdout.write(self.style.WARNING("No .po files found."))
             return
-        self.stdout.write(self.style.SUCCESS(f"Собрано каталогов: {total}."))
+        self.stdout.write(self.style.SUCCESS(f"Catalogs compiled: {total}."))

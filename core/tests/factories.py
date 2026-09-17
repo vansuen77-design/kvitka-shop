@@ -1,7 +1,7 @@
-"""Фабрики для тестов: создают записи с разумными значениями по умолчанию.
+"""Test factories: create records with sensible defaults.
 
-Констант магазина здесь нет (инвариант 26): цены, пороги и названия
-задаются в самих тестах или читаются из settings.SHOP.
+No shop constants here: prices, thresholds and names are set in the tests
+themselves or read from settings.SHOP.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ def make_product(name="Букет", price="500", stock=10, category=None, status
 
 
 def make_photo(product: Product) -> ProductImage:
-    """Запись о фото без файла на диске — для has_photo нужен сам путь."""
+    """A photo record without a file on disk — has_photo only needs the path."""
     return ProductImage.objects.create(product=product, image="products/test.png", position=1)
 
 

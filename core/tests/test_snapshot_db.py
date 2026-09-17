@@ -1,4 +1,4 @@
-"""snapshot_db: снимок читается как база, поверх себя не пишется."""
+"""snapshot_db: the snapshot reads as a database and never overwrites itself."""
 
 import shutil
 import sqlite3
@@ -30,5 +30,5 @@ class SnapshotDbTests(SimpleTestCase):
             self.assertEqual(conn.execute("SELECT x FROM t").fetchone(), (7,))
 
     def test_refuses_to_overwrite_itself(self):
-        with self.settings(), self.assertRaisesMessage(CommandError, "поверх самой базы"):
+        with self.settings(), self.assertRaisesMessage(CommandError, "cannot overwrite the database itself"):
             call_command("snapshot_db", str(self.live))

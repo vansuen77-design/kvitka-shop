@@ -1,5 +1,5 @@
-"""Миксины для представлений: маленькие кусочки поведения, которые
-подмешиваются к классам Django (CBV)."""
+"""View mixins: small pieces of behaviour mixed into Django's class-based
+views."""
 
 import json
 
@@ -8,7 +8,7 @@ from django.utils.cache import patch_vary_headers
 
 
 class PageTitleMixin:
-    """Добавляет заголовок страницы и хлебные крошки в контекст."""
+    """Adds the page title and breadcrumbs to the context."""
 
     page_title: str = ""
     breadcrumbs: list | None = None
@@ -27,7 +27,7 @@ class PageTitleMixin:
 
 
 class JsonRequestMixin:
-    """Разбирает тело запроса как JSON (fetch с фронтенда)."""
+    """Parses the request body as JSON (fetch from the frontend)."""
 
     def get_payload(self) -> dict:
         if self.request.content_type == "application/json":
@@ -49,11 +49,11 @@ class JsonRequestMixin:
 
 
 class AjaxTemplateMixin:
-    """Если запрос пришёл через fetch, отдаём только фрагмент списка.
+    """If the request came via fetch, return only the list fragment.
 
-    Один адрес отдаёт и HTML, и JSON — поэтому оба ответа помечены
-    Vary: X-Requested-With, а JSON ещё и no-store: иначе кнопка «Назад»
-    показывала бы вместо страницы голый JSON из кэша браузера (грабля 18).
+    One URL serves both HTML and JSON — so both responses are marked
+    Vary: X-Requested-With, and JSON additionally no-store: otherwise the
+    Back button would show raw JSON from the browser cache instead of the page.
     """
 
     ajax_template_name: str = ""

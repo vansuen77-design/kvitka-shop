@@ -1,7 +1,7 @@
-"""Оставляет в базе ровно одну учётную запись администратора.
+"""Keeps exactly one administrator account in the database.
 
-Лишние не удаляются, а отключаются: войти ими нельзя, но история
-изменений в админке остаётся целой. Запускается из ЗАПУСТИТЬ.bat.
+Extra ones are not deleted but deactivated: they cannot log in, but the
+admin change history stays intact.
 """
 
 from django.contrib.auth import get_user_model
@@ -11,13 +11,12 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Оставляет одного активного администратора, остальных отключает"
+    help = "Keeps one active administrator, deactivates the rest"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--keep", dest="keep", default=None,
-            help="Имя учётной записи, которую оставить. "
-                 "По умолчанию — созданная последней.",
+            help="Username of the account to keep. Default — the one created last.",
         )
 
     def handle(self, *args, **options):
@@ -25,10 +24,10 @@ class Command(BaseCommand):
             User.objects.filter(is_superuser=True, is_active=True).order_by("-date_joined")
         )
         if not admins:
-            self.stdout.write("Администраторов нет — создайте его через СОЗДАТЬ-АДМИНА.bat.")
+            self.stdout.write("No administrators — create one with tools\\create-admin.bat.")
             return
         if len(admins) == 1:
-            self.stdout.write(f"Администратор один: {admins[0].username}.")
+            self.stdout.write(f"Single administrator: {admins[0].username}.")
             return
 
         keep_name = options["keep"]
@@ -42,6 +41,6 @@ class Command(BaseCommand):
             user.is_staff = False
             user.is_superuser = False
             user.save(update_fields=["is_active", "is_staff", "is_superuser"])
-            self.stdout.write(f"  {user.username} — отключён")
+            self.stdout.write(f"  {user.username} — deactivated")
 
-        self.stdout.write(self.style.SUCCESS(f"Остался один администратор: {keep.username}."))
+        self.stdout.write(self.style.SUCCESS(f"One administrator left: {keep.username}."))

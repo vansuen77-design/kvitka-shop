@@ -1,4 +1,4 @@
-"""Вспомогательные функции без зависимости от Django-моделей."""
+"""Helper functions with no dependency on Django models."""
 
 from decimal import Decimal
 
@@ -13,7 +13,7 @@ _TRANSLIT_MAP = {
 
 
 def transliterate(text: str) -> str:
-    """Кириллица -> латиница, чтобы получались читаемые ЧПУ-адреса."""
+    """Cyrillic -> Latin, so that slugs come out readable."""
     result = []
     for char in text.lower():
         if char in _TRANSLIT_MAP:
@@ -29,7 +29,7 @@ def transliterate(text: str) -> str:
 
 
 def format_money(value) -> str:
-    """1008 -> «1 008». Тонкий пробел разделяет тысячи."""
+    """1008 -> "1 008". A thin space separates thousands."""
     if value is None:
         return "0"
     amount = Decimal(value).quantize(Decimal("1"))
@@ -38,7 +38,7 @@ def format_money(value) -> str:
 
 
 def plural_ru(number: int, one: str, few: str, many: str) -> str:
-    """«1 модель», «2 модели», «5 моделей»."""
+    """Russian plural forms: 1 модель, 2 модели, 5 моделей."""
     number = abs(int(number))
     if number % 10 == 1 and number % 100 != 11:
         return one

@@ -1,5 +1,5 @@
-"""Служебные middleware.
-Автор кода: ISHOD, 2026. Все права на исходный код принадлежат автору.
+"""Service middleware.
+Code by ISHOD, 2026. All rights to the source code belong to the author.
 """
 
 import ipaddress
@@ -14,11 +14,11 @@ logger = logging.getLogger("kvitka")
 
 
 class NoCacheMiddleware(MiddlewareMixin):
-    """Запрещает браузеру кэшировать страницы.
+    """Forbids the browser to cache pages.
 
-    При разработке браузер охотно показывает страницу из своего кэша —
-    и после обновления сайта видна старая вёрстка, пока не нажмёшь
-    Ctrl+F5. Включается только при DEBUG (см. config/settings.py).
+    During development the browser happily serves a page from its cache —
+    after an update you still see the old layout until Ctrl+F5.
+    Enabled only under DEBUG (see config/settings.py).
     """
 
     def process_response(self, request, response):
@@ -29,51 +29,52 @@ class NoCacheMiddleware(MiddlewareMixin):
 
 
 class AdminAccessMiddleware(MiddlewareMixin):
-    """Пускает в админку только с разрешённых IP-адресов.
+    """Lets only allowed IP addresses reach the admin panel.
 
-    Сайт открыт всему интернету, а значит адрес /admin/ виден всем и
-    пароль остаётся единственной защитой. Подбирать его будут роботы,
-    круглосуточно. Поэтому до формы входа доходят только свои.
+    The site is open to the whole internet, so /admin/ is visible to
+    everyone and the password is the only protection. Bots will try to
+    guess it around the clock. So only our own addresses reach the login form.
 
-    ОТКУДА БЕРЁТСЯ IP. Сайт стоит за туннелем Cloudflare, поэтому
-    соединение до Django всегда приходит с 127.0.0.1 — по нему отличить
-    посетителей невозможно. Настоящий адрес Cloudflare кладёт в заголовок
-    CF-Connecting-IP, его и проверяем.
+    WHERE THE IP COMES FROM. The site sits behind a Cloudflare tunnel, so the
+    connection to Django always arrives from 127.0.0.1 — visitors cannot be
+    told apart by it. Cloudflare puts the real address into the
+    CF-Connecting-IP header, and that is what we check.
 
-    ПОЧЕМУ ЗАГОЛОВКУ МОЖНО ВЕРИТЬ. Обычно заголовок можно подделать, но
-    здесь нет: сервер слушает только 127.0.0.1, наружу не торчит ни один
-    порт, и единственный путь к нему — туннель. А в туннеле Cloudflare
-    переписывает CF-Connecting-IP своим значением, что бы ни прислал
-    клиент. Если вы уйдёте от туннеля и откроете порт наружу, эту
-    проверку нужно будет переделать — см. deploy/УСТАНОВКА.md.
+    WHY THE HEADER CAN BE TRUSTED. Normally a header can be forged, but not
+    here: the server listens on 127.0.0.1 only, no port is exposed, and the
+    only way in is the tunnel. Inside the tunnel Cloudflare overwrites
+    CF-Connecting-IP with its own value whatever the client sent. If you
+    leave the tunnel and open a port to the internet, this check must be
+    reworked — see deploy/INSTALL.md.
 
-    ЗАПАСНОЙ ВХОД. Запросы с самого сервера (127.0.0.1) проходят всегда.
-    Это не дыра: попасть на loopback снаружи нельзя, зато можно пробросить
-    порт по SSH и открыть админку так, даже если ваш IP сменился:
+    FALLBACK. Requests from the server itself (127.0.0.1) always pass.
+    That is not a hole: loopback cannot be reached from outside, but you can
+    forward the port over SSH and open the admin that way even if your IP
+    has changed:
 
-        ssh -L 8000:127.0.0.1:8000 kvitka@СЕРВЕР
-        затем http://127.0.0.1:8000/admin/ в браузере
+        ssh -L 8000:127.0.0.1:8000 kvitka@SERVER
+        then http://127.0.0.1:8000/admin/ in the browser
 
-    НАСТРОЙКА. Обычный режим: адрес не проверяем, но перед админкой
-    стоит шлюз с одноразовым кодом из Telegram (core/admin_gate.py).
-    Пароль плюс код — две ступени, и вторая приходит только владельцу.
+    CONFIGURATION. Normal mode: the address is not checked, but the admin is
+    behind a gate with a one-time code from Telegram (core/admin_gate.py).
+    Password plus code — two steps, and the second one reaches the owner only.
 
-    Можно и жёстче, через .env:
+    Stricter options via .env:
 
         ADMIN_ALLOWED_IPS=91.203.10.55, 2a02:1810::/32
-            пускаем только с этих адресов, и там ещё спросят код
+            allow only these addresses, and the code is still asked
 
         ADMIN_LOCAL_ONLY=1
-            снаружи админки нет вовсе, вход только по SSH-туннелю
+            no admin from outside at all, SSH tunnel only
     """
 
     HEADER = "HTTP_CF_CONNECTING_IP"
 
     def client_ip(self, request) -> str:
-        """Адрес посетителя: из заголовка Cloudflare, иначе — самого соединения."""
+        """Visitor address: from the Cloudflare header, else from the connection."""
         header = request.META.get(self.HEADER, "")
         if header:
-            # заголовок бывает списком: первый адрес — исходный клиент
+            # the header may be a list: the first address is the original client
             return header.split(",")[0].strip()
         return request.META.get("REMOTE_ADDR", "")
 
@@ -86,26 +87,26 @@ class AdminAccessMiddleware(MiddlewareMixin):
             return False
         if ip.is_loopback:
             return True
-        # режим «только локально»: список адресов не смотрим вообще,
-        # чтобы забытая в .env строка не открыла админку наружу
+        # "local only" mode: the address list is ignored entirely, so that a
+        # line forgotten in .env cannot open the admin to the outside
         if settings.ADMIN_LOCAL_ONLY:
             return False
         return any(ip in network for network in settings.ADMIN_ALLOWED_NETWORKS)
 
     def guarding(self) -> bool:
-        """Стоит ли вообще проверять адрес.
+        """Whether the address should be checked at all.
 
-        Три случая:
+        Three cases:
 
-        * ADMIN_LOCAL_ONLY — проверяем всегда, снаружи админки нет;
-        * список ADMIN_ALLOWED_IPS заполнен — проверяем по нему;
-        * список пуст и включён шлюз с кодом из Telegram — не проверяем.
-          Иначе получилось бы, что до шлюза никто не доходит: адрес
-          отсекается раньше, и код спросить не у кого.
+        * ADMIN_LOCAL_ONLY — always check, there is no admin from outside;
+        * ADMIN_ALLOWED_IPS is filled — check against it;
+        * the list is empty and the Telegram code gate is on — do not check.
+          Otherwise nobody would reach the gate: the address is cut off
+          earlier and there is nobody to ask for the code.
 
-        Если же и списка нет, и шлюз выключен — админка осталась бы
-        открытой всему интернету под одним паролем. Так не делаем:
-        в этом случае пускаем только с самого сервера.
+        If there is no list and the gate is off, the admin would stay open to
+        the whole internet behind a single password. We do not do that:
+        in that case only the server itself is allowed in.
         """
         if settings.ADMIN_LOCAL_ONLY:
             return True
@@ -126,48 +127,48 @@ class AdminAccessMiddleware(MiddlewareMixin):
         if self.is_allowed(address):
             return None
 
-        # адрес пишем в журнал: сменился провайдер или вы из другого места —
-        # посмотрите строку в логе и добавьте адрес в .env
-        logger.warning("Админка: отказано адресу %s (%s)", address or "неизвестен",
+        # log the address: if the ISP changed or you are elsewhere, look at
+        # the log line and add the address to .env
+        logger.warning("Admin panel: denied address %s (%s)", address or "unknown",
                        request.path)
-        # 404, а не 403: пусть выглядит так, будто админки здесь нет
+        # 404, not 403: let it look as if there were no admin here
         raise Http404
 
 
 class DefaultLanguageMiddleware(MiddlewareMixin):
-    """Украинский по умолчанию, что бы ни стояло в браузере.
+    """Ukrainian by default, whatever the browser says.
 
-    Django сам выбирает язык так: кука → заголовок Accept-Language →
-    LANGUAGE_CODE. Средний шаг для украинского магазина вреден: у многих
-    покупателей браузер русский, и они попадали на русскую версию, даже
-    не зная, что украинская есть.
+    Django picks the language like this: cookie → Accept-Language header →
+    LANGUAGE_CODE. The middle step is harmful for a Ukrainian shop: many
+    customers have a Russian browser and landed on the Russian version
+    without even knowing a Ukrainian one exists.
 
-    Поэтому Accept-Language выключаем: язык берётся из куки, а если
-    человек переключателем не пользовался — украинский.
+    So Accept-Language is switched off: the language comes from the cookie,
+    and if the visitor never used the switcher — Ukrainian.
 
-    Выбор посетителя при этом уважаем полностью: нажал РУС — кука
-    поставлена, и дальше сайт русский, пока он сам не передумает.
+    The visitor's choice is fully respected: pressed RUS — the cookie is set
+    and the site stays Russian until they change their mind.
 
-    Стоит ДО LocaleMiddleware — тот читает уже подчищенный заголовок.
+    Placed BEFORE LocaleMiddleware — it reads the already cleaned header.
     """
 
     HEADER = "HTTP_ACCEPT_LANGUAGE"
 
     def process_request(self, request):
         if request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME):
-            return None      # выбор сделан руками — не вмешиваемся
+            return None      # explicit choice — do not interfere
         request.META.pop(self.HEADER, None)
         return None
 
 
 class AdminLanguageMiddleware(MiddlewareMixin):
-    """Держит админку на русском, что бы ни стояло в браузере.
+    """Keeps the admin panel in Russian, whatever the browser says.
 
-    Витрина двуязычная, и язык выбирает посетитель. Но админка — рабочее
-    место владельца: если браузер украинский, служебные надписи Django
-    перевелись бы, а названия полей остались русскими — вышла бы каша.
+    The storefront is bilingual and the visitor picks the language. But the
+    admin is the owner's workplace: with a Ukrainian browser Django's own
+    labels would be translated while field names stayed Russian — a mess.
 
-    Стоит после LocaleMiddleware, чтобы перебивать выбранный им язык.
+    Placed after LocaleMiddleware to override the language it picked.
     """
 
     LANGUAGE = "ru"
