@@ -18,8 +18,8 @@
   </a>
 
   {% comment %}
-    Сердечко лежит поверх фотографии, но вне ссылки на товар: внутри
-    <a> кнопка кликалась бы вместе со ссылкой.
+    The heart sits over the photo but outside the product link: inside
+    <a> the button would be clicked together with the link.
   {% endcomment %}
   <button type="button" class="card__fav{% if product.pk in favorite_ids %} is-active{% endif %}"
           data-favorite="{{ product.pk }}"
@@ -31,19 +31,19 @@
   <div class="card__body">
     <h3 class="card__name"><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></h3>
     {% comment %}
-      Подписи под названием — из справочников с пометкой in_tile
-      (catalog/facets.py): цветы, повод, размер. Не больше трёх.
+      Labels under the name come from reference models marked in_tile
+      (catalog/facets.py): flowers, occasion, size. No more than three.
     {% endcomment %}
     {% with tile=product.tile_values %}
       {% if tile %}<div class="card__article">{{ tile|join:" · " }}</div>{% endif %}
     {% endwith %}
 
     {% comment %}
-      Обычная форма POST: без JavaScript она уводит в корзину с
-      перезагрузкой, с ним — core.js перехватывает и шлёт fetch.
-      novalidate: остаток может уменьшиться после загрузки страницы,
-      обрезает сервер (грабля 14). Поле называется quantity, не
-      «action» и не «submit» — иначе form.action сломается (грабля 17).
+      A plain POST form: without JavaScript it leads to the cart with a
+      reload, with it core.js intercepts and sends fetch. novalidate:
+      stock may drop after the page loaded, the server clamps it. The
+      field is called quantity, not "action" or "submit" — otherwise
+      form.action would break.
     {% endcomment %}
     <form class="card__buy" method="post" action="{% url 'orders:form-add' %}" novalidate data-add-form>
       {% csrf_token %}

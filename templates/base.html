@@ -1,8 +1,8 @@
 {% load static shop i18n %}<!doctype html>
 <!--
-  КВІТКА — цветы с доставкой.
-  Разработка и код: ISHOD, 2026.
-  Все права на исходный код принадлежат автору.
+  KVITKA — flowers with delivery.
+  Design and code: ISHOD, 2026.
+  All rights to the source code belong to the author.
 -->
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -14,10 +14,10 @@
   <title>{% block title %}{{ page_title }} — {{ shop.NAME }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{% blocktrans with name=shop.NAME city=shop.CITY %}Магазин цветов {{ name }}: букеты, композиции и растения с доставкой по городу {{ city }} за 2–3 часа.{% endblocktrans %}{% endblock %}">
   {% comment %}
-    Значок сайта. SVG — основной: он чёткий на любом экране. PNG рядом
-    для браузеров постарше, apple-touch-icon — для ярлыка на телефоне.
-    Во вкладке знак идёт на розовой плашке: без неё лепесток
-    пропадал бы на тёмной теме браузера.
+    Site icon. SVG is the main one: crisp on any screen. PNG next to it
+    for older browsers, apple-touch-icon for the phone home screen. In
+    the tab the mark sits on a pink plate: without it the petal would
+    vanish on a dark browser theme.
   {% endcomment %}
   <link rel="icon" href="{% versioned 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="icon" href="{% versioned 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
@@ -25,9 +25,9 @@
   <meta name="theme-color" content="#B23A5E">
 
   {% comment %}
-    Картинка и подпись для ссылки, отправленной в мессенджер: без них
-    вместо превью приходит голый адрес. Адрес картинки должен быть
-    полным — относительный Telegram и Viber не покажут.
+    Image and caption for a link shared in a messenger: without them a
+    bare URL arrives instead of a preview. The image URL must be
+    absolute — Telegram and Viber do not show a relative one.
   {% endcomment %}
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ shop.NAME }}">
@@ -38,12 +38,12 @@
   <meta name="twitter:card" content="summary_large_image">
 
   {% comment %}
-    Основной адрес страницы. Каталог открывается по десяткам ссылок —
-    с сортировкой, поиском, галками фильтров в произвольном порядке, —
-    и для поисковика это разные страницы с одинаковыми товарами. Без
-    этой строки он сам выберет, какую показывать, и выберет не ту.
-    Номер страницы в адресе сохраняется: вторая страница списка — это
-    другие товары, склеивать её с первой нельзя.
+    The canonical page address. The catalog opens under dozens of URLs —
+    with sorting, search, filter checkboxes in arbitrary order — and to
+    a search engine these are different pages with the same products.
+    Without this line it picks which one to show, and picks the wrong one.
+    The page number is kept: the second page of a list is different
+    products, it must not be merged with the first.
   {% endcomment %}
   <link rel="canonical" href="{{ canonical_url }}">
 
@@ -76,8 +76,8 @@
 {% include "includes/footer.html" %}
 
 {% comment %}
-  Подписи для JavaScript. Скрипты нельзя перевести средствами Django,
-  поэтому кладём готовые строки в страницу, а core.js их читает.
+  Labels for JavaScript. Scripts cannot be translated by Django, so
+  ready strings are placed into the page and core.js reads them.
 {% endcomment %}
 <script type="application/json" id="kvitka-i18n">
 {

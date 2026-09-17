@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif&display=swap">
-  {# стили виджетов Django: без них разъезжаются поля со стрелкой «выбрать» #}
+  {# Django widget styles: without them the select fields with the arrow fall apart #}
   <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
 {% endblock %}
 
 {% block extrahead %}
   {{ block.super }}
-  {# наш файл идёт последним: change_form.html добавляет forms.css
-     внутри extrastyle, и он перебивал бы наши правила #}
+  {# our file goes last: change_form.html adds forms.css inside
+     extrastyle, and it would override our rules #}
   <link rel="stylesheet" href="{% versioned 'css/admin.css' %}">
 {% endblock %}
 

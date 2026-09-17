@@ -2,9 +2,9 @@
 {% load shop i18n %}
 
 {% comment %}
-  Имя есть — здороваемся по имени. Нет (учётку завели командой,
-  а не через регистрацию) — нейтральный заголовок: почта в шапке
-  страницы выглядит как ошибка, а не как приветствие.
+  A name is present — greet by name. Absent (the account was created
+  by a command, not through registration) — a neutral heading: an
+  e-mail in the page heading looks like a bug, not a greeting.
 {% endcomment %}
 {% block cabinet_title %}{% if user.first_name %}{% blocktrans with name=user.first_name %}Здравствуйте, {{ name }}{% endblocktrans %}{% else %}{% trans "Ваш кабинет" %}{% endif %}{% endblock %}
 

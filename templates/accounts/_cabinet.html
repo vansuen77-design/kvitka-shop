@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% load static shop i18n %}
 {% comment %}
-  Каркас кабинета: слева разделы, справа содержимое страницы.
+  Account layout: sections on the left, page content on the right.
 {% endcomment %}
 {% comment %}
-  Кабинет показывает те же карточки товаров, что и каталог (избранное,
-  сводка на обзоре), а вся их вёрстка живёт в catalog.css. Без него
-  карточка разваливалась: фотография во всю ширину, цена и счётчик
-  строчками подряд. Подключаем его первым, чтобы правила кабинета
-  могли что-то в нём перебить.
+  The account shows the same product cards as the catalog (favourites,
+  the overview summary), and all their layout lives in catalog.css.
+  Without it the card fell apart: full-width photo, price and stepper
+  as consecutive lines. Loaded first so that account rules can override
+  something in it.
 {% endcomment %}
 {% block styles %}
   <link rel="stylesheet" href="{% versioned 'css/catalog.css' %}">

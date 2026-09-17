@@ -1,13 +1,12 @@
 {% load shop i18n %}
 {% comment %}
-  Таблица позиций корзины. Отдельный файл, потому что после каждого
-  действия обновляется на месте, без перезагрузки страницы —
-  см. orders/views.py.
+  The cart lines table. A separate file because after every action it
+  is updated in place without a page reload — see orders/views.py.
 
-  Каждая строка — обычная форма: без JavaScript «Обновить» и «Убрать»
-  уходят на orders:form-update с перезагрузкой, с ним cart.js
-  перехватывает и шлёт fetch. Кнопка «Обновить» видна только без
-  скрипта: с ним количество уходит само при изменении.
+  Every row is a plain form: without JavaScript "Update" and "Remove"
+  go to orders:form-update with a reload, with it cart.js intercepts
+  and sends fetch. The "Update" button is visible only without the
+  script: with it the quantity is sent by itself on change.
 {% endcomment %}
 {% if totals.lines %}
   <div class="lines">

@@ -7,25 +7,25 @@
 
 {% if banner_products %}
   {% comment %}
-    Баннер над каталогом: новинки текущего раздела.
+    Banner above the catalog: new arrivals of the current category.
 
-    Ничего не крутится и не переключается: смена кадра каждые
-    10 секунд дёргает глаз. Здесь фото маленькие и сразу три штуки,
-    а весь текст лежит на чистом фоне слева.
+    Nothing rotates or switches: a new frame every 10 seconds twitches
+    the eye. Here the photos are small and three at once, and all the
+    text sits on a clean background on the left.
 
-    Товары выбирает сервер (CatalogView.banner_products). В разделе —
-    три последних добавленных сюда, статус «Новинка» вперёд. В общем
-    каталоге — по одной новинке из каждого раздела верхнего уровня,
-    поэтому на главной сразу видно и букеты, и композиции, и растения.
-    JavaScript блоку не нужен вообще.
+    Products are picked by the server (CatalogView.banner_products). In
+    a category — the three last added here, "New" status first. In the
+    whole catalog — one new item from every top-level category, so the
+    home page shows bouquets, arrangements and plants at once.
+    The block needs no JavaScript at all.
   {% endcomment %}
   <section class="hero" aria-label="{% trans "Новинки каталога" %}">
     <div class="hero__lead">
       {% comment %}
-        Название раздела вынесено в отдельный span: на телефоне вся эта
-        строка стоит в ряд со ссылкой «Смотреть новинки», и вдвоём они
-        туда не помещаются — раздел там прячется, он и так написан
-        в заголовке страницы прямо под баннером.
+        The category name is in a separate span: on a phone this whole line
+        sits in a row with the "See new arrivals" link, and together they
+        do not fit — the category is hidden there, it is written in the
+        page heading right under the banner anyway.
       {% endcomment %}
       <span class="hero__eyebrow">
         {% if current_category %}{% trans "Новинки раздела" %}<span
@@ -38,9 +38,9 @@
         {% else %}{% blocktrans with hours=shop.DELIVERY_HOURS %}По одной новинке из каждого раздела · доставка за {{ hours }}{% endblocktrans %}{% endif %}
       </p>
       {% comment %}
-        Кнопка ведёт в текущий раздел с сортировкой «сначала новые»,
-        а не в общий каталог: иначе из «Рослин» человек уезжал бы
-        смотреть букеты.
+        The button leads to the current category sorted "newest first", not
+        to the whole catalog: otherwise from "Plants" the person would be
+        taken off to look at bouquets.
       {% endcomment %}
       <a class="hero__btn"
          href="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'catalog:index' %}{% endif %}?sort=new">
@@ -60,9 +60,10 @@
             <span class="hero__flag">{% trans "Новинка" %}</span>
           </span>
           {% comment %}
-            В общем каталоге подписываем раздел: иначе непонятно, почему
-            рядом лежат орхидея и коробка с розами. Берём родительский
-            раздел — товар лежит в «Розах», а показать надо «Букети».
+            In the whole catalog the category is labelled: otherwise it is
+            unclear why an orchid and a box of roses sit side by side. The
+            parent category is used — the product sits in "Roses", but
+            "Bouquets" must be shown.
           {% endcomment %}
           {% if not current_category and item.category %}
             <span class="hero__cat">{{ item.category.parent.title|default:item.category.title }}</span>
@@ -82,8 +83,8 @@
 
   <aside class="filters" data-filters>
     {% comment %}
-      Заголовок вынесен из формы: кнопка сворачивает саму форму,
-      а шапка с названием остаётся видна и в свёрнутом виде.
+      The heading is outside the form: the button collapses the form
+      itself, while the header with the title stays visible when collapsed.
     {% endcomment %}
     <div class="filters__head">
       <button class="filters__toggle" type="button" data-filters-toggle
@@ -97,20 +98,21 @@
     </div>
 
     {% comment %}
-      Форма уходит на адрес открытого раздела, а не на корень каталога.
-      Раздел живёт в адресе (/katalog/bukety/), в полях формы его
-      нет — и при отправке на корень он просто терялся: сортировка
-      применялась ко всему каталогу, хотя в заголовке оставался раздел.
+      The form submits to the open category's URL, not the catalog root.
+      The category lives in the URL (/katalog/bukety/), not in the form
+      fields — and on submit to the root it was simply lost: sorting
+      applied to the whole catalog while the heading still showed the category.
     {% endcomment %}
     <form class="filters__form" id="catalog-filters" method="get"
           action="{% if current_category %}{{ current_category.get_absolute_url }}{% else %}{% url 'catalog:index' %}{% endif %}"
           data-filters-form>
       {% comment %}
-        Поиск и «Акции» задаются не галочками, а адресом: поиск — строкой
-        в шапке, скидка — кнопкой в меню. Скрипт собирает запрос из полей
-        ЭТОЙ формы, поэтому без скрытых полей оба фильтра слетали бы при
-        первом же клике по любой галке в подборе. Чип над сеткой снимает
-        их как обычно: он чистит поле с таким же именем.
+        Search and "Sale" are set by the URL, not by checkboxes: search by
+        the header field, discount by the menu button. The script builds
+        the query from the fields of THIS form, so without hidden fields
+        both filters would drop at the first click on any filter
+        checkbox. The chip above the grid removes them as usual: it clears
+        the field with the same name.
       {% endcomment %}
       {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
       {% if request.GET.discount %}<input type="hidden" name="discount" value="1">{% endif %}
@@ -131,10 +133,10 @@
           <div class="facet__list {% if group.searchable %}facet__list--scroll{% endif %}">
             {% for value in group.values %}
               {% comment %}
-                Каталог разнородный: у растений нет повода, у коробок —
-                размера. Значения без товаров прячем, кроме выбранных —
-                иначе снять галку было бы нечем. Пустая группа целиком
-                не показывается (см. views.get_facets).
+                The catalog is heterogeneous: plants have no occasion, boxes have
+                no size. Values without products are hidden, except the
+                selected ones — otherwise there would be no way to untick
+                them. A wholly empty group is not shown (see views.get_facets).
               {% endcomment %}
               {% if not value.empty or value.slug in selected|get_item:group.param %}
               <label class="check facet__item{% if value.empty %} is-empty{% endif %}"

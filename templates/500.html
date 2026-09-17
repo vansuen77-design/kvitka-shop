@@ -1,16 +1,16 @@
 {% load i18n %}
 {% comment %}
-  Страница «ошибка на сервере».
+  The "server error" page.
 
-  Здесь намеренно нет наследования от base.html и нет ссылок на внешние
-  файлы стилей. Причина: 500 показывается тогда, когда что-то уже
-  сломалось, и Django рендерит её БЕЗ контекста — без shop, без
-  корзины, без всего, что шапка и подвал считают само собой
-  разумеющимся. Наследование дало бы полупустую страницу, а ссылка на
-  css — второй запрос, который может упасть следом.
+  Deliberately no inheritance from base.html and no links to external
+  stylesheets. The reason: a 500 is shown when something has already
+  broken, and Django renders it WITHOUT context — no shop, no cart,
+  nothing the header and footer take for granted. Inheritance would
+  give a half-empty page, and a css link — a second request that may
+  fail right after.
 
-  Поэтому страница самодостаточная: разметка и стили внутри, ничего
-  снаружи не грузится. Она обязана показаться всегда.
+  So the page is self-contained: markup and styles inside, nothing is
+  loaded from outside. It must always show.
 {% endcomment %}
 <style>
   body { margin: 0; background: #F7F4F0; color: #191512;

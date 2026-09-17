@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% load static shop i18n %}
 {% comment %}
-  Страница «адрес не найден». Django подставляет её сам, когда ни один
-  адрес не подошёл — но только при выключенной отладке, то есть на
-  сервере. На копии вместо неё видно жёлтую отладочную страницу
-  со списком адресов, и это правильно: разработчику нужна она.
+  The "page not found" page. Django uses it by itself when no URL
+  matched — but only with debug off, i.e. on the server. On the local
+  copy the yellow debug page with the URL list is shown instead, and
+  that is right: the developer needs that one.
 
-  Контекст здесь обычный, с шапкой и подвалом: Django рендерит 404
-  вместе с запросом. У 500.html так не выйдет — см. соседний файл.
+  The context is the usual one, with header and footer: Django renders
+  the 404 together with the request. 500.html cannot do that — see the
+  neighbouring file.
 {% endcomment %}
 
 {% block title %}{% trans "Страница не найдена" %} — {{ shop.NAME }}{% endblock %}

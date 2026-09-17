@@ -1,8 +1,8 @@
 {% extends "admin/delete_confirmation.html" %}
 {% comment %}
-  Django ищет шаблон по цепочке admin/<приложение>/<модель>/… →
-  admin/<приложение>/… → admin/…, поэтому этот файл накрывает все модели
-  каталога, а extends спокойно берёт стандартный шаблон Django.
+  Django looks up the template along admin/<app>/<model>/… →
+  admin/<app>/… → admin/…, so this file covers every catalog model,
+  and extends safely picks up Django's standard template.
 {% endcomment %}
 
 {% block content %}

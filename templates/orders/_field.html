@@ -1,6 +1,6 @@
 {% load i18n %}
-{% comment %}Одно поле формы заказа: подпись, звёздочка или «необязательно», ошибка.
-  required=True — поле обязательно только при курьере, форма проверяет это сама.{% endcomment %}
+{% comment %}One order form field: label, asterisk or "optional", error.
+  required=True — the field is required for courier only, the form checks that itself.{% endcomment %}
 <label class="field">
   <span class="field__label">{{ field.label }}{% if field.field.required or required %} <i>*</i>{% else %} <em class="field__optional">{% trans "необязательно" %}</em>{% endif %}</span>
   {{ field }}

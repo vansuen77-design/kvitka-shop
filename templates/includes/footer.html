@@ -1,18 +1,19 @@
 {% load shop i18n %}
 {% comment %}
-  Подвал. Пять колонок: кто мы, разделы каталога, страницы для покупателя,
-  страницы для компаний и связь. Разделы берём из того же списка, что
-  и меню в шапке (context_processors.navigation), страницы — из таблицы
-  pages: завели страницу в админке, она появилась в своей колонке сама.
+  Footer. Five columns: who we are, catalog categories, pages for
+  customers, pages for companies and contact. Categories come from the
+  same list as the header menu (context_processors.navigation), pages
+  from the pages table: add a page in the admin and it appears in its
+  column by itself.
 
-  Нижняя строка отделена линией: там копирайт и оговорка про фото —
-  то, что читают один раз и больше не возвращаются.
+  The bottom line is separated by a rule: the copyright and the photo
+  disclaimer — read once and never returned to.
 {% endcomment %}
 <footer class="footer">
   <div class="footer__inner">
     <div class="footer__about">
       <div class="footer__brand">
-        {% comment %}Подвал тёмный — здесь светлая версия знака.{% endcomment %}
+        {% comment %}The footer is dark — the light version of the mark goes here.{% endcomment %}
         <img src="{% versioned 'img/logo-dark.svg' %}" alt="" width="34" height="34">
         {{ shop.NAME }}
       </div>

@@ -51,8 +51,8 @@
           </div>
         </div>
         {% comment %}
-          Полоса до бесплатной доставки. Порог — из settings.SHOP,
-          считает CartTotals; здесь только показываем.
+          Progress bar to free delivery. The threshold comes from
+          settings.SHOP and is computed by CartTotals; here it is only shown.
         {% endcomment %}
         <div class="progress" data-progress>
           <div class="progress__bar"><span data-progress-bar style="width: {{ totals.free_delivery_progress }}%"></span></div>
@@ -124,8 +124,8 @@
         {% if form.agree.errors %}<span class="field__error">{{ form.agree.errors|join:" " }}</span>{% endif %}
         {% if privacy_page %}
           {% comment %}
-            Согласие без возможности прочитать, на что соглашаешься,
-            юридически пустое — поэтому ссылка обязательна.
+            Consent without the ability to read what you consent to is legally
+            void — so the link is mandatory.
           {% endcomment %}
           <a class="agree__link" href="{{ privacy_page.get_absolute_url }}"
              target="_blank" rel="noopener">{{ privacy_page.title }}</a>

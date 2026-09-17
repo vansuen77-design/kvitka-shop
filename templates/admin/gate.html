@@ -1,10 +1,10 @@
 {% comment %}
-  Шлюз перед админкой. Своя страница, а не шаблон Django-админки:
-  человек сюда попадает ДО входа, и грузить ради этого всю админскую
-  вёрстку незачем. Стили внутри — страница должна открыться, даже если
-  со статикой что-то не так.
+  The gate before the admin. A page of its own, not a Django admin
+  template: the person lands here BEFORE logging in, and loading the
+  whole admin layout for that is pointless. Styles inline — the page
+  must open even if something is wrong with static files.
 
-  Автор кода: ISHOD, 2026.
+  Code by ISHOD, 2026.
 {% endcomment %}<!doctype html>
 <html lang="ru">
 <head>

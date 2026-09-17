@@ -4,7 +4,7 @@
 {% block title %}{% blocktrans with name=product.title shop=shop.NAME city=shop.CITY %}{{ name }} — купить с доставкой, {{ city }} | {{ shop }}{% endblocktrans %}{% endblock %}
 {% block description %}{% if product.summary_text %}{{ product.summary_text }}{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block styles %}
-  {# catalog.css нужен из-за блока «Из этого же раздела» — там те же плитки товара #}
+  {# catalog.css is needed for the "From the same category" block — the same product tiles #}
   <link rel="stylesheet" href="{% versioned 'css/catalog.css' %}">
   <link rel="stylesheet" href="{% versioned 'css/product.css' %}">
 {% endblock %}
@@ -23,8 +23,8 @@
       {% if product.has_photo %}
         <img src="{{ product.cover.image.url }}" alt="{{ product.title }}" data-gallery-main>
         {% comment %}
-          Кнопка, а не просто клик по картинке: так фото открывается
-          и с клавиатуры, и читалка объясняет, что произойдёт.
+          A button, not just a click on the image: this way the photo opens
+          from the keyboard too, and a screen reader explains what happens.
         {% endcomment %}
         <button type="button" class="gallery__zoom" data-lightbox-open
                 aria-label="{% trans "Открыть фото на весь экран" %}">
@@ -97,9 +97,9 @@
 
     {% if variants %}
       {% comment %}
-        Переключатель размера. Каждый вариант — отдельный товар со своей
-        страницей, поэтому это обычные ссылки: работают без JavaScript,
-        а поисковик видит все размеры.
+        Size switcher. Every variant is a separate product with its own page,
+        so these are plain links: they work without JavaScript, and the
+        search engine sees all sizes.
       {% endcomment %}
       <section class="variants" aria-label="{% trans "Размер букета" %}">
         <span class="variants__title">{% trans "Размер" %}</span>
@@ -123,9 +123,9 @@
 
     {% if product.is_orderable %}
       {% comment %}
-        Обычная форма POST — без JavaScript уводит в корзину, с ним
-        product.js перехватывает и шлёт fetch. novalidate: остаток
-        подрезает сервер, а не браузер (грабля 14).
+        A plain POST form — without JavaScript it leads to the cart, with it
+        product.js intercepts and sends fetch. novalidate: stock is clamped
+        by the server, not the browser.
       {% endcomment %}
       <form class="order-box" method="post" action="{% url 'orders:form-add' %}" novalidate data-add-form>
         {% csrf_token %}
@@ -175,10 +175,10 @@
   <section class="product__specs">
     <div class="specs__head"><span class="specs__tab is-active">{% trans "Характеристики" %}</span></div>
     {% comment %}
-      Правая колонка появляется, только если есть описание. Состав
-      в неё не идёт: он уже есть в таблице слева, а повторять одно
-      и то же в двух местах — заставлять покупателя сверять, не разное
-      ли там написано.
+      The right column appears only if there is a description. The
+      composition does not go there: it is already in the table on the
+      left, and repeating the same thing in two places makes the customer
+      check whether they differ.
     {% endcomment %}
     <div class="specs__body{% if not product.description_text %} specs__body--single{% endif %}">
       <dl class="specs specs--wide">
@@ -199,9 +199,9 @@
 
   {% if product.has_photo %}
     {% comment %}
-      Просмотр фото на весь экран. Разметка лежит в странице, а не
-      собирается скриптом: без JavaScript её просто не видно, а с ним
-      не нужно ничего дорисовывать на ходу.
+      Full-screen photo viewer. The markup is in the page rather than built
+      by script: without JavaScript it is simply not visible, and with it
+      nothing needs drawing on the fly.
     {% endcomment %}
     <div class="lightbox" data-lightbox hidden role="dialog" aria-modal="true"
          aria-label="{% blocktrans with name=product.title %}Фотографии: {{ name }}{% endblocktrans %}">
