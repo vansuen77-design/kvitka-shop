@@ -12,3 +12,8 @@ staticfiles/
 .vscode/
 .work/
 var/
+
+# internal development spec (Claude Code workflow), not part of the public repo
+CLAUDE.md
+.claude/
+docs/amigo-v2.md
