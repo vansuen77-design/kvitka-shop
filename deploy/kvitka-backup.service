@@ -1,6 +1,6 @@
-# Разовый запуск бэкапа. Копировать в /etc/systemd/system/
+# One-shot backup run. Copy to /etc/systemd/system/
 [Unit]
-Description=Резервная копия КВІТКА
+Description=KVITKA backup
 
 [Service]
 Type=oneshot

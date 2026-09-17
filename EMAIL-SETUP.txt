@@ -1,0 +1,106 @@
+E-MAIL FOR PASSWORD RESET AND ORDER CONFIRMATIONS
+=========================================================
+
+Why. Customers have an account with e-mail and password login.
+Everyone forgets passwords. For a customer to reset it themselves
+instead of messaging you, the site needs a mailbox to send the
+link from. The same mailbox sends "your order is accepted" e-mails.
+
+Until e-mail is set up the site works: e-mails are not sent but
+printed to the server log (journalctl -u kvitka). On the local
+copy they show up right in the console window. Enough for
+testing, not for the live site.
+
+
+WHAT YOU NEED
+-------------
+Any mailbox that supports SMTP. Gmail is the simplest; the steps
+below use it as the example. Ukr.net, Meta.ua and mail on your
+own domain are set up the same way - only the server address and
+port differ.
+
+IMPORTANT: the regular mailbox password will not work and is not
+needed. You need a separate "app password" - it only allows
+sending mail and can be revoked with one click without changing
+the main password.
+
+
+STEP 1. Enable two-step verification
+------------------------------------
+   https://myaccount.google.com/security
+   section "How you sign in to Google" -> "2-Step Verification"
+
+Without it Google does not allow creating app passwords.
+
+
+STEP 2. Create an app password
+------------------------------
+   https://myaccount.google.com/apppasswords
+
+Any name will do, e.g. "KVITKA site".
+Google shows 16 letters in four groups: abcd efgh ijkl mnop
+
+That is the app password. It is shown ONCE - copy it right away.
+Spaces may be removed or kept.
+
+Do not forward it to anyone, including chats: nobody else needs
+it. It goes only into the .env file on the server, typed by you.
+
+
+STEP 3. Put it into .env on the server
+--------------------------------------
+Log in to the server (deploy\INSTALL.md) and open the file:
+
+    nano ~/kvitka/.env
+
+Add five lines at the end with your values:
+
+    EMAIL_HOST=smtp.gmail.com
+    EMAIL_PORT=587
+    EMAIL_HOST_USER=yourmailbox@gmail.com
+    EMAIL_HOST_PASSWORD=abcdefghijklmnop
+    EMAIL_FROM=KVITKA <yourmailbox@gmail.com>
+
+Save: Ctrl+O, Enter; exit: Ctrl+X.
+
+Why nano and not echo. Everything typed on the command line stays
+in the command history (~/.bash_history) in plain text. An editor
+writes nothing to the history.
+
+Then restart the site:
+
+    sudo systemctl restart kvitka
+
+
+STEP 4. Test
+------------
+Open on the site:  /kabinet/parol/
+Enter the e-mail of an existing account and press the button.
+
+The e-mail should arrive within a minute. If not - check the
+"Spam" folder, then the log:
+
+    journalctl -u kvitka -n 50 --no-pager
+
+It shows exactly what the mail server replied.
+
+
+IF NOT GMAIL
+------------
+Only the first two lines change:
+
+    Ukr.net       EMAIL_HOST=smtp.ukr.net      EMAIL_PORT=465
+    Meta.ua       EMAIL_HOST=smtp.meta.ua      EMAIL_PORT=465
+    Own domain    ask your hosting for the SMTP address and port
+
+Port 465 is recognised automatically and uses encryption from the
+first byte; port 587 is a plain connection upgraded to TLS.
+Nothing else needs changing.
+
+
+WHY THE LINK LIVES 3 HOURS
+--------------------------
+The link from the e-mail opens the account without a password.
+A day, Django's default, is too long: the e-mail could stay open
+on someone else's computer. Three hours is enough to reach the
+mailbox and change the password. The link works once.

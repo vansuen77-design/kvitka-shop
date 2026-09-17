@@ -1,0 +1,79 @@
+ADMIN PANEL ACCESS
+=========================================================
+
+Address:  https://kvitka.example/admin/
+
+Two steps to get in:
+
+  1. One-time code. You open the address and instead of the admin
+     you see the "Admin access" page. Press "Send code", the code
+     arrives in Telegram. Enter it - and you are through.
+
+  2. The usual Django login: admin username and password.
+
+The point is that the password is no longer the only protection.
+Even if it is guessed or leaked, nobody gets in: the code only
+arrives in your Telegram.
+
+
+THINGS TO REMEMBER
+------------------
+  The code lives 5 minutes and burns after the first successful entry.
+  5 wrong attempts - the code is cancelled, request a new one.
+  A new code can be requested no more than once every 45 seconds.
+  After a successful login the code is not asked for 12 hours.
+
+All timings are in config/settings.py, block
+"admin login with a code from Telegram".
+
+
+IF TELEGRAM IS UNAVAILABLE
+--------------------------
+The fallback is always there - an SSH tunnel. From the server
+itself no code is asked:
+
+    ssh -L 8000:127.0.0.1:8000 kvitka@SERVER-ADDRESS
+
+then in the browser:  http://127.0.0.1:8000/admin/
+
+Keep this command at hand. It is the only way in if the phone
+is lost or Telegram is down.
+
+
+IF A CODE ARRIVED BUT YOU DID NOT LOG IN
+----------------------------------------
+Someone knows the admin address and pressed the button. The code
+is useless to them - it is with you. But it is a reason to change
+the admin password: tools\create-admin.bat.
+
+Attempts are visible in the log:
+
+    journalctl -u kvitka | grep "Admin gate"
+
+
+HOW TO TEST ON THE LOCAL COPY
+-----------------------------
+On the local copy all requests are local and the code is not
+asked - otherwise you could not work. To test the gate locally,
+add to the copy's .env:
+
+    ADMIN_GATE_ALLOW_LOCAL=0
+
+and restart. The code will then arrive in Telegram for the local
+version too. Remove the line after testing.
+
+
+EVEN STRICTER
+-------------
+In .env on the server:
+
+    ADMIN_ALLOWED_IPS=your.ip.address
+        allow only this address, and the code is still asked
+
+    ADMIN_LOCAL_ONLY=1
+        no admin from outside at all, SSH tunnel only
+        (this is how it worked before the code)
+
+    ADMIN_TELEGRAM_GATE=0
+        switch the code off entirely - NOT recommended: the admin
+        is then protected by a single password

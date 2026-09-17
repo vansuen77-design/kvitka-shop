@@ -1,8 +1,8 @@
-# Разовая проверка сайта. Запускается таймером, сам по себе не работает.
-# Копировать в /etc/systemd/system/
+# One-shot site check. Started by the timer, does nothing on its own.
+# Copy to /etc/systemd/system/
 
 [Unit]
-Description=Проверка доступности сайта КВІТКА
+Description=KVITKA site availability check
 After=network-online.target
 
 [Service]

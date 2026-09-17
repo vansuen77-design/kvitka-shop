@@ -1,22 +1,22 @@
 #!/bin/bash
-# Сторож: раз в несколько минут проверяет, отвечает ли сайт, и пишет
-# в Telegram, когда он упал или снова поднялся.
+# Watchdog: every few minutes checks whether the site answers and writes
+# to Telegram when it goes down or comes back up.
 #
-# Сообщение уходит только в момент СМЕНЫ состояния. Иначе при падении
-# на ночь вы бы получили сотню одинаковых сообщений и перестали бы
-# их читать — а это ровно то, ради чего сторож и ставится.
+# A message is sent only when the state CHANGES. Otherwise an overnight
+# outage would produce a hundred identical messages and you would stop
+# reading them - which is exactly what the watchdog is here to prevent.
 #
-# Проверяются две точки:
-#   * публичный адрес — как его видит покупатель (через Cloudflare);
-#   * 127.0.0.1:8000  — сам Django на сервере.
-# Разница между ними сразу говорит, где искать: если локально всё живо,
-# а снаружи нет — упал туннель, а не сайт.
+# Two endpoints are checked:
+#   * the public address - as the customer sees it (through Cloudflare);
+#   * 127.0.0.1:8000     - Django itself on the server.
+# The difference tells you where to look: if local is alive but public
+# is not - the tunnel is down, not the site.
 #
-# Токен берётся из того же .env, что и уведомления о заказах.
-# Отдельно ничего настраивать не нужно.
+# The token comes from the same .env as order notifications.
+# Nothing extra to configure.
 #
-# Установка:
-#   scp deploy/monitor.sh kvitka@СЕРВЕР:/home/kvitka/kvitka/deploy/
+# Install:
+#   scp deploy/monitor.sh kvitka@SERVER:/home/kvitka/kvitka/deploy/
 #   chmod +x /home/kvitka/kvitka/deploy/monitor.sh
 #   sudo cp deploy/kvitka-monitor.* /etc/systemd/system/
 #   sudo systemctl daemon-reload
@@ -28,7 +28,7 @@ PROJECT="/home/kvitka/kvitka"
 STATE="/home/kvitka/.kvitka-monitor-state"
 ENV_FILE="$PROJECT/.env"
 
-# --- настройки из .env ---------------------------------------------------
+# --- settings from .env --------------------------------------------------
 value_of() {
     grep -m1 "^$1=" "$ENV_FILE" 2>/dev/null | cut -d= -f2- | tr -d '"'"'"' \r'
 }
@@ -56,8 +56,8 @@ check_local() {
         -H "Host: ${SITE#https://}" http://127.0.0.1:8000/ 2>/dev/null
 }
 
-# --- проверка с повтором -------------------------------------------------
-# один неудачный запрос ещё ничего не значит: сеть моргает.
+# --- check with a retry --------------------------------------------------
+# a single failed request means nothing yet: networks blink.
 CODE=$(check_public)
 if [ "$CODE" != "200" ]; then
     sleep 20
@@ -68,26 +68,26 @@ PREVIOUS=$(cat "$STATE" 2>/dev/null || echo "ok")
 
 if [ "$CODE" = "200" ]; then
     if [ "$PREVIOUS" != "ok" ]; then
-        notify "🟢 <b>Сайт снова работает</b>
-$SITE отвечает нормально."
+        notify "🟢 <b>Site is back up</b>
+$SITE answers normally."
     fi
     echo "ok" > "$STATE"
     exit 0
 fi
 
-# --- сайт не отвечает: выясняем, где именно порвалось --------------------
+# --- site is down: find out where exactly it broke -----------------------
 LOCAL=$(check_local)
 if [ "$LOCAL" = "200" ]; then
-    WHERE="Django на сервере жив, наружу не пускает <b>туннель Cloudflare</b>.
-Смотреть: systemctl status kvitka-tunnel"
+    WHERE="Django on the server is alive, the <b>Cloudflare tunnel</b> is not passing traffic.
+Check: systemctl status kvitka-tunnel"
 else
-    WHERE="Не отвечает и сам <b>Django</b> (локально код: ${LOCAL:-нет ответа}).
-Смотреть: systemctl status kvitka"
+    WHERE="<b>Django</b> itself does not answer (local code: ${LOCAL:-no response}).
+Check: systemctl status kvitka"
 fi
 
 if [ "$PREVIOUS" = "ok" ]; then
-    notify "🔴 <b>Сайт не отвечает</b>
-$SITE — код: ${CODE:-нет ответа}
+    notify "🔴 <b>Site is down</b>
+$SITE - code: ${CODE:-no response}
 
 $WHERE"
 fi

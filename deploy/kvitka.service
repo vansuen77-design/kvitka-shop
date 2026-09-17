@@ -1,12 +1,12 @@
-# Сайт КВІТКА. Копировать в /etc/systemd/system/kvitka.service
+# KVITKA site. Copy to /etc/systemd/system/kvitka.service
 #
 #   sudo systemctl daemon-reload
 #   sudo systemctl enable --now kvitka
 #   sudo systemctl status kvitka
-#   journalctl -u kvitka -f        — смотреть, что происходит
+#   journalctl -u kvitka -f        - watch what is going on
 
 [Unit]
-Description=KVITKA — магазин цветов
+Description=KVITKA - flower shop
 After=network-online.target
 Wants=network-online.target
 
@@ -16,9 +16,9 @@ Group=kvitka
 WorkingDirectory=/home/kvitka/kvitka
 Environment=PYTHONUNBUFFERED=1
 
-# Слушаем только 127.0.0.1: наружу сервер не смотрит вообще, весь трафик
-# приходит через туннель Cloudflare. Именно поэтому заголовку
-# CF-Connecting-IP можно доверять — подделать его снаружи некому.
+# Listen on 127.0.0.1 only: the server is not exposed at all, all traffic
+# arrives through the Cloudflare tunnel. That is exactly why the
+# CF-Connecting-IP header can be trusted - nobody outside can forge it.
 ExecStart=/home/kvitka/kvitka/.venv/bin/waitress-serve \
     --host=127.0.0.1 --port=8000 --threads=6 \
     config.wsgi:application
@@ -26,8 +26,8 @@ ExecStart=/home/kvitka/kvitka/.venv/bin/waitress-serve \
 Restart=always
 RestartSec=3
 
-# Ограничения на случай, если в сайте найдут дыру: писать можно только
-# в свою папку, получить права root из процесса нельзя.
+# Restrictions in case a hole is found in the site: writable only inside
+# its own folder, no way to gain root from the process.
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict

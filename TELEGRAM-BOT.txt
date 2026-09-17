@@ -1,0 +1,91 @@
+TELEGRAM INFO BOT
+=========================================================
+
+What it is. The same bot that sends new orders learns to answer
+commands: show orders, customers and the numbers for the day.
+
+Why. The admin panel is closed from the outside and opens only
+through an SSH tunnel. Right for management, but to just glance
+from the phone how many orders came in, raising a tunnel is a
+chore. The bot covers exactly that need.
+
+The bot ONLY SHOWS. It changes nothing: no statuses, no products,
+no prices. Even if someone reaches the bot, they cannot break
+anything.
+
+
+COMMANDS
+--------
+   /zakazy        latest orders
+   /zakaz 12      contents of order #12
+   /segodnya      today's deliveries
+   /novye         new orders only, not yet in progress
+   /pokupateli    who registered an account on the site
+   /svodka        numbers for the day and the week
+   /ostatki       what is running low in stock
+   /help          this list
+
+Russian command names are understood too: /заказы, /сводка etc.
+
+
+WHO IT ANSWERS
+--------------
+Only you. The bot compares the sender id with TELEGRAM_CHAT_ID
+from .env. A message from any other id is dropped silently - the
+bot does not even confirm it is alive. Attempts are in the log:
+
+    journalctl -u kvitka-bot | grep "foreign id"
+
+Important to understand: anyone can learn the bot's name, but
+only you get the data.
+
+
+HOW TO ENABLE (once)
+--------------------
+1. Deploy the code to the server: deploy-to-server.bat
+   The service file travels with the code.
+
+2. Log in to the server and run three commands:
+
+    sudo cp ~/kvitka/deploy/kvitka-bot.service /etc/systemd/system/
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now kvitka-bot
+
+3. Check that it is up:
+
+    systemctl status kvitka-bot
+
+   Should say "active (running)".
+
+4. Write to the bot in Telegram:  /help
+   If the command list arrives - everything works.
+
+
+IF IT DOES NOT ANSWER
+---------------------
+Check the log:
+
+    journalctl -u kvitka-bot -n 50 --no-pager
+
+Common causes:
+
+  "TELEGRAM_BOT_TOKEN is not set in .env"
+      The token is missing on the server. The server has its own
+      .env, deploying code does not touch it. Edit: nano ~/kvitka/.env
+
+  "Conflict: terminated by other getUpdates"
+      The bot is running twice. Happens when it was left running
+      on your computer as well. Keep only the server instance.
+
+  Silence, no errors
+      Make sure you write to the bot whose token is in .env, and
+      that your id matches TELEGRAM_CHAT_ID. To find your id,
+      write to @userinfobot.
+
+
+DISABLE
+-------
+    sudo systemctl disable --now kvitka-bot
+
+New-order notifications keep coming - they work separately,
+inside the site itself.

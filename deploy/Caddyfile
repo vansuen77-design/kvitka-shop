@@ -1,19 +1,19 @@
-# ЗАПАСНОЙ ВАРИАНТ — нужен, только если откажетесь от туннеля Cloudflare
-# и решите пускать трафик прямо на IP сервера.
+# FALLBACK OPTION - only needed if you drop the Cloudflare tunnel and
+# decide to route traffic straight to the server IP.
 #
-# ВНИМАНИЕ. При таком раскладе проверку по IP в админке нужно переделать:
-# заголовок CF-Connecting-IP перестаёт быть надёжным, потому что сервер
-# станет доступен напрямую и заголовок сможет прислать кто угодно.
-# Тогда в core/middleware.py надо брать адрес из REMOTE_ADDR, а в
-# Caddy — передавать настоящий адрес клиента (строка X-Forwarded-For ниже).
+# WARNING. In that setup the admin IP check must be reworked: the
+# CF-Connecting-IP header is no longer trustworthy, because the server
+# becomes reachable directly and anyone can send that header.
+# Then core/middleware.py must take the address from REMOTE_ADDR, and
+# Caddy must pass the real client address (the X-Forwarded-For line below).
 #
-# Копировать в /etc/caddy/Caddyfile, затем: sudo systemctl reload caddy
-# Сертификат Caddy получит сам, ничего покупать не нужно.
+# Copy to /etc/caddy/Caddyfile, then: sudo systemctl reload caddy
+# Caddy obtains the certificate itself, nothing to buy.
 
 kvitka.example, www.kvitka.example {
 	encode zstd gzip
 
-	# фотографии товаров отдаёт сам Caddy — быстрее, чем через Django
+	# product photos are served by Caddy itself - faster than through Django
 	handle_path /media/* {
 		root * /home/kvitka/kvitka/media
 		file_server

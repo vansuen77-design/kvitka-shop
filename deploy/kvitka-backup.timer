@@ -1,15 +1,15 @@
-# Ежедневный бэкап в 4 утра. Копировать в /etc/systemd/system/
+# Daily backup at 4 am. Copy to /etc/systemd/system/
 #
 #   sudo systemctl enable --now kvitka-backup.timer
-#   systemctl list-timers kvitka-backup     — когда сработает в следующий раз
-#   sudo systemctl start kvitka-backup      — сделать копию прямо сейчас
+#   systemctl list-timers kvitka-backup     - when it fires next
+#   sudo systemctl start kvitka-backup      - make a backup right now
 
 [Unit]
-Description=Ежедневная резервная копия КВІТКА
+Description=KVITKA daily backup
 
 [Timer]
 OnCalendar=*-*-* 04:00:00
-# если сервер был выключен в 4 утра — сделает копию сразу после включения
+# if the server was off at 4 am - runs right after boot
 Persistent=true
 
 [Install]

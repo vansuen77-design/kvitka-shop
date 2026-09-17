@@ -1,0 +1,165 @@
+KVITKA - WORKING FOLDER
+=========================================================
+
+The live site runs on the server: https://kvitka.example
+Server address and how to log in - see deploy\INSTALL.md.
+
+Here you edit the code and check the result on your computer
+before handing it to the server. The folder is self-contained:
+its own Python environment, its own copy of the database and photos.
+
+
+DAILY WORKFLOW
+--------------
+1. pull-from-server.bat   - fetch the fresh database and photos
+2. start.bat              - open the local copy at http://127.0.0.1:8001/
+3. edit files, check the result
+4. deploy-to-server.bat   - hand the code to the server
+
+The fifth file in the root - download-backups.bat - copies the
+server backups to your computer. Once every week or two.
+
+Everything else lives in the "tools" folder: diagnostics, admin
+account, Telegram check, test run. Rarely needed, so kept out of
+the way. See tools\README.txt.
+
+The fourth script does everything itself: code, dependencies,
+migrations, translations, static files and restart. Downtime is
+a couple of seconds.
+
+ADMIN LOGIN - WITH A CODE FROM TELEGRAM
+---------------------------------------
+The admin panel is at /admin/, but first it asks for a one-time
+code that arrives in your Telegram. Then the usual login and
+password. Two steps instead of one.
+
+The code lives for 5 minutes; after a successful login it is not
+asked again for 12 hours.
+
+Fallback when Telegram is unavailable - an SSH tunnel; from the
+server itself no code is needed:
+
+    ssh -L 8000:127.0.0.1:8000 kvitka@SERVER-ADDRESS
+    then http://127.0.0.1:8000/admin/
+
+On the local copy the code is never asked - all requests there
+are local.
+
+Details: ADMIN-ACCESS.txt
+
+
+CUSTOMER ACCOUNT
+----------------
+Customers have an account: /kabinet/  (login by e-mail and password)
+
+  their orders and order contents
+  favourites - the heart on a product card
+  profile: name, phone, delivery address. These are pre-filled in
+  the order form, no need to type them every time
+
+An order can still be placed without registering - nothing broke,
+the account just adds convenience.
+
+For "forgot password" to work the site needs an e-mail account:
+see EMAIL-SETUP.txt. Until it is set up, e-mails are not sent,
+everything else works.
+
+In the admin, customers are listed under "Users": phone and
+address are there too. Their accounts always stay on the server
+and are never overwritten by a deploy.
+
+
+WHERE TO MAINTAIN PRODUCTS - THE IMPORTANT RULE
+-----------------------------------------------
+Products, prices and page texts live in the database. The database
+exists in two places: on the server and in the local copy. They do
+not sync by themselves, and whichever you send last overwrites
+the other.
+
+Hence one rule: DECIDE WHERE YOU MAINTAIN THE CATALOG and stick to it.
+
+Option A. Catalog is maintained in the SERVER admin (simplest)
+    You edit products on the live site via /admin/.
+    When deploying code, ALWAYS answer N. The server database is
+    then never touched and nothing is lost.
+
+    If you need to work with products locally - run
+    pull-from-server.bat first, it fetches the fresh database.
+
+Option B. Catalog is maintained in the LOCAL COPY
+    You edit products at 127.0.0.1:8001 and deploy answering Y.
+    Still start with pull-from-server.bat every time - otherwise
+    you overwrite orders and edits made on the server.
+
+Never mix the two: edit on the server, then deploy with Y from the
+copy - and the server edits are gone.
+
+The deploy script has a safety net: before asking about content it
+shows when the local copy was last pulled from the server. If the
+date is old and you recently changed something in the admin -
+answer N.
+
+
+WHAT GOES WHERE
+---------------
+On deploy the script asks: send content, or code only.
+
+  Code only (answer N) - the usual case. You edited templates,
+  styles, logic. Nothing but code changes on the server.
+
+  Code and content (answer Y) - when you added products, changed
+  attributes, pages or photos here, locally.
+
+What gets replaced on Y:
+  products, categories, filter attributes, footer pages,
+  the whole media folder
+
+What ALWAYS stays on the server:
+  customer orders and their contents
+  admin account and password
+  customer accounts: profiles and favourites
+  open sessions - you will not be logged out
+
+IMPORTANT CONSEQUENCE. Since content travels from here, products
+must be created HERE, in the local copy, not in the server admin.
+Otherwise the next deploy with Y overwrites what you added on the
+server. Always start with pull-from-server.bat before editing.
+
+The previous server database is not deleted but set aside with a
+date: db.before-2026-09-06_13-20.sqlite3 and the like. Restoring
+is one command, see deploy\INSTALL.md.
+
+tools\create-admin.bat changes the admin password here, in the
+local copy. On the server this is done over ssh.
+
+TWO SITE LANGUAGES
+------------------
+The site always opens in Ukrainian regardless of the browser
+language, as required by the language law. The top bar has a
+UKR / RUS switch; the choice is remembered for a year.
+The page address does not change.
+
+Where things live:
+
+  locale/uk/LC_MESSAGES/django.po  - Ukrainian UI strings
+  locale/ru/LC_MESSAGES/django.po  - Russian (same as the source)
+
+After editing a .po file rebuild it, or the site will not see
+the changes:
+
+  start.bat does this on every start.
+  By hand:  .venv\Scripts\python.exe manage.py compilelocales
+
+Added a new string to a template or code - first collect the
+strings, then fill in the empty msgstr in locale\uk and rebuild:
+
+  .venv\Scripts\python.exe manage.py makelocales
+  .venv\Scripts\python.exe manage.py makelocales --check   (is everything translated)
+
+Names of categories, colours, occasions and other reference values
+are not here but in the database. Every reference model in the
+admin has a second field "name in Ukrainian". Left empty - the
+Ukrainian version shows the Russian name, the page does not break.
+
+The admin panel always stays Russian regardless of the browser
+language: it is a workplace, not the storefront.

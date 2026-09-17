@@ -1,15 +1,15 @@
-# Настройка туннеля на сервере. Тот же туннель, что работает сейчас:
-# идентификатор и файл ключей — ваши, менять не нужно.
+# Tunnel configuration on the server. The same tunnel you already have:
+# the id and the credentials file are yours.
 
-tunnel: ИДЕНТИФИКАТОР-ТУННЕЛЯ
-credentials-file: /home/kvitka/.cloudflared/ИДЕНТИФИКАТОР-ТУННЕЛЯ.json
+tunnel: TUNNEL-ID
+credentials-file: /home/kvitka/.cloudflared/TUNNEL-ID.json
 
 protocol: http2
 edge-ip-version: "4"
 
-# Боевой адрес — kvitka.example. Всё остальное падает в заглушку внизу
-# и получает 404. Понадобится второй домен — допишите его двумя строками
-# выше заглушки.
+# Live address - kvitka.example. Everything else falls into the catch-all
+# below and gets a 404. Need a second domain - add it two lines above
+# the catch-all.
 ingress:
   - hostname: kvitka.example
     service: http://127.0.0.1:8000

@@ -1,16 +1,16 @@
-# Telegram-бот КВІТКА: показывает заказы и покупателей владельцу.
-# Копировать в /etc/systemd/system/kvitka-bot.service
+# KVITKA Telegram bot: shows orders and customers to the owner.
+# Copy to /etc/systemd/system/kvitka-bot.service
 #
 #   sudo systemctl daemon-reload
 #   sudo systemctl enable --now kvitka-bot
 #   sudo systemctl status kvitka-bot
-#   journalctl -u kvitka-bot -f     — смотреть, что происходит
+#   journalctl -u kvitka-bot -f     - watch what is going on
 #
-# Бот только читает базу. Ничего не меняет и никому, кроме владельца,
-# не отвечает: чужой id отбрасывается молча.
+# The bot only reads the database. It changes nothing and answers nobody
+# but the owner: a foreign id is dropped silently.
 
 [Unit]
-Description=KVITKA — Telegram-бот для владельца
+Description=KVITKA - Telegram bot for the owner
 After=network-online.target kvitka.service
 Wants=network-online.target
 
@@ -22,13 +22,13 @@ Environment=PYTHONUNBUFFERED=1
 
 ExecStart=/home/kvitka/kvitka/.venv/bin/python manage.py telegram_bot
 
-# Бот висит на длинных опросах: соединение рвётся штатно, это не ошибка.
-# Поэтому перезапускаем всегда и без спешки.
+# The bot sits on long polling: the connection drops routinely, that is
+# not an error. So restart always, without hurry.
 Restart=always
 RestartSec=10
 
-# Те же ограничения, что у сайта: писать можно только в свою папку,
-# root из процесса не получить.
+# Same restrictions as the site: writable only inside its own folder,
+# no way to gain root from the process.
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict

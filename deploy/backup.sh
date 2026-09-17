@@ -1,12 +1,12 @@
 #!/bin/bash
-# Резервная копия базы и фотографий.
+# Backup of the database and photos.
 #
-# База копируется командой sqlite3 .backup, а не обычным cp: сайт в это
-# время работает, и копия «на лету» может получиться битой. Эта команда
-# делает согласованный снимок.
+# The database is copied with sqlite3 .backup, not plain cp: the site is
+# running meanwhile, and a copy "on the fly" may come out corrupted. This
+# command makes a consistent snapshot.
 #
-# Ставится таймером systemd (см. kvitka-backup.timer) — раз в сутки ночью.
-# Хранятся последние 14 копий.
+# Scheduled by a systemd timer (see kvitka-backup.timer) - once a night.
+# The last 14 copies are kept.
 
 set -euo pipefail
 
@@ -22,9 +22,9 @@ gzip -f "$DEST/db_$STAMP.sqlite3"
 
 tar -czf "$DEST/media_$STAMP.tar.gz" -C "$PROJECT" media
 
-# чистим старые: оставляем последние $KEEP каждого вида
+# prune old ones: keep the last $KEEP of each kind
 for prefix in db media; do
     ls -1t "$DEST/${prefix}_"* 2>/dev/null | tail -n +$((KEEP + 1)) | xargs -r rm --
 done
 
-echo "Готово: $DEST/db_$STAMP.sqlite3.gz и media_$STAMP.tar.gz"
+echo "Done: $DEST/db_$STAMP.sqlite3.gz and media_$STAMP.tar.gz"
