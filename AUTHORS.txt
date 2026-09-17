@@ -1,65 +1,65 @@
-АВТОРСТВО
+AUTHORSHIP
 =========================================================
 
-Проект:  КВІТКА — сайт магазина цветов с доставкой
-Автор:   ISHOD
-Год:     2026
-Почта:   ishod.tech@gmail.com
+Project:  KVITKA — flower shop website with delivery
+Author:   ISHOD
+Year:     2026
+E-mail:   ishod.tech@gmail.com
 
-Исходный код проекта написан автором. Все права на код
-принадлежат автору. Использование, копирование и распространение
-исходного кода без письменного разрешения автора не допускается.
+The source code of the project was written by the author. All rights
+to the code belong to the author. Use, copying and distribution of the
+source code without the author's written permission are not allowed.
 
-Это касается кода. Товары, фотографии, цены и тексты страниц —
-содержимое магазина, к коду отношения не имеет.
+This concerns the code. Products, photos, prices and page texts are
+the shop's content and have nothing to do with the code.
 
 
-ГДЕ В КОДЕ СТОИТ МЕТКА
-----------------------
-На внешний вид сайта ни одна из них не влияет.
+WHERE THE MARK IS IN THE CODE
+-----------------------------
+None of these affect how the site looks.
 
   templates/base.html
-      комментарий в начале документа и мета-теги author,
-      generator, copyright - видно через "Просмотр кода
-      страницы" (Ctrl+U) в любом браузере, на любой странице
+      a comment at the top of the document and the author, generator
+      and copyright meta tags — visible via "View page source" (Ctrl+U)
+      in any browser, on any page
 
-  static/css/*.css   (7 файлов)
-  static/js/*.js     (4 файла)
-      шапка-комментарий в начале каждого файла
+  static/css/*.css   (8 files)
+  static/js/*.js     (4 files)
+      a header comment at the top of every file
 
   config/settings.py
       BUILT_BY, BUILT_YEAR, CODE_NOTICE
 
   catalog/models.py, orders/models.py, accounts/models.py,
   core/middleware.py
-      строка в описании модуля
+      a line in the module docstring
 
 
-ЧЕГО ЭТИ МЕТКИ НЕ ДЕЛАЮТ
-------------------------
-Честно: комментарий в коде сам по себе слабое доказательство.
-Тот, кто заберёт код, может его стереть за пять минут.
+WHAT THESE MARKS DO NOT DO
+--------------------------
+Honestly: a comment in the code is weak evidence by itself. Whoever
+takes the code can erase it in five minutes.
 
-Метки решают другую задачу - они показывают авторство тому, кто
-смотрит код добросовестно: подрядчику, покупателю проекта,
-партнёру. Для спора нужно другое, см. ниже.
+The marks solve a different task — they show authorship to someone
+who reads the code in good faith: a contractor, a buyer of the
+project, a partner. A dispute needs something else, see below.
 
 
-ЧТО ДЕЙСТВИТЕЛЬНО ДОКАЗЫВАЕТ АВТОРСТВО
---------------------------------------
-1. История изменений (git). Каждый коммит - это дата, время и
-   содержимое правки. Восстановить задним числом чужую историю
-   за несколько месяцев практически невозможно. Это самое
-   сильное из доступного, и это бесплатно: приватный репозиторий
-   на GitHub или GitLab.
+WHAT REALLY PROVES AUTHORSHIP
+-----------------------------
+1. The change history (git). Every commit is a date, a time and the
+   content of the change. Faking someone else's history spanning
+   several months after the fact is practically impossible. This is
+   the strongest thing available, and it is free: a repository on
+   GitHub or GitLab.
 
-2. Черновики и переписка. Ранние версии файлов, задачи, чаты -
-   всё с датами.
+2. Drafts and correspondence. Early versions of files, tasks, chats —
+   all with dates.
 
-3. Оригиналы фотографий с датой съёмки в свойствах файла.
+3. Original photos with the shooting date in the file properties.
 
-4. Домен и хостинг, оформленные на вас: договор с Deltahost,
-   регистрация домена, оплаты.
+4. Domain and hosting registered in your name: the hosting contract,
+   the domain registration, the payments.
 
-Если проект будете кому-то передавать или продавать - пункт 1
-стоит сделать до передачи, а не после.
+If the project is ever handed over or sold — do item 1 before the
+handover, not after.
